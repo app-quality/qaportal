@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACJ Integrated Quality & E-PTP Portal</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js, XLSX & jsPDF (Untuk Dashboard & Export Modul Quality A) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <!-- Signature Pad (Untuk Modul E-PTP B) -->
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <!-- Cloudflare Turnstile Anti-Bot (Dari Security A) -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .blueprint-grid {
+      background-color: #090d16;
+      background-image:
+        linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .sig-canvas {
+      border: 1.5px dashed #94a3b8;
+      border-radius: 0.5rem;
+      background-color: #f8fafc;
+      touch-action: none;
+      width: 100%;
+      height: 110px;
+    }
+    .ptp-subtab.active {
+      border-bottom: 3px solid #1e3a8a;
+      color: #1e3a8a;
+      font-weight: 700;
+      background-color: #eff6ff;
+    }
+    .main-nav-btn.active {
+      background-color: #f59e0b;
+      color: #0f172a;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-[80] translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium pointer-events-none max-w-sm"></div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN LOGIN (DESIGN SPLIT-SCREEN B + SECURITY TURNSTILE & MFA A)    -->
+  <!-- ===================================================================== -->
+  <section id="loginScreen" class="min-h-screen blueprint-grid flex items-center justify-center p-4 sm:p-6">
+    <div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900">
+      <!-- Kiri -->
+      <div class="md:col-span-5 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-7 sm:p-8 text-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-800">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold tracking-wider mb-5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            ISO 9001:2015 • INTEGRATED PORTAL
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white">
+            ACJ QUALITY <span class="text-amber-400">&amp; E-PTP</span>
+          </h1>
+          <p class="text-xs font-semibold text-blue-300 mt-1 tracking-wide uppercase">PT. Adhi Chandra Jaya</p>
+          <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+            Portal Terpadu Monitoring Claim Customer, Database NG Internal, Data Inspection, serta Permintaan Tindakan Perbaikan (AF-PROD-014).
+          </p>
+        </div>
+        <div class="mt-8 pt-6 border-t border-slate-800/80 space-y-2.5 text-[11px] text-slate-300">
+          <div class="flex items-center gap-2.5"><i data-lucide="shield-check" class="w-4 h-4 text-amber-400 shrink-0"></i><span>Keamanan Berlapis: Turnstile, SHA-256 &amp; 2FA</span></div>
+          <div class="flex items-center gap-2.5"><i data-lucide="layers" class="w-4 h-4 text-sky-400 shrink-0"></i><span>4 Modul Quality Terintegrasi dalam 1 Sistem</span></div>
+          <button type="button" onclick="openSecurityModal()" class="mt-3 w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-emerald-400 transition">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i><span>Status Keamanan Situs</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kanan -->
+      <div class="md:col-span-7 p-7 sm:p-10 bg-slate-900/95 text-slate-100 flex flex-col justify-center">
+        <div class="mb-5">
+          <h2 class="text-xl font-bold text-white">Masuk ke Portal Terpadu</h2>
+          <p class="text-xs text-slate-400 mt-1">Gunakan akun departemen atau akun QA/Admin Anda.</p>
+        </div>
+
+        <div id="loginErrorBox" class="hidden mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+          <span id="loginErrorText">Username atau password salah.</span>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div id="loginCredsStep" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Username</label>
+              <div class="relative">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+                <input type="text" id="loginUsername" required autocomplete="username" placeholder="Contoh: admin / qa / produksi / inspeksi"
+                  class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
+              <div class="relative">
+                <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+                <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Masukkan password..."
+                  class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 outline-none" />
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"><i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+            <div id="turnstileWidget" class="flex justify-center min-h-[65px] pt-1"></div>
+            <button type="submit" id="loginSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>
+            </button>
+          </div>
+
+          <div id="mfaVerifyStep" class="hidden space-y-4">
+            <div class="p-3.5 rounded-xl bg-blue-950/60 border border-blue-800 text-center">
+              <p class="text-sm font-bold text-amber-300">Verifikasi 2 Langkah (Admin / Auditor)</p>
+              <p class="text-xs text-slate-300 mt-1">Masukkan 6 digit kode dari aplikasi Authenticator Anda.</p>
+            </div>
+            <input type="text" id="mfaCodeInput" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold tracking-[0.45em] text-white outline-none" />
+            <button type="button" id="mfaSubmitBtn" onclick="submitMfaVerification()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl flex items-center justify-center gap-2">
+              <i data-lucide="key-round" class="w-4 h-4"></i><span>Verifikasi Kode</span>
+            </button>
+            <button type="button" onclick="cancelMfaStep()" class="w-full text-xs text-slate-400 hover:text-white underline">&larr; Kembali ke login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Status Keamanan -->
+  <div id="securityModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 text-slate-800">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-base flex items-center gap-2 text-slate-900"><i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Status Keamanan Situs</h3>
+        <button type="button" onclick="closeSecurityModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      </div>
+      <div id="securityModalBody" class="space-y-2.5 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APLIKASI UTAMA TERPADU (NAVBAR B + 4 MODUL LENGKAP A & B)             -->
+  <!-- ===================================================================== -->
+  <div id="mainAppContainer" class="hidden pb-14">
+
+    <!-- Header Utama Perusahaan + Navigasi 4 Modul -->
+    <header class="bg-blue-950 text-white shadow-lg sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="bg-amber-500 text-slate-950 font-extrabold text-xs px-2 py-0.5 rounded">ACJ PORTAL</span>
+              <h1 class="text-base sm:text-lg font-bold tracking-wide">PT. ADHI CHANDRA JAYA</h1>
+            </div>
+            <p class="text-[11px] text-blue-200">Quality Management System &amp; E-PTP (AF-PROD-014) • ISO 9001:2015</p>
+          </div>
+        </div>
+
+        <!-- Navigasi 4 Modul Utama -->
+        <nav class="flex flex-wrap items-center gap-1.5 bg-blue-900/60 p-1.5 rounded-xl border border-blue-800">
+          <button type="button" id="nav-claim" onclick="switchMainModule('claim')" class="main-nav-btn active px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:bg-blue-800 transition flex items-center gap-1.5">
+            <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> Claim Customer
+          </button>
+          <button type="button" id="nav-ng" onclick="switchMainModule('ng')" class="main-nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:bg-blue-800 transition flex items-center gap-1.5">
+            <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Database NG
+          </button>
+          <button type="button" id="nav-insp" onclick="switchMainModule('insp')" class="main-nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:bg-blue-800 transition flex items-center gap-1.5">
+            <i data-lucide="check-square" class="w-3.5 h-3.5"></i> Data Inspection
+          </button>
+          <button type="button" id="nav-ptp" onclick="switchMainModule('ptp')" class="main-nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:bg-blue-800 transition flex items-center gap-1.5">
+            <i data-lucide="file-signature" class="w-3.5 h-3.5"></i> E-PTP (AF-PROD-014)
+          </button>
+        </nav>
+
+        <!-- Info User, Sync & Logout -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="bg-blue-900 text-blue-100 border border-blue-700 font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span id="loggedUserName">User</span>
+          </span>
+          <button type="button" onclick="syncAllSystems(true)" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Sinkronkan Semua Data">
+            <i id="syncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
+          </button>
+          <button type="button" onclick="logoutUser()" class="bg-rose-600/90 hover:bg-rose-600 text-white font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- AREA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, DATA INSPECTION)   -->
+    <!-- =================================================================== -->
+    <div id="qualityModulesWrapper" class="max-w-7xl mx-auto px-3 sm:px-5 mt-5 space-y-5"></div>
+
+    <!-- =================================================================== -->
+    <!-- AREA MODUL E-PTP (AF-PROD-014 DARI APLIKASI B)                      -->
+    <!-- =================================================================== -->
+    <div id="ptpModuleWrapper" class="hidden max-w-5xl mx-auto px-3 sm:px-4 mt-5">
+      <!-- Panel Lanjutkan / Update PTP -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-blue-100 text-blue-900 rounded-lg"><i data-lucide="folder-search" class="w-5 h-5"></i></div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-sm font-bold text-slate-800">Lanjutkan / Update PTP yang Sudah Ada</h2>
+              <span id="modeBadge" class="bg-amber-500 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Mode: Buat PTP Baru</span>
+            </div>
+            <p class="text-xs text-slate-500">Pilih No. Reg. PTP untuk mengisi investigasi (Tahap 2) atau verifikasi (Tahap 3).</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <select id="existingPtpSelect" onchange="loadSelectedPtpFromDropdown()" class="w-full sm:w-56 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-slate-50 outline-none">
+            <option value="">-- Buat PTP Baru --</option>
+          </select>
+          <button type="button" onclick="resetFormToNew()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg whitespace-nowrap">Reset Baru</button>
+        </div>
+      </div>
+
+      <!-- Sub-Tab E-PTP -->
+      <div class="bg-white rounded-t-xl border-b border-slate-200 grid grid-cols-2 sm:grid-cols-5 overflow-hidden shadow-sm">
+        <button type="button" id="tabBtn5" onclick="switchPtpTab(5)" class="ptp-subtab active py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard PTP</span></button>
+        <button type="button" id="tabBtn4" onclick="switchPtpTab(4)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="list-checks" class="w-4 h-4"></i><span>Log Register (<span id="logTotalBadge">0</span>)</span></button>
+        <button type="button" id="tabBtn1" onclick="switchPtpTab(1)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">1</span><span>Temuan Awal</span></button>
+        <button type="button" id="tabBtn2" onclick="switchPtpTab(2)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">2</span><span>Investigasi &amp; Perbaikan</span></button>
+        <button type="button" id="tabBtn3" onclick="switchPtpTab(3)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">3</span><span>Verifikasi &amp; Close</span></button>
+      </div>
+
+      <form id="ptpForm" class="bg-white rounded-b-xl shadow-sm border border-t-0 border-slate-200 p-4 sm:p-6">
+        <!-- TAHAP 1 PTP -->
+        <div id="step1" class="hidden space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">No. Reg. PTP (Otomatis)</label><input type="text" id="noReg" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono font-bold text-blue-950 bg-blue-50" /></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Terbit PTP</label><input type="date" id="tanggalTerbit" onchange="onTanggalTerbitChange()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Acuan Dokumen / Standar</label><input type="text" id="acuan" placeholder="Contoh: ISO 9001:2015 / WI-QC-01" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Ditujukan Kepada / Auditee *</label><input type="text" id="auditee" placeholder="Dept. Produksi / Nama PIC" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Yang Mengusulkan / Auditor *</label><input type="text" id="auditor" placeholder="Dept. QA-QC / Nama Auditor" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Lokasi Ketidaksesuaian *</label><input type="text" id="lokasi" placeholder="Line Stamping / Area Incoming" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2">Sumber Ketidaksesuaian</label>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <label class="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="sumber" value="Audit Internal" class="accent-blue-900" /> Audit Internal</label>
+                  <label class="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="sumber" value="Complaint / Claim Customer" class="accent-blue-900" /> Complaint / Claim Customer</label>
+                  <label class="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="sumber" value="Reject Internal" checked class="accent-blue-900" /> Reject Internal</label>
+                  <label class="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="sumber" value="Audit External" class="accent-blue-900" /> Audit External</label>
+                </div>
+              </div>
+              <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nomor Referensi Dokumen Sumber</label><input type="text" id="noRefSumber" placeholder="Contoh: NCR-012 / No. Claim" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs" /></div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Upload Dokumen Referensi (maks. 5 file, 5 MB/file)</label>
+                <label for="refFileInput" class="flex items-center justify-center gap-2 border-2 border-dashed border-slate-300 hover:border-blue-900 rounded-lg px-3 py-2.5 text-xs text-slate-500 cursor-pointer"><i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Klik untuk memilih file</span></label>
+                <input type="file" id="refFileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" class="hidden" onchange="handleRefFiles(this)" />
+                <ul id="refFileList" class="mt-2 space-y-1.5"></ul>
+              </div>
+            </div>
+            <div class="border border-slate-200 rounded-xl p-4">
+              <label class="block text-xs font-bold text-slate-700 mb-2">Kategori (Khusus Saat Audit)</label>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="kategori" value="MAJOR" class="accent-blue-900" /> MAJOR</label>
+                <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="kategori" value="MINOR" class="accent-blue-900" /> MINOR</label>
+                <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="radio" name="kategori" value="OBSERVASI" class="accent-blue-900" /> OBSERVASI</label>
+              </div>
+            </div>
+          </div>
+          <div class="border border-slate-200 rounded-xl p-4 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-950 border-b pb-2">Uraian Ketidaksesuaian / Permasalahan</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Part Name</label><input type="text" id="partName" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Part No.</label><input type="text" id="partNo" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Qty NG</label><input type="text" id="qtyNg" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Hasil Sortir</label><input type="text" id="hasilSortir" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="md:col-span-2"><label class="block text-xs font-semibold text-slate-700 mb-1">Uraian Problem</label><textarea id="problem" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"></textarea></div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Upload Foto Part</label>
+                <input type="file" id="fotoPartInput" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-slate-500" />
+                <div id="fotoPreviewBox" class="mt-2 border border-dashed border-slate-300 rounded-lg h-28 flex items-center justify-center bg-slate-50 overflow-hidden"><span class="text-xs text-slate-400">Preview Foto</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60">
+            <div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-slate-700">Tanda Tangan Pengusul / Auditor</span><button type="button" onclick="clearSig('auditor')" class="text-xs text-rose-600 hover:underline">Hapus TTD</button></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+              <div><canvas id="sigAuditor" class="sig-canvas"></canvas></div>
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pengusul / Auditor</label><input type="text" id="namaTtdAuditor" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white" /></div>
+              <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Tanda Tangan</label><input type="date" id="tglTtdAuditor" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white" /></div>
+            </div>
+          </div>
+          <div class="flex justify-end"><button type="button" onclick="switchPtpTab(2)" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-5 py-2.5 rounded-lg">Lanjut ke Tahap 2 &rarr;</button></div>
+        </div>
+
+        <!-- TAHAP 2 PTP -->
+        <div id="step2" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 bg-amber-50/30 space-y-2.5">
+              <h3 class="text-xs font-bold text-amber-900 uppercase border-b border-amber-200 pb-1.5">Kenapa Terbuat (Dept. Produksi)</h3>
+              <input type="text" id="madeWhy1" placeholder="Why 1..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="madeWhy2" placeholder="Why 2..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="madeWhy3" placeholder="Why 3..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="madeWhy4" placeholder="Why 4..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="madeWhy5" placeholder="Why 5 (Root Cause)..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+            </div>
+            <div class="border border-slate-200 rounded-xl p-4 bg-blue-50/30 space-y-2.5">
+              <h3 class="text-xs font-bold text-blue-900 uppercase border-b border-blue-200 pb-1.5">Kenapa Terkirim (Dept. Inspeksi / QC)</h3>
+              <input type="text" id="sentWhy1" placeholder="Why 1..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="sentWhy2" placeholder="Why 2..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="sentWhy3" placeholder="Why 3..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="sentWhy4" placeholder="Why 4..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+              <input type="text" id="sentWhy5" placeholder="Why 5 (Root Cause)..." class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" />
+            </div>
+          </div>
+          <div class="border border-slate-200 rounded-xl p-4 space-y-5">
+            <div>
+              <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-bold text-slate-800 uppercase">Tindakan Perbaikan: Kenapa Terbuat (Produksi)</h3><button type="button" onclick="addActionRow('made')" class="bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-200">+ Tambah Baris</button></div>
+              <div id="madeActionsContainer" class="space-y-2"></div>
+            </div>
+            <div class="border-t pt-4">
+              <div class="flex items-center justify-between mb-2"><h3 class="text-xs font-bold text-slate-800 uppercase">Tindakan Perbaikan: Kenapa Terkirim (Inspeksi)</h3><button type="button" onclick="addActionRow('sent')" class="bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-200">+ Tambah Baris</button></div>
+              <div id="sentActionsContainer" class="space-y-2"></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2"><div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700">Auditee (Produksi)</span><button type="button" onclick="clearSig('auditeeProd')" class="text-[11px] text-rose-600">Hapus</button></div><canvas id="sigAuditeeProd" class="sig-canvas"></canvas><input type="text" id="namaAuditeeProd" placeholder="Nama PIC Produksi" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /><input type="date" id="tglTtdAuditeeProd" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /></div>
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2"><div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700">Auditee (Inspeksi)</span><button type="button" onclick="clearSig('auditeeInsp')" class="text-[11px] text-rose-600">Hapus</button></div><canvas id="sigAuditeeInsp" class="sig-canvas"></canvas><input type="text" id="namaAuditeeInsp" placeholder="Nama PIC Inspeksi" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /><input type="date" id="tglTtdAuditeeInsp" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /></div>
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2"><div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700">Disetujui Oleh</span><button type="button" onclick="clearSig('approved')" class="text-[11px] text-rose-600">Hapus</button></div><canvas id="sigApproved" class="sig-canvas"></canvas><input type="text" id="namaApproved" placeholder="Nama Atasan / Mgr" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /><input type="date" id="tglTtdApproved" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" /></div>
+          </div>
+          <div class="flex justify-between"><button type="button" onclick="switchPtpTab(1)" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-lg">&larr; Tahap 1</button><button type="button" onclick="switchPtpTab(3)" class="bg-blue-900 text-white text-xs font-bold px-5 py-2.5 rounded-lg">Tahap 3 &rarr;</button></div>
+        </div>
+
+        <!-- TAHAP 3 PTP -->
+        <div id="step3" class="hidden space-y-5">
+          <div class="border border-slate-200 rounded-xl p-4 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-950 border-b pb-2">Verifikasi dan Follow Up (Min. 2 Minggu Setelah PTP Diterima)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2">Sudah Problem Tereliminasi?</label>
+                <div class="space-y-2 text-xs">
+                  <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-emerald-50"><input type="radio" name="statusEvaluasi" value="Ya / Closed" class="accent-emerald-600" /><span class="font-bold text-emerald-800">Ya / Closed (Masalah Selesai)</span></label>
+                  <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-amber-50"><input type="radio" name="statusEvaluasi" value="Tidak / Open" checked class="accent-amber-600" /><span class="font-bold text-amber-800">Tidak / Open (Masih Dalam Pemantauan)</span></label>
+                  <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-rose-50"><input type="radio" name="statusEvaluasi" value="Terbitkan PTP Baru" class="accent-rose-600" /><span class="font-bold text-rose-800">Terbitkan PTP Baru</span></label>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Evaluasi</label><input type="date" id="tanggalEvaluasi" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Komentar / Keterangan Verifikasi</label><textarea id="komentarVerifikasi" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"></textarea></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2"><div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700">Verifikasi oleh (Auditor)</span><button type="button" onclick="clearSig('verifAuditor')" class="text-xs text-rose-600">Hapus</button></div><canvas id="sigVerifAuditor" class="sig-canvas"></canvas><input type="date" id="tglVerifAuditor" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" /></div>
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2"><div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700">Disetujui oleh (TMJ)</span><button type="button" onclick="clearSig('tmj')" class="text-xs text-rose-600">Hapus</button></div><canvas id="sigTmj" class="sig-canvas"></canvas><input type="date" id="tglTmj" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white" /></div>
+          </div>
+          <div><button type="button" onclick="switchPtpTab(2)" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-lg">&larr; Kembali ke Tahap 2</button></div>
+        </div>
+
+        <!-- TAHAP 4: LOG REGISTER PTP -->
+        <div id="step4" class="hidden space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div><h3 class="text-sm font-bold text-blue-950">Log Register Permintaan Tindakan Perbaikan (PTP)</h3><p class="text-xs text-slate-500">Pantau seluruh nomor PTP yang terbit beserta status penyelesaiannya.</p></div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="statOpenBadge" class="bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold px-2.5 py-1 rounded-full">On Progress: 0</span>
+              <span id="statClosedBadge" class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-2.5 py-1 rounded-full">Closed: 0</span>
+              <a id="openSheetsLogBtn" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1"><i data-lucide="sheet" class="w-3.5 h-3.5"></i> Google Sheets</a>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2"><input type="text" id="logSearchInput" oninput="renderLogRegisterTable()" placeholder="Cari No. Reg. PTP, Part Name, Auditee..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none" /></div>
+            <div><select id="logStatusFilter" onchange="renderLogRegisterTable()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white"><option value="ALL">Semua Status</option><option value="OPEN">On Progress</option><option value="CLOSED">Closed</option></select></div>
+          </div>
+          <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead><tr class="bg-blue-950 text-white"><th class="p-2.5">No. Reg. PTP</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee / Sumber</th><th class="p-2.5">Part &amp; Problem</th><th class="p-2.5 text-center">Status</th><th class="p-2.5 text-center">Update</th><th class="p-2.5 text-center">Aksi</th></tr></thead>
+              <tbody id="logRegisterBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 5: DASHBOARD PTP -->
+        <div id="step5" class="space-y-5">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-[11px] font-semibold text-slate-500">Total PTP</p><p id="dashTotal" class="text-3xl font-extrabold text-blue-950">0</p></div>
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4"><p class="text-[11px] font-semibold text-amber-700">On Progress</p><p id="dashProgress" class="text-3xl font-extrabold text-amber-700">0</p></div>
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4"><p class="text-[11px] font-semibold text-emerald-700">Closed</p><p id="dashClosed" class="text-3xl font-extrabold text-emerald-700">0</p></div>
+            <div class="rounded-xl border border-blue-200 bg-blue-50 p-4"><p class="text-[11px] font-semibold text-blue-700">Rata-rata umur On Progress</p><p class="text-3xl font-extrabold text-blue-900"><span id="dashAvgAge">0</span> <span class="text-sm font-semibold">hari</span></p></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center">
+              <h4 class="text-xs font-bold text-slate-700 mb-3 self-start">Tingkat Penyelesaian</h4>
+              <div class="relative w-36 h-36">
+                <svg viewBox="0 0 42 42" class="w-36 h-36 -rotate-90"><circle cx="21" cy="21" r="15.915" fill="none" stroke="#fde68a" stroke-width="6"></circle><circle id="dashDonut" cx="21" cy="21" r="15.915" fill="none" stroke="#10b981" stroke-width="6" stroke-dasharray="0 100"></circle></svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="dashPct" class="text-2xl font-extrabold text-slate-800">0%</span><span class="text-[10px] text-slate-500">Closed</span></div>
+              </div>
+            </div>
+            <div class="border border-slate-200 rounded-xl p-4 md:col-span-2"><h4 class="text-xs font-bold text-slate-700 mb-3">PTP Terbit per Bulan (6 bulan terakhir)</h4><div id="dashMonthly" class="flex items-end gap-3 h-40"></div></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4"><h4 class="text-xs font-bold text-slate-700 mb-3">Berdasarkan Sumber</h4><div id="dashSumber" class="space-y-2.5"></div></div>
+            <div class="border border-slate-200 rounded-xl p-4"><h4 class="text-xs font-bold text-slate-700 mb-3">On Progress per Auditee (Top 5)</h4><div id="dashAuditee" class="space-y-2.5"></div></div>
+          </div>
+          <div class="border border-amber-200 rounded-xl overflow-hidden">
+            <div class="bg-amber-50 px-4 py-2.5"><h4 class="text-xs font-bold text-amber-800">PTP On Progress (Terlama di Atas)</h4></div>
+            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600"><th class="p-2.5">No. Reg.</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee</th><th class="p-2.5">Part</th><th class="p-2.5 text-center">Umur</th><th class="p-2.5 text-center">Aksi</th></tr></thead><tbody id="dashProgressBody" class="divide-y divide-slate-100"></tbody></table></div>
+          </div>
+          <div class="border border-emerald-200 rounded-xl overflow-hidden">
+            <div class="bg-emerald-50 px-4 py-2.5"><h4 class="text-xs font-bold text-emerald-800">PTP Closed (Terbaru di Atas)</h4></div>
+            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600"><th class="p-2.5">No. Reg.</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee</th><th class="p-2.5">Part</th><th class="p-2.5 text-center">Tgl Update</th><th class="p-2.5 text-center">Aksi</th></tr></thead><tbody id="dashClosedBody" class="divide-y divide-slate-100"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- TOMBOL AKSI FORM PTP -->
+        <div id="actionButtonsBar" class="hidden mt-6 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
+          <button type="button" onclick="executePtpAction('SAVE')" class="w-full sm:w-auto bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
+          <button type="button" onclick="executePtpAction('PREVIEW')" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="eye" class="w-4 h-4"></i> Print Preview</button>
+          <button type="button" onclick="executePtpAction('PDF')" class="w-full sm:w-auto bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="file-down" class="w-4 h-4"></i> Print PDF</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal Input/Edit Modul Quality (Claim, NG, Inspection) -->
+    <div id="qualityModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto p-4"></div>
+    <datalist id="dlCust"></datalist>
+
+    <!-- Modal Print Preview PTP -->
+    <div id="previewModal" class="hidden fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-3 sm:p-6">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+        <div class="px-5 py-3.5 bg-blue-950 text-white flex items-center justify-between">
+          <span class="text-sm font-bold flex items-center gap-2"><i data-lucide="file-check" class="w-4 h-4 text-amber-400"></i> Print Preview Dokumen PTP (AF-PROD-014)</span>
+          <button type="button" onclick="document.getElementById('previewModal').classList.add('hidden')" class="text-white/80 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+        <div id="previewModalBody" class="p-4 overflow-y-auto bg-slate-200 flex-1"></div>
+        <div class="px-5 py-3 bg-slate-50 border-t flex justify-end gap-2">
+          <button type="button" onclick="document.getElementById('previewModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>
+          <button type="button" onclick="document.getElementById('previewModal').classList.add('hidden'); executePtpAction('PDF');" class="bg-blue-900 text-white text-xs font-bold px-5 py-2 rounded-lg">Cetak PDF Sekarang</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Notifikasi / Loading -->
+    <div id="statusModal" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center space-y-4">
+        <div id="statusIcon" class="mx-auto w-12 h-12 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center"><i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i></div>
+        <h3 id="statusTitle" class="text-base font-bold text-slate-900">Memproses...</h3>
+        <p id="statusDesc" class="text-xs text-slate-600">Mohon tunggu sebentar.</p>
+        <div id="statusActions" class="hidden pt-2 flex justify-center gap-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SCRIPT TERPADU: SECURITY A + QUALITY MODULES A + E-PTP B             -->
+  <!-- ===================================================================== -->
+  <script>
+    window.PORTAL_CONFIG = {
+      // >>> GANTI dengan URL Web App Apps Script Anda (/exec) <<<
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzXRt6r0rsJzvRSEyOY_K-VwWwfoUXB-WjcSG2aAde_vGR_Tp3Ml9BmoZnuK5TahqNU/exec',
+      TURNSTILE_SITEKEY: '0x4AAAAAAF_JNNxBwXPQpQm_'
+    };
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const num = v => Number(v) || 0;
+    const fmt = n => num(n).toLocaleString('id-ID', { maximumFractionDigits: 0 });
+    const todayStr = () => new Date().toLocaleDateString('sv-SE');
+    const add90 = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d+90).toLocaleDateString('sv-SE'); };
+    const pd = s => { if (!/^\d{4}-\d{2}-\d{2}/.test(s || '')) return null; const d = new Date(s.slice(0,10) + 'T00:00:00'); return isNaN(d) ? null : d; };
+    const icons = () => { try { lucide.createIcons(); } catch (e) {} };
+
+    let toastT;
+    function toast(msg, type) {
+      const t = $('toast'); t.textContent = msg;
+      t.className = 'fixed bottom-5 right-5 z-[80] transition-all duration-300 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium max-w-sm pointer-events-none ' + (type === 'error' ? 'bg-rose-700' : type === 'success' ? 'bg-emerald-700' : 'bg-slate-900');
+      clearTimeout(toastT); toastT = setTimeout(() => t.className += ' translate-y-24 opacity-0', 3200);
+    }
+
+    /* --- Jembatan API Aman (fetch POST / google.script.run) --- */
+    function apiCall(fn, ...args) {
+      const publicFns = ['apiLogin', 'apiVerifyMfa', 'apiSecurityStatus'];
+      const finalArgs = publicFns.includes(fn) ? args : args;
+      const token = sessionStorage.getItem('acj_token') || '';
+
+      return fetch(window.PORTAL_CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn, args: finalArgs, token })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.error === 'SESSION_EXPIRED') {
+          logoutUser(true);
+          throw new Error('Sesi berakhir, silakan login kembali.');
+        }
+        if (res && res.ok === false && !res.success) {
+          throw new Error(res.message || res.error || 'Terjadi kesalahan server.');
+        }
+        return res.data !== undefined ? res.data : res;
+      });
+    }
+
+    /* --- Cloudflare Turnstile --- */
+    let tsWidgetId = null;
+    function initTurnstile() {
+      if (tsWidgetId !== null) return;
+      if (!window.turnstile) return setTimeout(initTurnstile, 300);
+      tsWidgetId = turnstile.render('#turnstileWidget', { sitekey: window.PORTAL_CONFIG.TURNSTILE_SITEKEY, theme: 'dark', 'expired-callback': () => resetTurnstile() });
+    }
+    const getTurnstileToken = () => (window.turnstile && tsWidgetId !== null) ? turnstile.getResponse(tsWidgetId) : '';
+    const resetTurnstile = () => { try { if (window.turnstile && tsWidgetId !== null) turnstile.reset(tsWidgetId); } catch (e) {} };
+
+    /* --- Login, MFA & Session --- */
+    let currentUser = null, pendingMfaToken = null, activeMainMod = 'claim';
+    const isEditor = () => currentUser && (currentUser.role === 'Admin' || currentUser.role === 'AUDITOR');
+
+    function togglePasswordVisibility() {
+      const i = $('loginPassword'), ic = $('eyeIcon');
+      i.type = i.type === 'password' ? 'text' : 'password';
+      ic.setAttribute('data-lucide', i.type === 'password' ? 'eye' : 'eye-off');
+      icons();
+    }
+    function showLoginError(msg) { $('loginErrorText').textContent = msg; $('loginErrorBox').classList.remove('hidden'); }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      if (pendingMfaToken) return submitMfaVerification();
+      const cf = getTurnstileToken();
+      if (!cf) return showLoginError('Selesaikan verifikasi keamanan (centang Cloudflare) terlebih dahulu.');
+
+      const btn = $('loginSubmitBtn'); btn.disabled = true; btn.textContent = 'Memverifikasi...';
+      $('loginErrorBox').classList.add('hidden');
+      try {
+        const res = await apiCall('apiLogin', $('loginUsername').value.trim(), $('loginPassword').value, cf);
+        resetTurnstile();
+        if (res.success && res.mfaRequired) {
+          pendingMfaToken = res.mfaToken;
+          $('loginCredsStep').classList.add('hidden');
+          $('mfaVerifyStep').classList.remove('hidden');
+          $('mfaCodeInput').value = '';
+          setTimeout(() => $('mfaCodeInput').focus(), 60);
+        } else if (res.success) {
+          enterPortal(res.user, res.token, true);
+          if (res.mfaWarning) setTimeout(() => toast('Peringatan: Akun Admin/Auditor ini belum mengaktifkan MFA 2FA.', 'error'), 2000);
+        } else {
+          showLoginError(res.message || 'Login gagal.');
+        }
+      } catch (err) {
+        resetTurnstile();
+        showLoginError(err.message);
+      } finally {
+        btn.disabled = false; btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>'; icons();
+      }
+    }
+
+    async function submitMfaVerification() {
+      const code = $('mfaCodeInput').value.replace(/\s/g, '');
+      if (!/^\d{6}$/.test(code)) return showLoginError('Masukkan 6 digit kode Authenticator.');
+      const btn = $('mfaSubmitBtn'); btn.disabled = true; btn.textContent = 'Memverifikasi...';
+      try {
+        const res = await apiCall('apiVerifyMfa', pendingMfaToken, code);
+        if (res.success) {
+          pendingMfaToken = null;
+          $('mfaVerifyStep').classList.add('hidden'); $('loginCredsStep').classList.remove('hidden');
+          enterPortal(res.user, res.token, true);
+        } else {
+          showLoginError(res.message || 'Kode MFA salah.');
+        }
+      } catch (err) { showLoginError(err.message); }
+      finally { btn.disabled = false; btn.innerHTML = '<i data-lucide="key-round" class="w-4 h-4"></i><span>Verifikasi Kode</span>'; icons(); }
+    }
+
+    function cancelMfaStep() {
+      pendingMfaToken = null; $('mfaVerifyStep').classList.add('hidden'); $('loginCredsStep').classList.remove('hidden'); $('loginPassword').value = ''; resetTurnstile();
+    }
+
+    function enterPortal(user, token, fresh) {
+      currentUser = user;
+      sessionStorage.setItem('acj_token', token);
+      sessionStorage.setItem('acj_user', JSON.stringify(user));
+      $('loginScreen').classList.add('hidden');
+      $('mainAppContainer').classList.remove('hidden');
+      $('loggedUserName').textContent = `${user.fullName} (${user.role})`;
+
+      if (user.role === 'AUDITOR' && !$('namaTtdAuditor').value) $('namaTtdAuditor').value = user.fullName;
+      if (user.role === 'AUDITEE_PROD' && !$('namaAuditeeProd').value) $('namaAuditeeProd').value = user.fullName;
+      if (user.role === 'AUDITEE_INSP' && !$('namaAuditeeInsp').value) $('namaAuditeeInsp').value = user.fullName;
+
+      initSignaturePads();
+      initDefaultActionRows();
+      switchMainModule('claim');
+      syncAllSystems(false);
+      if (fresh) toast('Selamat datang, ' + user.fullName, 'success');
+    }
+
+    function logoutUser(expired) {
+      const tok = sessionStorage.getItem('acj_token');
+      if (tok && !expired) apiCall('apiLogout', tok).catch(() => {});
+      currentUser = null;
+      sessionStorage.removeItem('acj_token');
+      sessionStorage.removeItem('acj_user');
+      $('mainAppContainer').classList.add('hidden');
+      $('loginScreen').classList.remove('hidden');
+      $('loginForm').reset();
+      resetTurnstile();
+      if (expired) toast('Sesi berakhir, silakan login ulang.', 'error');
+    }
+
+    function openSecurityModal() {
+      $('securityModal').classList.remove('hidden');
+      const isHttps = location.protocol === 'https:';
+      $('securityModalBody').innerHTML = `<div class="p-3 rounded-xl ${isHttps ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-rose-50 border border-rose-200 text-rose-800'}"><b>${isHttps ? '✓ Koneksi Terenkripsi (HTTPS)' : '⚠ Koneksi Tidak Terenkripsi'}</b></div><div class="p-3 rounded-xl bg-slate-50 border text-slate-500">Memuat status keamanan server...</div>`;
+      apiCall('apiSecurityStatus').then(r => {
+        let html = `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800"><b>✓ Koneksi Terenkripsi (HTTPS)</b><br/>Data browser &amp; server terenkripsi.</div>
+          <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800"><b>✓ Proteksi Password &amp; Audit Log</b><br/>Password SHA-256 Hash, Lockout 10 menit, dan pencatatan Audit Log aktif.</div>`;
+        if (r.antiBot) html += `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800"><b>✓ Cloudflare Turnstile Anti-Bot Aktif</b></div>`;
+        if (r.mfaAdmin) html += `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800"><b>✓ MFA 2 Langkah Wajib untuk Admin/Auditor</b></div>`;
+        if (r.vt) html += `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800"><b>✓ VirusTotal Scan (${r.vt.malicious}/${r.vt.total} deteksi)</b><br/>Dipindai: ${new Date(r.vt.at).toLocaleString('id-ID')}</div>`;
+        $('securityModalBody').innerHTML = html;
+      }).catch(() => {});
+    }
+    function closeSecurityModal() { $('securityModal').classList.add('hidden'); }
+
+    /* --- Navigasi 4 Modul Utama --- */
+    function switchMainModule(mod) {
+      activeMainMod = mod;
+      ['claim', 'ng', 'insp', 'ptp'].forEach(m => $('nav-' + m).classList.toggle('active', m === mod));
+      if (mod === 'ptp') {
+        $('qualityModulesWrapper').classList.add('hidden');
+        $('ptpModuleWrapper').classList.remove('hidden');
+        switchPtpTab(5);
+      } else {
+        $('ptpModuleWrapper').classList.add('hidden');
+        $('qualityModulesWrapper').classList.remove('hidden');
+        ['claim', 'ng', 'insp'].forEach(m => {
+          const el = $('qsec-' + m);
+          if (el) el.classList.toggle('hidden', m !== mod);
+        });
+        renderQualityModule(mod);
+      }
+      icons();
+    }
+
+    async function syncAllSystems(manual) {
+      const ic = $('syncIcon'); ic.classList.add('animate-spin');
+      try {
+        const [qRes, ptpRes] = await Promise.all([
+          apiCall('apiGetAllData'),
+          apiCall('getInitialPtpMetadata', $('tanggalTerbit').value)
+        ]);
+        if (qRes && qRes.success) {
+          Q_DATA.claim = qRes.claims || [];
+          Q_DATA.ng = qRes.ngRecords || [];
+          Q_DATA.insp = qRes.inspections || [];
+          popQualityFilters(qRes.customerList || []);
+          if (activeMainMod !== 'ptp') renderQualityModule(activeMainMod);
+        }
+        if (ptpRes) {
+          if (ptpRes.nextNoReg && $('modeBadge').textContent.includes('Baru')) $('noReg').value = ptpRes.nextNoReg;
+          ptpLogRecords = ptpRes.existingList || [];
+          populateExistingDropdown(ptpLogRecords);
+          renderLogRegisterTable();
+          if (ptpRes.spreadsheetUrl) { $('openSheetsLogBtn').href = ptpRes.spreadsheetUrl; $('openSheetsLogBtn').classList.remove('hidden'); }
+        }
+        if (manual) toast('Semua database berhasil disinkronkan!', 'success');
+      } catch (e) {
+        toast('Gagal sinkronisasi: ' + e.message, 'error');
+      } finally {
+        ic.classList.remove('animate-spin');
+      }
+    }
+
+    /* =================================================================== */
+    /* LOGIKA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, INSPECTION)      */
+    /* =================================================================== */
+    const Q_DATA = { claim: [], ng: [], insp: [] }, Q_PG = { claim: 1, ng: 1, insp: 1 }, Q_CHARTS = {};
+    const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const MS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const PLANTS = ['Sangiang','Cikarang','Kalisabi','Jatake'];
+    const DIVISI = ['Bor','CNC','Cutting','Harden','Hexagon','Punch','Rolling','Turret'];
+
+    const Q_MOD = {
+      claim: { title: 'Claim Customer', sheet: 'Claim_Customer', idk: 'idRegister', dk: 'tanggalClaim', color: 'blue',
+        search: ['namaCustomer','namaPart','partNomor','noClaim','idRegister','keteranganJenisNG','acjPlant'],
+        cols: [['ID Register','idRegister'],['Tgl Claim','tanggalClaim'],['Plant','acjPlant'],['Kategori','kategoriClaim'],['Customer','namaCustomer'],['No Claim','noClaim'],['Nama Part','namaPart'],['Part No','partNomor'],['Jenis NG','keteranganJenisNG'],['Kategori NG','kategoriNG'],['Qty Check','qtyCheck','n'],['Qty NG','qtyNG','n'],['% Defect','prosentase','p'],['Status','statusClaim'],['Official Doc','officialDoc','b'],['PICA','pica','b']] },
+      ng: { title: 'Database NG Internal', sheet: 'Database_NG', idk: 'idNG', dk: 'tanggal', color: 'amber',
+        search: ['namaPart','jenisNG','faktorPenyebab','divisi','noMesin','namaOperator','idNG'],
+        cols: [['ID NG','idNG'],['Tanggal','tanggal'],['Nama Part','namaPart'],['Qty NG','qtyNG','n'],['Qty Produksi','qtyProduksi','n'],['Ratio NG','ratioNG','p'],['Jenis Defect','jenisNG'],['Faktor Penyebab','faktorPenyebab'],['Divisi','divisi'],['No Mesin','noMesin'],['Operator','namaOperator']] },
+      insp: { title: 'Data Inspection', sheet: 'Data_Inspection', idk: 'uid', dk: 'tanggal', color: 'emerald',
+        search: ['namaPart','customer','proses','operator','keterangan','no'],
+        cols: [['Tanggal','tanggal'],['Nama Part','namaPart'],['Customer','customer'],['Proses','proses'],['Qty OK','qtyOK','n'],['Qty NG','qtyNG','n'],['Qty Repair','qtyRepair','n'],['Total Check','totalCheck','n'],['Operator','operator'],['Keterangan','keterangan']] }
+    };
+
+    const Q_FIELDS = {
+      claim: [
+        {k:'idRegister',l:'ID Register (Otomatis)',t:'text',ro:1},{k:'tanggalClaim',l:'Tanggal Claim',t:'date',req:1},
+        {k:'acjPlant',l:'ACJ Plant',t:'sel',o:PLANTS},{k:'namaCustomer',l:'Nama Customer',t:'text',req:1,list:'dlCust'},
+        {k:'noClaim',l:'No. Claim Customer',t:'text'},{k:'kategoriClaim',l:'Kategori Claim',t:'sel',o:['Claim','Informasi']},
+        {k:'lokasiPenemuan',l:'Lokasi Penemuan',t:'sel',o:['Receiving Inspection','In-Process','Customer']},{k:'frekuensiClaim',l:'Frekuensi Claim',t:'sel',o:['Pertama kali','Berulang / rutin']},
+        {k:'namaPart',l:'Nama Part',t:'text',req:1},{k:'partNomor',l:'Part Nomor',t:'text'},
+        {k:'keteranganJenisNG',l:'Keterangan Jenis NG',t:'text',req:1,w:1},
+        {k:'qtyCheck',l:'Qty Check',t:'number',min:0,def:100},{k:'qtyNG',l:'Qty NG',t:'number',min:0,def:1},
+        {k:'prosentase',l:'Prosentase (%)',t:'text',ro:1},{k:'finishMonitoring',l:'Finish Monitoring (+90 hari)',t:'text',ro:1},
+        {k:'kategoriNG',l:'Kategori NG',t:'sel',o:['Dimensi','Visual']},{k:'penyebabProblem',l:'Penyebab Problem',t:'sel',o:['Internal','External']},
+        {k:'statusClaim',l:'Status Claim',t:'sel',o:['Monitoring','Closed']},
+        {k:'officialDoc',l:'Lampiran Official Doc (PDF/JPG/PNG, maks 4 MB)',t:'file'},{k:'pica',l:'Lampiran PICA (PDF/JPG/PNG, maks 4 MB)',t:'file'}],
+      ng: [
+        {k:'idNG',l:'ID NG (Otomatis)',t:'text',ro:1},{k:'tanggal',l:'Tanggal',t:'date',req:1},
+        {k:'namaPart',l:'Nama Part',t:'text',req:1},{k:'qtyNG',l:'Qty NG (Pcs)',t:'number',min:0,req:1,def:1},
+        {k:'qtyProduksi',l:'Qty Produksi (Pcs)',t:'number',min:0,req:1,def:0},{k:'ratioNG',l:'Ratio NG (%)',t:'text',ro:1},
+        {k:'jenisNG',l:'Jenis NG',t:'text',req:1},{k:'faktorPenyebab',l:'Faktor Penyebab',t:'text',req:1},
+        {k:'divisi',l:'Divisi',t:'sel',o:DIVISI},{k:'noMesin',l:'No. Mesin',t:'text'},{k:'namaOperator',l:'Nama Operator',t:'text'}],
+      insp: [
+        {k:'no',l:'No (Kosongkan = Otomatis)',t:'text'},{k:'tanggal',l:'Tanggal',t:'date',req:1},
+        {k:'namaPart',l:'Nama Part',t:'text',req:1},{k:'customer',l:'Customer',t:'text',req:1,list:'dlCust'},
+        {k:'proses',l:'Proses',t:'text',req:1},{k:'operator',l:'Operator',t:'text',req:1},
+        {k:'qtyOK',l:'Qty OK',t:'number',min:0,req:1,def:0},{k:'qtyNG',l:'Qty NG',t:'number',min:0,req:1,def:0},
+        {k:'qtyRepair',l:'Qty Repair',t:'number',min:0,req:1,def:0},{k:'totalCheck',l:'Total Check',t:'text',ro:1},
+        {k:'keterangan',l:'Keterangan',t:'text',w:1}]
+    };
+
+    function buildQualityShell() {
+      $('qualityModulesWrapper').innerHTML = Object.keys(Q_MOD).map(m => {
+        const c = Q_MOD[m];
+        const th = '<th class="p-2.5">Aksi</th>' + c.cols.map(x => `<th class="p-2.5 whitespace-nowrap ${x[2]==='n'||x[2]==='p'?'text-right':''}">${x[0]}</th>`).join('');
+        return `
+        <section id="qsec-${m}" class="${m === 'claim' ? '' : 'hidden'} space-y-5">
+          <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Monitoring</span>
+              <h2 class="text-2xl font-extrabold mt-0.5">${c.title}</h2>
+              <p class="text-xs text-slate-300 mt-1">Analisis Pareto, Tren Defect &amp; Log Register Terintegrasi</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="openQualityForm('${m}')" class="q-adm bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>
+              <button type="button" onclick="exportQualityExcel('${m}')" class="q-adm bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="sheet" class="w-4 h-4"></i> Excel</button>
+            </div>
+          </div>
+
+          <!-- Filter Bar -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-3">
+            <span class="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><i data-lucide="filter" class="w-3.5 h-3.5 text-blue-900"></i> Filter:</span>
+            <select id="qf-${m}-year" onchange="Q_PG['${m}']=1;renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Tahun</option></select>
+            <select id="qf-${m}-month" onchange="Q_PG['${m}']=1;renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Bulan</option>${MONTHS.map((x, i) => `<option value="${i+1}">${x}</option>`).join('')}</select>
+            ${m === 'claim' ? `<select id="qf-claim-plant" onchange="Q_PG.claim=1;renderQualityModule('claim')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>` : ''}
+            ${m === 'ng' ? `<select id="qf-ng-divisi" onchange="Q_PG.ng=1;renderQualityModule('ng')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Divisi</option>${DIVISI.map(d => `<option value="${d}">${d}</option>`).join('')}</select>` : ''}
+            <button type="button" onclick="resetQualityFilter('${m}')" class="text-xs text-blue-800 hover:underline font-semibold ml-auto">Reset Filter</button>
+          </div>
+
+          <!-- KPI Cards -->
+          <div id="qkpi-${m}" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+          <!-- Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800 mb-2">Analisis Pareto (80/20)</h4><div class="relative h-60"><canvas id="qchart-${m}-1"></canvas></div></div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800 mb-2">Tren &amp; Distribusi Bulanan</h4><div class="relative h-60"><canvas id="qchart-${m}-2"></canvas></div></div>
+          </div>
+
+          <!-- Tabel Log Register -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 class="font-bold text-sm text-blue-950">Log Register ${c.title}</h3>
+              <input id="qq-${m}" oninput="Q_PG['${m}']=1;renderQualityTable('${m}')" placeholder="Cari part, customer, ID..." class="w-full sm:w-72 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-900">
+            </div>
+            <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-blue-950 text-white uppercase"><tr>${th}</tr></thead><tbody id="qtb-${m}" class="divide-y divide-slate-200"></tbody></table></div>
+            <div class="p-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span id="qinfo-${m}"></span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="Q_PG['${m}']--;renderQualityTable('${m}')" id="qprev-${m}" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                <span id="qpn-${m}" class="font-bold"></span>
+                <button type="button" onclick="Q_PG['${m}']++;renderQualityTable('${m}')" id="qnext-${m}" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Next</button>
+              </div>
+            </div>
+          </div>
+        </section>`;
+      }).join('');
+    }
+
+    function popQualityFilters(custList) {
+      $('dlCust').innerHTML = custList.map(c => `<option value="${esc(c)}">`).join('');
+      const ys = new Set([new Date().getFullYear()]);
+      Object.keys(Q_MOD).forEach(m => Q_DATA[m].forEach(r => { const d = pd(r[Q_MOD[m].dk]); if (d) ys.add(d.getFullYear()); }));
+      const arr = [...ys].sort((a, b) => b - a);
+      Object.keys(Q_MOD).forEach(m => {
+        const s = $(`qf-${m}-year`), cur = s.value;
+        s.innerHTML = '<option value="ALL">Semua Tahun</option>' + arr.map(y => `<option value="${y}">${y}</option>`).join('');
+        s.value = arr.map(String).includes(cur) ? cur : 'ALL';
+      });
+    }
+
+    function resetQualityFilter(m) {
+      $(`qf-${m}-year`).value = 'ALL'; $(`qf-${m}-month`).value = 'ALL';
+      if ($(`qf-${m}-plant`)) $(`qf-${m}-plant`).value = 'ALL';
+      if ($(`qf-${m}-divisi`)) $(`qf-${m}-divisi`).value = 'ALL';
+      $(`qq-${m}`).value = ''; Q_PG[m] = 1; renderQualityModule(m);
+    }
+
+    function getFilteredQuality(m) {
+      const c = Q_MOD[m], y = $(`qf-${m}-year`).value, mo = $(`qf-${m}-month`).value;
+      const pl = $(`qf-${m}-plant`) ? $(`qf-${m}-plant`).value : 'ALL';
+      const dv = $(`qf-${m}-divisi`) ? $(`qf-${m}-divisi`).value : 'ALL';
+      const q = ($(`qq-${m}`).value || '').toLowerCase().trim();
+      return Q_DATA[m].filter(r => {
+        const d = pd(r[c.dk]);
+        if ((y !== 'ALL' || mo !== 'ALL') && !d) return false;
+        if (y !== 'ALL' && d.getFullYear() != y) return false;
+        if (mo !== 'ALL' && d.getMonth() + 1 != mo) return false;
+        if (pl !== 'ALL' && r.acjPlant !== pl) return false;
+        if (dv !== 'ALL' && r.divisi !== dv) return false;
+        if (q && !c.search.some(k => String(r[k] || '').toLowerCase().includes(q))) return false;
+        return true;
+      });
+    }
+
+    function renderQualityModule(m) {
+      document.querySelectorAll('.q-adm').forEach(el => el.classList.toggle('hidden', !isEditor()));
+      const d = getFilteredQuality(m);
+      const kpiCard = (lbl, val, sub, cls) => `<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><p class="text-[11px] font-bold uppercase text-slate-500">${lbl}</p><h3 class="text-2xl font-extrabold ${cls} mt-1">${val}</h3><span class="text-[11px] text-slate-400">${sub}</span></div>`;
+
+      if (m === 'claim') {
+        $('qkpi-claim').innerHTML =
+          kpiCard('Total Kasus', fmt(d.length), 'Sesuai filter', 'text-blue-950') +
+          kpiCard('Monitoring', fmt(d.filter(x => x.statusClaim === 'Monitoring').length), 'Dalam evaluasi', 'text-amber-600') +
+          kpiCard('Closed', fmt(d.filter(x => x.statusClaim === 'Closed').length), 'Terselesaikan', 'text-emerald-600') +
+          kpiCard('Total Qty NG', fmt(d.reduce((a, x) => a + num(x.qtyNG), 0)) + ' Pcs', 'Total defect', 'text-rose-600');
+        drawParetoChart('qchart-claim-1', d, r => r.namaCustomer || 'Unknown', r => num(r.qtyNG), 'Qty NG');
+        drawMonthlyChart('qchart-claim-2', d, 'tanggalClaim', 'qtyNG');
+      } else if (m === 'ng') {
+        const tq = d.reduce((a, x) => a + num(x.qtyNG), 0), tp = d.reduce((a, x) => a + num(x.qtyProduksi), 0);
+        $('qkpi-ng').innerHTML =
+          kpiCard('Total Qty NG', fmt(tq) + ' Pcs', 'Defect internal', 'text-rose-600') +
+          kpiCard('Qty Produksi', fmt(tp) + ' Pcs', 'Total output', 'text-blue-950') +
+          kpiCard('Ratio NG', tp > 0 ? (tq / tp * 100).toFixed(2) + '%' : '-', 'NG ÷ Produksi', 'text-amber-600') +
+          kpiCard('Frekuensi Lot', fmt(d.length), 'Kejadian tercatat', 'text-slate-700');
+        drawParetoChart('qchart-ng-1', d, r => r.namaPart || 'Unknown', r => num(r.qtyNG), 'Qty NG');
+        drawMonthlyChart('qchart-ng-2', d, 'tanggal', 'qtyNG');
+      } else {
+        const tc = d.reduce((a, x) => a + num(x.totalCheck), 0);
+        $('qkpi-insp').innerHTML =
+          kpiCard('Total Check', fmt(tc) + ' Pcs', 'Terinspeksi', 'text-blue-950') +
+          kpiCard('Qty OK', fmt(d.reduce((a, x) => a + num(x.qtyOK), 0)) + ' Pcs', 'Lolos inspeksi', 'text-emerald-600') +
+          kpiCard('Qty NG', fmt(d.reduce((a, x) => a + num(x.qtyNG), 0)) + ' Pcs', 'Reject', 'text-rose-600') +
+          kpiCard('Qty Repair', fmt(d.reduce((a, x) => a + num(x.qtyRepair), 0)) + ' Pcs', 'Perbaikan', 'text-amber-600');
+        drawParetoChart('qchart-insp-1', d, r => r.namaPart || 'Unknown', r => num(r.qtyNG), 'Qty NG');
+        drawMonthlyChart('qchart-insp-2', d, 'tanggal', 'qtyNG');
+      }
+      renderQualityTable(m);
+    }
+
+    function drawParetoChart(canvasId, rows, keyFn, valFn, unit) {
+      if (Q_CHARTS[canvasId]) Q_CHARTS[canvasId].destroy();
+      const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); });
+      const keys = Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 8);
+      const vals = keys.map(k => map[k]), tot = vals.reduce((a, b) => a + b, 0);
+      let run = 0; const cum = vals.map(v => { run += v; return tot ? +(run / tot * 100).toFixed(1) : 0; });
+      Q_CHARTS[canvasId] = new Chart($(canvasId), {
+        type: 'bar',
+        data: { labels: keys.length ? keys : ['Tidak ada data'], datasets: [
+          { type: 'bar', label: unit, data: vals.length ? vals : [0], backgroundColor: '#1e3a8a', borderRadius: 4, yAxisID: 'y' },
+          { type: 'line', label: 'Kumulatif %', data: cum.length ? cum : [0], borderColor: '#f59e0b', borderWidth: 2, yAxisID: 'y1' }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } } } }
+      });
+    }
+
+    function drawMonthlyChart(canvasId, rows, dateKey, valKey) {
+      if (Q_CHARTS[canvasId]) Q_CHARTS[canvasId].destroy();
+      const arr = new Array(12).fill(0);
+      rows.forEach(r => { const d = pd(r[dateKey]); if (d) arr[d.getMonth()] += num(r[valKey]); });
+      Q_CHARTS[canvasId] = new Chart($(canvasId), {
+        type: 'line',
+        data: { labels: MS, datasets: [{ label: 'Qty NG (Pcs)', data: arr, borderColor: '#0284c7', backgroundColor: 'rgba(2,132,199,0.1)', fill: true, tension: 0.3 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    function renderQualityTable(m) {
+      const c = Q_MOD[m], rows = getFilteredQuality(m), PAGE = 15, pages = Math.ceil(rows.length / PAGE) || 1;
+      Q_PG[m] = Math.min(Math.max(1, Q_PG[m]), pages);
+      const st = (Q_PG[m] - 1) * PAGE, adm = isEditor();
+
+      $('qtb-' + m).innerHTML = rows.slice(st, st + PAGE).map(r => {
+        const id = esc(r[c.idk]);
+        const act = adm && r[c.idk]
+          ? `<div class="flex gap-1"><button type="button" onclick="openQualityForm('${m}','${id}')" class="px-2 py-0.5 bg-blue-50 text-blue-800 rounded font-semibold">Edit</button><button type="button" onclick="deleteQualityRow('${m}','${id}')" class="px-2 py-0.5 bg-rose-50 text-rose-700 rounded font-semibold">Hapus</button></div>`
+          : '<span class="text-slate-400 text-[10px]">Read Only</span>';
+        const tds = c.cols.map(col => {
+          const [, k, t] = col, v = r[k];
+          if (t === 'n') return `<td class="p-2.5 text-right font-semibold">${fmt(v)}</td>`;
+          if (t === 'p') return `<td class="p-2.5 text-right">${num(v)}%</td>`;
+          if (t === 'b') return `<td class="p-2.5">${v ? `<button type="button" onclick="openPrivateFile('${esc(v)}')" class="text-blue-700 underline font-semibold">Buka</button>` : '-'}</td>`;
+          if (k === 'statusClaim') return `<td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${v === 'Closed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(v)}</span></td>`;
+          return `<td class="p-2.5 whitespace-nowrap">${esc(v || '-')}</td>`;
+        }).join('');
+        return `<tr class="hover:bg-slate-50"><td class="p-2.5">${act}</td>${tds}</tr>`;
+      }).join('') || `<tr><td colspan="${c.cols.length + 1}" class="p-6 text-center text-slate-400">Belum ada data.</td></tr>`;
+
+      $('qinfo-' + m).textContent = `Menampilkan ${rows.length ? st + 1 : 0}-${Math.min(st + PAGE, rows.length)} dari ${rows.length} data`;
+      $('qpn-' + m).textContent = `${Q_PG[m]} / ${pages}`;
+      $('qprev-' + m).disabled = Q_PG[m] <= 1;
+      $('qnext-' + m).disabled = Q_PG[m] >= pages;
+    }
+
+    let qEditing = null;
+    function openQualityForm(m, id) {
+      if (!isEditor()) return toast('Hanya Admin / QA Auditor yang dapat menginput data!', 'error');
+      const rec = id ? Q_DATA[m].find(x => x[Q_MOD[m].idk] === id) : null;
+      qEditing = { m, id: rec ? rec[Q_MOD[m].idk] : '' };
+      const fieldsHtml = Q_FIELDS[m].map(x => {
+        const fid = 'qfm-' + x.k, base = 'w-full px-3 py-2 border border-slate-300 rounded-lg text-xs ' + (x.ro ? 'bg-slate-100 font-mono' : 'bg-white');
+        let inp = x.t === 'sel' ? `<select id="${fid}" class="${base}">${x.o.map(o => `<option>${esc(o)}</option>`).join('')}</select>`
+          : x.t === 'file' ? `<input type="file" id="${fid}" accept=".pdf,image/jpeg,image/png" class="text-xs">`
+          : `<input id="${fid}" type="${x.t}" ${x.ro ? 'readonly' : ''} ${x.req ? 'required' : ''} ${x.list ? `list="${x.list}"` : ''} class="${base}">`;
+        return `<div class="${x.w || x.t === 'file' ? 'sm:col-span-2' : ''}"><label class="block text-xs font-bold text-slate-700 mb-1">${x.l}</label>${inp}</div>`;
+      }).join('');
+
+      $('qualityModal').innerHTML = `<div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full mx-auto my-6 overflow-hidden">
+        <div class="px-6 py-4 bg-blue-950 text-white flex justify-between items-center"><h3 class="font-bold text-sm">${rec ? 'Edit' : 'Input'} ${Q_MOD[m].title}</h3><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="text-slate-300 hover:text-white text-lg font-bold">&times;</button></div>
+        <form id="qFormElement" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">${fieldsHtml}
+          <div class="sm:col-span-2 pt-3 border-t flex justify-end gap-2"><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="px-4 py-2 border rounded-lg text-xs font-semibold">Batal</button><button id="qSaveBtn" class="px-5 py-2 bg-blue-900 hover:bg-blue-950 text-white rounded-lg text-xs font-bold">Simpan Data</button></div>
+        </form></div>`;
+
+      Q_FIELDS[m].forEach(x => {
+        if (x.t === 'file') return;
+        const v = rec ? rec[x.k] : (x.def != null ? x.def : x.t === 'date' ? todayStr() : '');
+        $('qfm-' + x.k).value = v == null ? '' : v;
+      });
+      $('qFormElement').addEventListener('input', calcQualityForm);
+      $('qFormElement').addEventListener('submit', submitQualityForm);
+      calcQualityForm();
+      $('qualityModal').classList.remove('hidden');
+    }
+
+    function calcQualityForm() {
+      const m = qEditing.m, g = k => num($('qfm-' + k).value);
+      if (m === 'claim') {
+        $('qfm-prosentase').value = (g('qtyCheck') > 0 ? (g('qtyNG') / g('qtyCheck') * 100).toFixed(2) : '0.00') + '%';
+        const t = $('qfm-tanggalClaim').value; $('qfm-finishMonitoring').value = t ? add90(t) : '';
+      }
+      if (m === 'insp') $('qfm-totalCheck').value = g('qtyOK') + g('qtyNG') + g('qtyRepair');
+      if (m === 'ng') $('qfm-ratioNG').value = (g('qtyProduksi') > 0 ? (g('qtyNG') / g('qtyProduksi') * 100).toFixed(2) : '0.00') + '%';
+    }
+
+    const readB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(f); });
+    async function submitQualityForm(e) {
+      e.preventDefault();
+      const { m, id } = qEditing, btn = $('qSaveBtn'); btn.disabled = true; btn.textContent = 'Menyimpan...';
+      try {
+        const f = { id };
+        for (const x of Q_FIELDS[m]) {
+          if (x.ro) continue;
+          if (x.t === 'file') {
+            const file = $('qfm-' + x.k).files[0]; if (!file) continue;
+            f[x.k + 'Base64'] = await readB64(file); f[x.k + 'Name'] = file.name;
+          } else f[x.k] = $('qfm-' + x.k).value;
+        }
+        const r = await apiCall('apiSave', m, f);
+        if (r.success) { $('qualityModal').classList.add('hidden'); toast(r.message, 'success'); syncAllSystems(false); }
+      } catch (err) { toast('Gagal simpan: ' + err.message, 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Simpan Data'; }
+    }
+
+    async function deleteQualityRow(m, id) {
+      if (!confirm('Yakin menghapus data ini? Tercatat di Audit Log.')) return;
+      try {
+        const r = await apiCall('apiDelete', m, id);
+        if (r.success) { toast(r.message, 'success'); syncAllSystems(false); }
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    async function openPrivateFile(url) {
+      const w = window.open('', '_blank');
+      try {
+        const r = await apiCall('apiGetFile', url);
+        const bin = atob(r.data), arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        w.location = URL.createObjectURL(new Blob([arr], { type: r.mime }));
+      } catch (e) { if (w) w.close(); toast('Gagal membuka lampiran: ' + e.message, 'error'); }
+    }
+
+    function exportQualityExcel(m) {
+      const c = Q_MOD[m], rows = getFilteredQuality(m);
+      if (!rows.length) return toast('Tidak ada data untuk diexport.', 'error');
+      const hdr = ['NO', ...c.cols.map(x => x[0].toUpperCase())];
+      const aoa = [['PT. ADHI CHANDRA JAYA - ' + c.title.toUpperCase()], [], hdr];
+      rows.forEach((r, i) => aoa.push([i + 1, ...c.cols.map(x => r[x[1]] || '-')]));
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, c.sheet);
+      XLSX.writeFile(wb, `ACJ_${c.sheet}_${todayStr().replace(/-/g, '')}.xlsx`);
+    }
+
+    /* =================================================================== */
+    /* LOGIKA MODUL E-PTP (AF-PROD-014 DARI APLIKASI B)                    */
+    /* =================================================================== */
+    let sigPads = {}, base64FotoPart = '', ptpLogRecords = [], refNewFiles = [], refExisting = [];
+
+    function initSignaturePads() {
+      const ids = { auditor: 'sigAuditor', auditeeProd: 'sigAuditeeProd', auditeeInsp: 'sigAuditeeInsp', approved: 'sigApproved', verifAuditor: 'sigVerifAuditor', tmj: 'sigTmj' };
+      for (const [key, canvasId] of Object.entries(ids)) {
+        const canvas = $(canvasId);
+        if (canvas && !sigPads[key]) sigPads[key] = new SignaturePad(canvas, { penColor: '#0f172a' });
+      }
+      resizeAllCanvases();
+    }
+    function resizeAllCanvases() {
+      Object.values(sigPads).forEach(pad => {
+        const canvas = pad.canvas; if (!canvas || canvas.offsetWidth === 0) return;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1), data = pad.toData();
+        canvas.width = canvas.offsetWidth * ratio; canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio); pad.clear(); pad.fromData(data);
+      });
+    }
+    function clearSig(key) { if (sigPads[key]) sigPads[key].clear(); }
+
+    function switchPtpTab(stepNum) {
+      [1, 2, 3, 4, 5].forEach(n => {
+        $('step' + n).classList.toggle('hidden', n !== stepNum);
+        const btn = $('tabBtn' + n); if (btn) btn.classList.toggle('active', n === stepNum);
+      });
+      $('actionButtonsBar').classList.toggle('hidden', stepNum === 4 || stepNum === 5);
+      if (stepNum === 5) renderDashboard();
+      setTimeout(resizeAllCanvases, 50);
+    }
+
+    function initDefaultActionRows() {
+      $('madeActionsContainer').innerHTML = ''; $('sentActionsContainer').innerHTML = '';
+      for (let i = 0; i < 3; i++) { addActionRow('made'); addActionRow('sent'); }
+    }
+
+    function addActionRow(type) {
+      const container = $(`${type}ActionsContainer`), rowIdx = container.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-200';
+      row.innerHTML = `<div class="sm:col-span-6 flex items-center gap-1.5"><span class="text-xs font-bold text-slate-400 w-5">${rowIdx}.</span><input type="text" class="${type}-action w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="Uraian tindakan..." /></div><div class="sm:col-span-3"><input type="text" class="${type}-pic w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="PIC" /></div><div class="sm:col-span-3 flex items-center gap-1"><input type="date" class="${type}-due w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white" /><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-500 font-bold text-sm px-1">&times;</button></div>`;
+      container.appendChild(row);
+    }
+
+    function collectActionRows(type) {
+      const a = document.querySelectorAll(`.${type}-action`), p = document.querySelectorAll(`.${type}-pic`), d = document.querySelectorAll(`.${type}-due`), list = [];
+      for (let i = 0; i < a.length; i++) if (a[i].value.trim() || p[i].value.trim() || d[i].value) list.push({ action: a[i].value.trim(), pic: p[i].value.trim(), due: d[i].value });
+      return list;
+    }
+
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { base64FotoPart = e.target.result; $('fotoPreviewBox').innerHTML = `<img src="${base64FotoPart}" class="max-h-28 object-contain" />`; };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function onTanggalTerbitChange() {
+      if (!$('modeBadge').textContent.includes('Baru')) return;
+      apiCall('generateNextNoReg', $('tanggalTerbit').value).then(no => { $('noReg').value = no; });
+    }
+
+    function populateExistingDropdown(list) {
+      const sel = $('existingPtpSelect');
+      sel.innerHTML = '<option value="">-- Buat PTP Baru --</option>' + list.map(i => `<option value="${esc(i.noReg)}">${esc(i.noReg)} | ${esc(i.partName)} (${esc(i.status)})</option>`).join('');
+    }
+    function loadSelectedPtpFromDropdown() {
+      const v = $('existingPtpSelect').value; if (!v) return resetFormToNew();
+      editPtpFromLog(v, 2);
+    }
+
+    function handleRefFiles(input) {
+      const files = Array.from(input.files || []); input.value = '';
+      Promise.all(files.slice(0, 5).map(f => readB64(f).then(data => ({ name: f.name, size: f.size, data })))).then(list => {
+        refNewFiles = refNewFiles.concat(list); renderRefList();
+      });
+    }
+    function renderRefList() {
+      const ul = $('refFileList'); ul.innerHTML = '';
+      refExisting.forEach((a, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-slate-50 border rounded-lg px-2.5 py-1 text-xs"><a href="${esc(a.url)}" target="_blank" class="text-blue-900 underline truncate">${esc(a.name)}</a><button type="button" onclick="refExisting.splice(${i},1);renderRefList()" class="text-rose-500 font-bold">&times;</button></li>`; });
+      refNewFiles.forEach((f, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-amber-50 border rounded-lg px-2.5 py-1 text-xs"><span class="truncate">${esc(f.name)} (Baru)</span><button type="button" onclick="refNewFiles.splice(${i},1);renderRefList()" class="text-rose-500 font-bold">&times;</button></li>`; });
+    }
+
+    function editPtpFromLog(noReg, tab) {
+      const r = ptpLogRecords.find(x => x.noReg === noReg); if (!r) return;
+      $('existingPtpSelect').value = r.noReg; $('noReg').value = r.noReg;
+      if (r.tanggalTerbit) $('tanggalTerbit').value = r.tanggalTerbit;
+      $('auditee').value = r.auditee !== '-' ? r.auditee : ''; $('auditor').value = r.auditor !== '-' ? r.auditor : '';
+      $('lokasi').value = r.lokasi !== '-' ? r.lokasi : ''; $('noRefSumber').value = r.noRefSumber !== '-' ? r.noRefSumber : '';
+      $('partName').value = r.partName !== '-' ? r.partName : ''; $('partNo').value = r.partNo !== '-' ? r.partNo : '';
+      $('problem').value = r.problem !== '-' ? r.problem : ''; $('qtyNg').value = r.qtyNg !== '-' ? r.qtyNg : '';
+      $('hasilSortir').value = r.hasilSortir !== '-' ? r.hasilSortir : '';
+      document.querySelectorAll('input[name="sumber"]').forEach(el => el.checked = (el.value === r.sumber));
+      document.querySelectorAll('input[name="kategori"]').forEach(el => el.checked = (el.value === r.kategori));
+      Object.keys(sigPads).forEach(k => clearSig(k));
+      if (r.dataJson) {
+        try {
+          const d = JSON.parse(r.dataJson);
+          ['acuan','namaTtdAuditor','tglTtdAuditor','madeWhy1','madeWhy2','madeWhy3','madeWhy4','madeWhy5','sentWhy1','sentWhy2','sentWhy3','sentWhy4','sentWhy5','namaAuditeeProd','tglTtdAuditeeProd','namaAuditeeInsp','tglTtdAuditeeInsp','namaApproved','tglTtdApproved','tanggalEvaluasi','komentarVerifikasi','tglVerifAuditor','tglTmj'].forEach(id => { if ($(id)) $(id).value = d[id] || ''; });
+          refExisting = Array.isArray(d.refAttachments) ? d.refAttachments : []; refNewFiles = []; renderRefList();
+        } catch (e) {}
+      }
+      $('modeBadge').textContent = `Mode: Update ${r.noReg}`;
+      $('modeBadge').className = 'bg-emerald-400 text-slate-950 font-bold px-2.5 py-0.5 rounded-full text-[11px]';
+      switchPtpTab(tab || 2);
+    }
+
+    function resetFormToNew() {
+      $('ptpForm').reset(); base64FotoPart = ''; refExisting = []; refNewFiles = []; renderRefList();
+      $('fotoPreviewBox').innerHTML = '<span class="text-xs text-slate-400">Preview Foto</span>';
+      Object.keys(sigPads).forEach(k => clearSig(k)); initDefaultActionRows();
+      $('tanggalTerbit').value = todayStr(); $('tglTtdAuditor').value = todayStr();
+      $('modeBadge').textContent = 'Mode: Buat PTP Baru';
+      $('modeBadge').className = 'bg-amber-500 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]';
+      onTanggalTerbitChange(); switchPtpTab(1);
+    }
+
+    function collectPtpPayload() {
+      const getSig = k => (sigPads[k] && !sigPads[k].isEmpty() ? sigPads[k].toDataURL('image/png') : '');
+      const sEl = document.querySelector('input[name="sumber"]:checked'), kEl = document.querySelector('input[name="kategori"]:checked'), eEl = document.querySelector('input[name="statusEvaluasi"]:checked');
+      return {
+        isNewRecord: $('modeBadge').textContent.includes('Baru'), refAttachments: refExisting, refFilesNew: refNewFiles.map(f => ({ name: f.name, data: f.data })),
+        noReg: $('noReg').value.trim(), tanggalTerbit: $('tanggalTerbit').value, acuan: $('acuan').value.trim(), auditee: $('auditee').value.trim(), auditor: $('auditor').value.trim(), lokasi: $('lokasi').value.trim(),
+        sumber: sEl ? sEl.value : '', noRefSumber: $('noRefSumber').value.trim(), kategori: kEl ? kEl.value : '', partName: $('partName').value.trim(), partNo: $('partNo').value.trim(), qtyNg: $('qtyNg').value.trim(), hasilSortir: $('hasilSortir').value.trim(), problem: $('problem').value.trim(),
+        fotoPartBase64: base64FotoPart, sigAuditorBase64: getSig('auditor'), namaTtdAuditor: $('namaTtdAuditor').value.trim(), tglTtdAuditor: $('tglTtdAuditor').value,
+        madeWhy1: $('madeWhy1').value.trim(), madeWhy2: $('madeWhy2').value.trim(), madeWhy3: $('madeWhy3').value.trim(), madeWhy4: $('madeWhy4').value.trim(), madeWhy5: $('madeWhy5').value.trim(),
+        sentWhy1: $('sentWhy1').value.trim(), sentWhy2: $('sentWhy2').value.trim(), sentWhy3: $('sentWhy3').value.trim(), sentWhy4: $('sentWhy4').value.trim(), sentWhy5: $('sentWhy5').value.trim(),
+        madeActions: collectActionRows('made'), sentActions: collectActionRows('sent'),
+        sigAuditeeProdBase64: getSig('auditeeProd'), namaAuditeeProd: $('namaAuditeeProd').value.trim(), tglTtdAuditeeProd: $('tglTtdAuditeeProd').value,
+        sigAuditeeInspBase64: getSig('auditeeInsp'), namaAuditeeInsp: $('namaAuditeeInsp').value.trim(), tglTtdAuditeeInsp: $('tglTtdAuditeeInsp').value,
+        sigApprovedBase64: getSig('approved'), namaApproved: $('namaApproved').value.trim(), tglTtdApproved: $('tglTtdApproved').value,
+        statusEvaluasi: eEl ? eEl.value : 'Tidak / Open', tanggalEvaluasi: $('tanggalEvaluasi').value, komentarVerifikasi: $('komentarVerifikasi').value.trim(),
+        sigVerifAuditorBase64: getSig('verifAuditor'), tglVerifAuditor: $('tglVerifAuditor').value, sigTmjBase64: getSig('tmj'), tglTmj: $('tglTmj').value
+      };
+    }
+
+    async function executePtpAction(actionType) {
+      const payload = collectPtpPayload();
+      if (actionType === 'PREVIEW') payload.refFilesNew = [];
+      showStatusModal(true, 'Memproses Dokumen PTP...', 'Mohon tunggu sebentar, terhubung ke server aman.');
+      try {
+        const res = await apiCall('handlePtpAction', actionType, payload);
+        if (actionType !== 'PREVIEW') {
+          if (res.refAttachments) refExisting = res.refAttachments;
+          refNewFiles = []; renderRefList(); syncAllSystems(false);
+        }
+        if (actionType === 'PREVIEW') {
+          $('statusModal').classList.add('hidden');
+          $('previewModalBody').innerHTML = res.previewHtml;
+          $('previewModal').classList.remove('hidden');
+        } else if (actionType === 'SAVE') {
+          showStatusModal(false, 'Data Tersimpan!', res.message);
+        } else if (actionType === 'PDF') {
+          showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `No. Reg. ${res.noReg} tersimpan di Google Drive.`, `<a href="${res.pdfUrl}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a>`);
+        }
+      } catch (err) {
+        showStatusModal(false, 'Terjadi Kesalahan', err.message);
+      }
+    }
+
+    function renderLogRegisterTable() {
+      const tbody = $('logRegisterBody'), kw = ($('logSearchInput').value || '').toLowerCase(), sf = $('logStatusFilter').value;
+      const closedCount = ptpLogRecords.filter(r => r.status.toLowerCase().includes('closed')).length;
+      $('logTotalBadge').textContent = ptpLogRecords.length;
+      $('statOpenBadge').textContent = `On Progress: ${ptpLogRecords.length - closedCount}`;
+      $('statClosedBadge').textContent = `Closed: ${closedCount}`;
+      renderDashboard();
+
+      const filtered = ptpLogRecords.filter(i => {
+        const isClosed = i.status.toLowerCase().includes('closed');
+        if (sf === 'CLOSED' && !isClosed) return false;
+        if (sf === 'OPEN' && isClosed) return false;
+        return !kw || i.noReg.toLowerCase().includes(kw) || i.partName.toLowerCase().includes(kw) || i.auditee.toLowerCase().includes(kw);
+      });
+
+      const canDel = isEditor();
+      tbody.innerHTML = filtered.map(i => {
+        const isClosed = i.status.toLowerCase().includes('closed');
+        const badge = isClosed ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[10px]">CLOSED</span>' : '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px]">ON PROGRESS</span>';
+        const pdfBtn = i.pdfUrl ? `<a href="${esc(i.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '';
+        const delBtn = canDel ? `<button type="button" onclick="deletePtpRow('${esc(i.noReg)}')" class="bg-rose-50 text-rose-700 font-semibold px-2 py-1 rounded text-[11px]">Hapus</button>` : '';
+        return `<tr class="hover:bg-slate-50"><td class="p-2.5 font-mono font-bold text-blue-900">${esc(i.noReg)}</td><td class="p-2.5">${esc(i.tanggalTerbit)}</td><td class="p-2.5"><div class="font-semibold">${esc(i.auditee)}</div><div class="text-[10px] text-slate-500">${esc(i.sumber)}</div></td><td class="p-2.5"><div class="font-semibold">${esc(i.partName)}</div><div class="text-[11px] text-slate-500 truncate max-w-xs">${esc(i.problem)}</div></td><td class="p-2.5 text-center">${badge}</td><td class="p-2.5 text-center text-[11px] text-slate-500">${esc(i.lastUpdated)}</td><td class="p-2.5 text-center space-x-1"><button type="button" onclick="editPtpFromLog('${esc(i.noReg)}',1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Edit</button>${pdfBtn}${delBtn}</td></tr>`;
+      }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data PTP.</td></tr>';
+    }
+
+    async function deletePtpRow(noReg) {
+      if (!confirm('Hapus PTP ' + noReg + '? Tercatat di Audit Log.')) return;
+      try {
+        const res = await apiCall('deletePtp', noReg);
+        toast(res.message, 'success'); syncAllSystems(false);
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function renderDashboard() {
+      if (!$('dashTotal')) return;
+      const isClosed = r => String(r.status || '').toLowerCase().includes('closed');
+      const closed = ptpLogRecords.filter(isClosed), prog = ptpLogRecords.filter(r => !isClosed(r)), total = ptpLogRecords.length;
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const ageOf = r => { const d = new Date((r.tanggalTerbit || '') + 'T00:00:00'); return isNaN(d) ? null : Math.max(0, Math.floor((today - d) / 86400000)); };
+
+      $('dashTotal').textContent = total; $('dashProgress').textContent = prog.length; $('dashClosed').textContent = closed.length;
+      const ages = prog.map(ageOf).filter(a => a !== null);
+      $('dashAvgAge').textContent = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
+      const pct = total ? Math.round(closed.length / total * 100) : 0;
+      $('dashPct').textContent = pct + '%'; $('dashDonut').setAttribute('stroke-dasharray', (total ? closed.length / total * 100 : 0) + ' 100');
+
+      const months = [];
+      for (let i = 5; i >= 0; i--) { const d = new Date(today.getFullYear(), today.getMonth() - i, 1); months.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }), c: 0, p: 0 }); }
+      ptpLogRecords.forEach(r => { const m = months.find(x => x.key === String(r.tanggalTerbit || '').substring(0, 7)); if (m) { if (isClosed(r)) m.c++; else m.p++; } });
+      const maxM = Math.max(1, ...months.map(m => m.c + m.p));
+      $('dashMonthly').innerHTML = months.map(m => `<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[10px] font-bold mb-1">${m.c + m.p || ''}</span><div class="w-full max-w-[40px] flex flex-col justify-end" style="height:75%"><div class="bg-amber-300 rounded-t" style="height:${m.p/maxM*100}%"></div><div class="bg-emerald-500" style="height:${m.c/maxM*100}%"></div></div><span class="text-[10px] text-slate-500 mt-1">${m.label}</span></div>`).join('');
+
+      const actions = r => `<button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Buka</button>` + (r.pdfUrl ? ` <a href="${esc(r.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '');
+      $('dashProgressBody').innerHTML = prog.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5">${esc(r.partName)}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
+      $('dashClosedBody').innerHTML = closed.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5">${esc(r.partName)}</td><td class="p-2.5 text-center text-[11px]">${esc(r.lastUpdated)}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
+    }
+
+    function showStatusModal(isLoading, title, desc, extraBtnHtml = '') {
+      $('statusTitle').textContent = title; $('statusDesc').textContent = desc;
+      $('statusIcon').innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>' : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
+      $('statusActions').innerHTML = `${extraBtnHtml}<button type="button" onclick="$('statusModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>`;
+      $('statusActions').classList.toggle('hidden', isLoading);
+      $('statusModal').classList.remove('hidden'); icons();
+    }
+
+    /* --- Inisialisasi Awal --- */
+    window.addEventListener('DOMContentLoaded', () => {
+      buildQualityShell();
+      icons();
+      initTurnstile();
+      $('tanggalTerbit').value = todayStr();
+      $('tglTtdAuditor').value = todayStr();
+
+      const u = sessionStorage.getItem('acj_user'), t = sessionStorage.getItem('acj_token');
+      if (u && t) {
+        try { enterPortal(JSON.parse(u), t, false); } catch (e) { sessionStorage.clear(); }
+      }
+    });
+  </script>
+</body>
+</html>
