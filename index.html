@@ -16,8 +16,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <!-- Signature Pad (Untuk Modul E-PTP B) -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-  <!-- Cloudflare Turnstile Anti-Bot (Dari Security A) -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; }
@@ -115,7 +113,6 @@
                 <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"><i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i></button>
               </div>
             </div>
-            <div id="turnstileWidget" class="flex justify-center min-h-[65px] pt-1"></div>
             <button type="submit" id="loginSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
               <i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>
             </button>
@@ -513,15 +510,9 @@
       });
     }
 
-    /* --- Cloudflare Turnstile --- */
-    let tsWidgetId = null;
-    function initTurnstile() {
-      if (tsWidgetId !== null) return;
-      if (!window.turnstile) return setTimeout(initTurnstile, 300);
-      tsWidgetId = turnstile.render('#turnstileWidget', { sitekey: window.PORTAL_CONFIG.TURNSTILE_SITEKEY, theme: 'dark', 'expired-callback': () => resetTurnstile() });
-    }
-    const getTurnstileToken = () => (window.turnstile && tsWidgetId !== null) ? turnstile.getResponse(tsWidgetId) : '';
-    const resetTurnstile = () => { try { if (window.turnstile && tsWidgetId !== null) turnstile.reset(tsWidgetId); } catch (e) {} };
+    /* --- Cloudflare Turnstile (Dinonaktifkan Sementara) --- */
+    const getTurnstileToken = () => '';
+    const resetTurnstile = () => {};
 
     /* --- Login, MFA & Session --- */
     let currentUser = null, pendingMfaToken = null, activeMainMod = 'claim';
@@ -538,14 +529,11 @@
     async function handleLoginSubmit(e) {
       e.preventDefault();
       if (pendingMfaToken) return submitMfaVerification();
-      const cf = getTurnstileToken();
-      if (!cf) return showLoginError('Selesaikan verifikasi keamanan (centang Cloudflare) terlebih dahulu.');
 
       const btn = $('loginSubmitBtn'); btn.disabled = true; btn.textContent = 'Memverifikasi...';
       $('loginErrorBox').classList.add('hidden');
       try {
-        const res = await apiCall('apiLogin', $('loginUsername').value.trim(), $('loginPassword').value, cf);
-        resetTurnstile();
+        const res = await apiCall('apiLogin', $('loginUsername').value.trim(), $('loginPassword').value, '');
         if (res.success && res.mfaRequired) {
           pendingMfaToken = res.mfaToken;
           $('loginCredsStep').classList.add('hidden');
@@ -1234,7 +1222,6 @@
     window.addEventListener('DOMContentLoaded', () => {
       buildQualityShell();
       icons();
-      initTurnstile();
       $('tanggalTerbit').value = todayStr();
       $('tglTtdAuditor').value = todayStr();
 
