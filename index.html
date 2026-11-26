@@ -370,7 +370,7 @@
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="sm:col-span-2"><input type="text" id="logSearchInput" oninput="renderLogRegisterTable()" placeholder="Cari No. Reg. PTP, Part Name, Auditee..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none" /></div>
+            <div class="sm:col-span-2"><input type="text" id="logSearchInput" oninput="renderLogRegisterTable()" placeholder="Cari No. Reg. PTP, Part Name, Part No, Auditee..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none" /></div>
             <div><select id="logStatusFilter" onchange="renderLogRegisterTable()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white"><option value="ALL">Semua Status</option><option value="OPEN">On Progress</option><option value="CLOSED">Closed</option></select></div>
           </div>
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
@@ -380,6 +380,7 @@
                 <th onclick="togglePtpSort('tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Tanggal<span id="ptp-sort-tanggalTerbit" class="ml-1 text-[10px] text-amber-300 font-bold">▼ Terbaru</span></th>
                 <th onclick="togglePtpSort('auditee')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Auditee / Sumber<span id="ptp-sort-auditee" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('partName')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Part &amp; Problem<span id="ptp-sort-partName" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th onclick="togglePtpSort('partNo')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Part No.<span id="ptp-sort-partNo" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('status')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 text-center cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Status<span id="ptp-sort-status" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('lastUpdated')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 text-center cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Update<span id="ptp-sort-lastUpdated" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th class="p-2.5 text-center">Aksi</th>
@@ -1677,15 +1678,15 @@
             styles: { fontSize: 6.3, cellPadding: 2, overflow: 'ellipsize', lineColor: BORDER_GRAY, lineWidth: 0.4, textColor: [30, 41, 59] },
             headStyles: { fillColor: [239, 246, 255], textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.6 },
             alternateRowStyles: { fillColor: [250, 251, 252] },
-            columnStyles: { 0: { cellWidth: 72, fontStyle: 'bold' }, 1: { cellWidth: 55 }, 2: { cellWidth: 85 }, 3: { cellWidth: 85 }, 4: { cellWidth: 100 }, 6: { cellWidth: 58, halign: 'center' }, 7: { cellWidth: 42, halign: 'center' } },
-            head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Sumber', 'Part Name', 'Uraian Problem', 'Status', 'Umur']],
+            columnStyles: { 0: { cellWidth: 72, fontStyle: 'bold' }, 1: { cellWidth: 52 }, 2: { cellWidth: 80 }, 3: { cellWidth: 80 }, 4: { cellWidth: 90 }, 5: { cellWidth: 68 }, 7: { cellWidth: 56, halign: 'center' }, 8: { cellWidth: 40, halign: 'center' } },
+            head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Sumber', 'Part Name', 'Part No.', 'Uraian Problem', 'Status', 'Umur']],
             body: ptpAll.length ? ptpAll.slice(0, 80).map(r => {
               const closedFlag = isPtpClosed(r);
               const ageVal = ptpAge(r);
-              return [r.noReg, D10(r.tanggalTerbit), r.auditee, r.sumber, r.partName, r.problem, closedFlag ? 'CLOSED' : 'ON PROGRESS', closedFlag ? 'Selesai' : (ageVal !== null ? ageVal + ' hr' : '-')];
-            }) : [['-', 'Belum ada data E-PTP', '-', '-', '-', '-', '-', '-']],
+              return [r.noReg, D10(r.tanggalTerbit), r.auditee, r.sumber, r.partName, r.partNo || '-', r.problem, closedFlag ? 'CLOSED' : 'ON PROGRESS', closedFlag ? 'Selesai' : (ageVal !== null ? ageVal + ' hr' : '-')];
+            }) : [['-', 'Belum ada data E-PTP', '-', '-', '-', '-', '-', '-', '-']],
             didParseCell: d => {
-              if (d.section === 'body' && d.column.index === 6) {
+              if (d.section === 'body' && d.column.index === 7) {
                 const ok = d.cell.raw === 'CLOSED';
                 d.cell.styles.textColor = ok ? [4, 120, 87] : [180, 83, 9];
                 d.cell.styles.fontStyle = 'bold';
@@ -1719,31 +1720,32 @@
     /* =================================================================== */
     /* LOGIKA MODUL E-PTP (SIGNATURE PAD, FORM 3 TAHAP, LOG REGISTER)      */
     /* =================================================================== */
-    let sigPads = {}, base64FotoPart = '', ptpLogRecords = [], refNewFiles = [], refExisting = [];
+    let sigPads = {}, base64FotoPart = '', ptpLogRecords = [], refNewFiles = [], refExisting = [], editingPtpOriginalNoReg = '';
 
     function initSignaturePads() {
       const ids = { auditor: 'sigAuditor', auditeeProd: 'sigAuditeeProd', auditeeInsp: 'sigAuditeeInsp', approved: 'sigApproved', verifAuditor: 'sigVerifAuditor', tmj: 'sigTmj' };
-      for (const [key, canvasId] of Object.entries(ids)) {
-        const canvas = $(canvasId);
-        if (canvas && !sigPads[key]) sigPads[key] = new SignaturePad(canvas, { penColor: '#0f172a' });
+      for (const [k, cid] of Object.entries(ids)) {
+        const cv = $(cid);
+        if (cv) sigPads[k] = new SignaturePad(cv, { penColor: '#0f172a' });
       }
       resizeAllCanvases();
     }
 
     function resizeAllCanvases() {
       Object.values(sigPads).forEach(pad => {
-        const canvas = pad.canvas; if (!canvas || canvas.offsetWidth === 0) return;
+        const cv = pad.canvas; if (!cv || cv.offsetWidth === 0) return;
         const ratio = Math.max(window.devicePixelRatio || 1, 1), data = pad.toData();
-        canvas.width = canvas.offsetWidth * ratio; canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext('2d').scale(ratio, ratio); pad.clear(); pad.fromData(data);
+        cv.width = cv.offsetWidth * ratio; cv.height = cv.offsetHeight * ratio;
+        cv.getContext('2d').scale(ratio, ratio); pad.clear(); pad.fromData(data);
       });
     }
-    function clearSig(key) { if (sigPads[key]) sigPads[key].clear(); }
+
+    function clearSig(k) { if (sigPads[k]) sigPads[k].clear(); }
 
     function switchPtpTab(stepNum) {
       [1, 2, 3, 4, 5].forEach(n => {
         $('step' + n).classList.toggle('hidden', n !== stepNum);
-        const btn = $('tabBtn' + n); if (btn) btn.classList.toggle('active', n === stepNum);
+        $('tabBtn' + n).classList.toggle('active', n === stepNum);
       });
       $('actionButtonsBar').classList.toggle('hidden', stepNum === 4 || stepNum === 5);
       if (stepNum === 5) renderDashboard();
@@ -1755,57 +1757,61 @@
       for (let i = 0; i < 3; i++) { addActionRow('made'); addActionRow('sent'); }
     }
 
-    function addActionRow(type) {
-      const container = $(`${type}ActionsContainer`), rowIdx = container.children.length + 1;
-      const row = document.createElement('div');
+    function addActionRow(type, act = '', pic = '', due = '') {
+      const c = $(`${type}ActionsContainer`), idx = c.children.length + 1, row = document.createElement('div');
       row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-200';
-      row.innerHTML = `<div class="sm:col-span-6 flex items-center gap-1.5"><span class="text-xs font-bold text-slate-400 w-5">${rowIdx}.</span><input type="text" class="${type}-action w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="Uraian tindakan..." /></div><div class="sm:col-span-3"><input type="text" class="${type}-pic w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="PIC" /></div><div class="sm:col-span-3 flex items-center gap-1"><input type="date" class="${type}-due w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white" /><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-500 font-bold text-sm px-1">&times;</button></div>`;
-      container.appendChild(row);
+      row.innerHTML = `<div class="sm:col-span-6 flex items-center gap-1.5"><span class="text-xs font-bold text-slate-400 w-5">${idx}.</span><input type="text" class="${type}-action w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="Uraian tindakan..." value="${esc(act)}" /></div>
+        <div class="sm:col-span-3"><input type="text" class="${type}-pic w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white" placeholder="PIC" value="${esc(pic)}" /></div>
+        <div class="sm:col-span-3 flex items-center gap-1"><input type="date" class="${type}-due w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white" value="${esc(due)}" /><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-500 font-bold px-1.5">&times;</button></div>`;
+      c.appendChild(row);
     }
 
     function collectActionRows(type) {
-      const a = document.querySelectorAll(`.${type}-action`), p = document.querySelectorAll(`.${type}-pic`), d = document.querySelectorAll(`.${type}-due`), list = [];
-      for (let i = 0; i < a.length; i++) if (a[i].value.trim() || p[i].value.trim() || d[i].value) list.push({ action: a[i].value.trim(), pic: p[i].value.trim(), due: d[i].value });
-      return list;
+      const a = document.querySelectorAll(`.${type}-action`), p = document.querySelectorAll(`.${type}-pic`), d = document.querySelectorAll(`.${type}-due`), out = [];
+      for (let i = 0; i < a.length; i++) if (a[i].value.trim() || p[i].value.trim() || d[i].value) out.push({ action: a[i].value.trim(), pic: p[i].value.trim(), due: d[i].value });
+      return out;
     }
 
     function previewImage(input) {
       if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => { base64FotoPart = e.target.result; $('fotoPreviewBox').innerHTML = `<img src="${base64FotoPart}" class="max-h-28 object-contain" />`; };
-        reader.readAsDataURL(input.files[0]);
+        readB64(input.files[0]).then(res => { base64FotoPart = res; $('fotoPreviewBox').innerHTML = `<img src="${res}" class="max-h-28 object-contain" />`; });
       }
     }
 
     function onTanggalTerbitChange() {
       if (!$('modeBadge').textContent.includes('Baru')) return;
-      apiCall('generateNextNoReg', $('tanggalTerbit').value).then(no => { $('noReg').value = no; });
+      apiCall('generateNextNoReg', $('tanggalTerbit').value).then(no => { if (no) $('noReg').value = no; }).catch(() => {});
     }
 
     function populateExistingDropdown(list) {
-      const sel = $('existingPtpSelect');
-      sel.innerHTML = '<option value="">-- Buat PTP Baru --</option>' + list.map(i => `<option value="${esc(i.noReg)}">${esc(i.noReg)} | ${esc(i.partName)} (${esc(i.status)})</option>`).join('');
+      const sel = $('existingPtpSelect'); sel.innerHTML = '<option value="">-- Buat PTP Baru --</option>';
+      list.forEach(item => { const o = document.createElement('option'); o.value = item.noReg; o.textContent = `${item.noReg} | ${item.partName} (${item.status})`; sel.appendChild(o); });
     }
-    function loadSelectedPtpFromDropdown() {
-      const v = $('existingPtpSelect').value; if (!v) return resetFormToNew();
-      editPtpFromLog(v, 2);
-    }
+
+    function loadSelectedPtpFromDropdown() { const v = $('existingPtpSelect').value; if (!v) resetFormToNew(); else editPtpFromLog(v); }
 
     function handleRefFiles(input) {
       const files = Array.from(input.files || []); input.value = '';
-      Promise.all(files.slice(0, 5).map(f => readB64(f).then(data => ({ name: f.name, size: f.size, data })))).then(list => {
-        refNewFiles = refNewFiles.concat(list); renderRefList();
+      files.forEach(f => {
+        if (refExisting.length + refNewFiles.length >= 5) return toast('Maksimal 5 file referensi.', 'error');
+        if (f.size > 5 * 1024 * 1024) return toast('Ukuran file maksimal 5 MB.', 'error');
+        readB64(f).then(data => { refNewFiles.push({ name: f.name, size: f.size, data }); renderRefList(); });
       });
     }
+
     function renderRefList() {
       const ul = $('refFileList'); ul.innerHTML = '';
-      refExisting.forEach((a, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-slate-50 border rounded-lg px-2.5 py-1 text-xs"><a href="${esc(a.url)}" target="_blank" class="text-blue-900 underline truncate">${esc(a.name)}</a><button type="button" onclick="refExisting.splice(${i},1);renderRefList()" class="text-rose-500 font-bold">&times;</button></li>`; });
-      refNewFiles.forEach((f, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-amber-50 border rounded-lg px-2.5 py-1 text-xs"><span class="truncate">${esc(f.name)} (Baru)</span><button type="button" onclick="refNewFiles.splice(${i},1);renderRefList()" class="text-rose-500 font-bold">&times;</button></li>`; });
+      refExisting.forEach((a, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-slate-50 border rounded-lg px-2.5 py-1 text-xs"><a href="${esc(a.url)}" target="_blank" class="text-blue-900 underline truncate">${esc(a.name)}</a><button type="button" onclick="refExisting.splice(${i},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></li>`; });
+      refNewFiles.forEach((f, i) => { ul.innerHTML += `<li class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1 text-xs"><span class="truncate">${esc(f.name)} (Akan diunggah)</span><button type="button" onclick="refNewFiles.splice(${i},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></li>`; });
     }
 
     function editPtpFromLog(noReg, tab) {
       const r = ptpLogRecords.find(x => x.noReg === noReg); if (!r) return;
-      $('existingPtpSelect').value = r.noReg; $('noReg').value = r.noReg;
+      editingPtpOriginalNoReg = r.noReg;
+      $('existingPtpSelect').value = r.noReg;
+      $('noReg').value = r.noReg;
+      $('noReg').readOnly = true;
+      $('noReg').classList.add('bg-slate-200', 'cursor-not-allowed');
       if (r.tanggalTerbit) $('tanggalTerbit').value = r.tanggalTerbit;
       $('auditee').value = r.auditee !== '-' ? r.auditee : ''; $('auditor').value = r.auditor !== '-' ? r.auditor : '';
       $('lokasi').value = r.lokasi !== '-' ? r.lokasi : ''; $('noRefSumber').value = r.noRefSumber !== '-' ? r.noRefSumber : '';
@@ -1819,6 +1825,16 @@
         try {
           const d = JSON.parse(r.dataJson);
           ['acuan','namaTtdAuditor','tglTtdAuditor','madeWhy1','madeWhy2','madeWhy3','madeWhy4','madeWhy5','sentWhy1','sentWhy2','sentWhy3','sentWhy4','sentWhy5','namaAuditeeProd','tglTtdAuditeeProd','namaAuditeeInsp','tglTtdAuditeeInsp','namaApproved','tglTtdApproved','tanggalEvaluasi','komentarVerifikasi','tglVerifAuditor','tglTmj'].forEach(id => { if ($(id)) $(id).value = d[id] || ''; });
+          if (d.statusEvaluasi) document.querySelectorAll('input[name="statusEvaluasi"]').forEach(el => el.checked = (el.value === d.statusEvaluasi));
+          ['made', 'sent'].forEach(type => {
+            const list = d[type + 'Actions'] || [];
+            $(`${type}ActionsContainer`).innerHTML = '';
+            const total = Math.max(list.length, 3);
+            for (let i = 0; i < total; i++) {
+              const it = list[i];
+              addActionRow(type, it ? it.action : '', it ? it.pic : '', it ? it.due : '');
+            }
+          });
           refExisting = Array.isArray(d.refAttachments) ? d.refAttachments : []; refNewFiles = []; renderRefList();
         } catch (e) {}
       }
@@ -1828,7 +1844,10 @@
     }
 
     function resetFormToNew() {
+      editingPtpOriginalNoReg = '';
       $('ptpForm').reset(); base64FotoPart = ''; refExisting = []; refNewFiles = []; renderRefList();
+      $('noReg').readOnly = false;
+      $('noReg').classList.remove('bg-slate-200', 'cursor-not-allowed');
       $('fotoPreviewBox').innerHTML = '<span class="text-xs text-slate-400">Preview Foto</span>';
       Object.keys(sigPads).forEach(k => clearSig(k)); initDefaultActionRows();
       $('tanggalTerbit').value = todayStr(); $('tglTtdAuditor').value = todayStr();
@@ -1840,9 +1859,11 @@
     function collectPtpPayload() {
       const getSig = k => (sigPads[k] && !sigPads[k].isEmpty() ? sigPads[k].toDataURL('image/png') : '');
       const sEl = document.querySelector('input[name="sumber"]:checked'), kEl = document.querySelector('input[name="kategori"]:checked'), eEl = document.querySelector('input[name="statusEvaluasi"]:checked');
+      const isNew = !editingPtpOriginalNoReg && $('modeBadge').textContent.includes('Baru');
+      const finalReg = isNew ? $('noReg').value.trim() : (editingPtpOriginalNoReg || $('noReg').value.trim());
       return {
-        isNewRecord: $('modeBadge').textContent.includes('Baru'), refAttachments: refExisting, refFilesNew: refNewFiles.map(f => ({ name: f.name, data: f.data })),
-        noReg: $('noReg').value.trim(), tanggalTerbit: $('tanggalTerbit').value, acuan: $('acuan').value.trim(), auditee: $('auditee').value.trim(), auditor: $('auditor').value.trim(), lokasi: $('lokasi').value.trim(),
+        isNewRecord: isNew, originalNoReg: editingPtpOriginalNoReg || '', refAttachments: refExisting, refFilesNew: refNewFiles.map(f => ({ name: f.name, data: f.data })),
+        noReg: finalReg, tanggalTerbit: $('tanggalTerbit').value, acuan: $('acuan').value.trim(), auditee: $('auditee').value.trim(), auditor: $('auditor').value.trim(), lokasi: $('lokasi').value.trim(),
         sumber: sEl ? sEl.value : '', noRefSumber: $('noRefSumber').value.trim(), kategori: kEl ? kEl.value : '', partName: $('partName').value.trim(), partNo: $('partNo').value.trim(), qtyNg: $('qtyNg').value.trim(), hasilSortir: $('hasilSortir').value.trim(), problem: $('problem').value.trim(),
         fotoPartBase64: base64FotoPart, sigAuditorBase64: getSig('auditor'), namaTtdAuditor: $('namaTtdAuditor').value.trim(), tglTtdAuditor: $('tglTtdAuditor').value,
         madeWhy1: $('madeWhy1').value.trim(), madeWhy2: $('madeWhy2').value.trim(), madeWhy3: $('madeWhy3').value.trim(), madeWhy4: $('madeWhy4').value.trim(), madeWhy5: $('madeWhy5').value.trim(),
@@ -1899,7 +1920,7 @@
         const isClosed = i.status.toLowerCase().includes('closed');
         if (sf === 'CLOSED' && !isClosed) return false;
         if (sf === 'OPEN' && isClosed) return false;
-        return !kw || i.noReg.toLowerCase().includes(kw) || i.partName.toLowerCase().includes(kw) || i.auditee.toLowerCase().includes(kw);
+        return !kw || i.noReg.toLowerCase().includes(kw) || i.partName.toLowerCase().includes(kw) || (i.partNo || '').toLowerCase().includes(kw) || i.auditee.toLowerCase().includes(kw);
       });
 
       if (!ptpSortState) {
@@ -1913,7 +1934,7 @@
         filtered = filtered.slice().sort((a, b) => String(a[k] || '').localeCompare(String(b[k] || ''), 'id', { numeric: true, sensitivity: 'base' }) * dir);
       }
 
-      ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'status', 'lastUpdated'].forEach(colKey => {
+      ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'partNo', 'status', 'lastUpdated'].forEach(colKey => {
         const ind = $('ptp-sort-' + colKey);
         if (!ind) return;
         if (ptpSortState && ptpSortState.k === colKey) {
@@ -1934,8 +1955,8 @@
         const badge = isClosed ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[10px]">CLOSED</span>' : '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px]">ON PROGRESS</span>';
         const pdfBtn = i.pdfUrl ? `<a href="${esc(i.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '';
         const delBtn = canDel ? `<button type="button" onclick="deletePtpRow('${esc(i.noReg)}')" class="bg-rose-50 text-rose-700 font-semibold px-2 py-1 rounded text-[11px]">Hapus</button>` : '';
-        return `<tr class="hover:bg-slate-50"><td class="p-2.5 font-mono font-bold text-blue-900">${esc(i.noReg)}</td><td class="p-2.5">${esc(i.tanggalTerbit)}</td><td class="p-2.5"><div class="font-semibold">${esc(i.auditee)}</div><div class="text-[10px] text-slate-500">${esc(i.sumber)}</div></td><td class="p-2.5"><div class="font-semibold">${esc(i.partName)}</div><div class="text-[11px] text-slate-500 truncate max-w-xs">${esc(i.problem)}</div></td><td class="p-2.5 text-center">${badge}</td><td class="p-2.5 text-center text-[11px] text-slate-500">${esc(i.lastUpdated)}</td><td class="p-2.5 text-center space-x-1"><button type="button" onclick="editPtpFromLog('${esc(i.noReg)}',1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Edit</button>${pdfBtn}${delBtn}</td></tr>`;
-      }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data PTP.</td></tr>';
+        return `<tr class="hover:bg-slate-50"><td class="p-2.5 font-mono font-bold text-blue-900 whitespace-nowrap">${esc(i.noReg)}</td><td class="p-2.5 whitespace-nowrap">${esc(i.tanggalTerbit)}</td><td class="p-2.5"><div class="font-semibold">${esc(i.auditee)}</div><div class="text-[10px] text-slate-500">${esc(i.sumber)}</div></td><td class="p-2.5"><div class="font-semibold">${esc(i.partName)}</div><div class="text-[11px] text-slate-500 truncate max-w-xs">${esc(i.problem)}</div></td><td class="p-2.5 font-mono text-slate-700 whitespace-nowrap">${esc(i.partNo || '-')}</td><td class="p-2.5 text-center">${badge}</td><td class="p-2.5 text-center text-[11px] text-slate-500">${esc(i.lastUpdated)}</td><td class="p-2.5 text-center space-x-1 whitespace-nowrap"><button type="button" onclick="editPtpFromLog('${esc(i.noReg)}',1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Edit</button>${pdfBtn}${delBtn}</td></tr>`;
+      }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada data PTP.</td></tr>';
     }
 
     async function deletePtpRow(noReg) {
