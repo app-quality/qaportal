@@ -9,12 +9,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js, XLSX & jsPDF (Untuk Dashboard & Export Modul Quality A) -->
+  <!-- Chart.js, XLSX & jsPDF -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <!-- Signature Pad (Untuk Modul E-PTP B) -->
+  <!-- Signature Pad -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -54,11 +54,10 @@
   <div id="toast" class="fixed bottom-5 right-5 z-[80] translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium pointer-events-none max-w-sm"></div>
 
   <!-- ===================================================================== -->
-  <!-- HALAMAN LOGIN (DESIGN SPLIT-SCREEN B + SECURITY TURNSTILE & MFA A)    -->
+  <!-- HALAMAN LOGIN (SPLIT-SCREEN INDUSTRIAL BLUEPRINT + SECURITY A)        -->
   <!-- ===================================================================== -->
   <section id="loginScreen" class="min-h-screen blueprint-grid flex items-center justify-center p-4 sm:p-6">
     <div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900">
-      <!-- Kiri -->
       <div class="md:col-span-5 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-7 sm:p-8 text-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-800">
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold tracking-wider mb-5">
@@ -74,7 +73,7 @@
           </p>
         </div>
         <div class="mt-8 pt-6 border-t border-slate-800/80 space-y-2.5 text-[11px] text-slate-300">
-          <div class="flex items-center gap-2.5"><i data-lucide="shield-check" class="w-4 h-4 text-amber-400 shrink-0"></i><span>Keamanan Berlapis: Turnstile, SHA-256 &amp; 2FA</span></div>
+          <div class="flex items-center gap-2.5"><i data-lucide="shield-check" class="w-4 h-4 text-amber-400 shrink-0"></i><span>Keamanan Berlapis: SHA-256 Hash, Session Token &amp; 2FA</span></div>
           <div class="flex items-center gap-2.5"><i data-lucide="layers" class="w-4 h-4 text-sky-400 shrink-0"></i><span>4 Modul Quality Terintegrasi dalam 1 Sistem</span></div>
           <button type="button" onclick="openSecurityModal()" class="mt-3 w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-emerald-400 transition">
             <i data-lucide="shield-alert" class="w-4 h-4"></i><span>Status Keamanan Situs</span>
@@ -82,7 +81,6 @@
         </div>
       </div>
 
-      <!-- Kanan -->
       <div class="md:col-span-7 p-7 sm:p-10 bg-slate-900/95 text-slate-100 flex flex-col justify-center">
         <div class="mb-5">
           <h2 class="text-xl font-bold text-white">Masuk ke Portal Terpadu</h2>
@@ -147,11 +145,11 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- APLIKASI UTAMA TERPADU (NAVBAR B + 4 MODUL LENGKAP A & B)             -->
+  <!-- APLIKASI UTAMA TERPADU                                                -->
   <!-- ===================================================================== -->
   <div id="mainAppContainer" class="hidden pb-14">
 
-    <!-- Header Utama Perusahaan + Navigasi 4 Modul -->
+    <!-- Header Utama + Navigasi 4 Modul -->
     <header class="bg-blue-950 text-white shadow-lg sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
         <div class="flex items-center justify-between">
@@ -164,7 +162,6 @@
           </div>
         </div>
 
-        <!-- Navigasi 4 Modul Utama -->
         <nav class="flex flex-wrap items-center gap-1.5 bg-blue-900/60 p-1.5 rounded-xl border border-blue-800">
           <button type="button" id="nav-claim" onclick="switchMainModule('claim')" class="main-nav-btn active px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-100 hover:bg-blue-800 transition flex items-center gap-1.5">
             <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> Claim Customer
@@ -180,7 +177,6 @@
           </button>
         </nav>
 
-        <!-- Info User, Sync & Logout -->
         <div class="flex flex-wrap items-center gap-2 text-xs">
           <span class="bg-blue-900 text-blue-100 border border-blue-700 font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5">
             <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-400"></i>
@@ -200,16 +196,11 @@
       </div>
     </header>
 
-    <!-- =================================================================== -->
-    <!-- AREA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, DATA INSPECTION)   -->
-    <!-- =================================================================== -->
+    <!-- AREA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, DATA INSPECTION) -->
     <div id="qualityModulesWrapper" class="max-w-7xl mx-auto px-3 sm:px-5 mt-5 space-y-5"></div>
 
-    <!-- =================================================================== -->
-    <!-- AREA MODUL E-PTP (AF-PROD-014 DARI APLIKASI B)                      -->
-    <!-- =================================================================== -->
+    <!-- AREA MODUL E-PTP (AF-PROD-014) -->
     <div id="ptpModuleWrapper" class="hidden max-w-5xl mx-auto px-3 sm:px-4 mt-5">
-      <!-- Panel Lanjutkan / Update PTP -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
           <div class="p-2 bg-blue-100 text-blue-900 rounded-lg"><i data-lucide="folder-search" class="w-5 h-5"></i></div>
@@ -387,7 +378,15 @@
           </div>
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left border-collapse text-xs">
-              <thead><tr class="bg-blue-950 text-white"><th class="p-2.5">No. Reg. PTP</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee / Sumber</th><th class="p-2.5">Part &amp; Problem</th><th class="p-2.5 text-center">Status</th><th class="p-2.5 text-center">Update</th><th class="p-2.5 text-center">Aksi</th></tr></thead>
+              <thead><tr class="bg-blue-950 text-white">
+                <th onclick="togglePtpSort('noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">No. Reg. PTP<span id="ptp-sort-noReg" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th onclick="togglePtpSort('tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Tanggal<span id="ptp-sort-tanggalTerbit" class="ml-1 text-[10px] text-amber-300 font-bold">▼ Terbaru</span></th>
+                <th onclick="togglePtpSort('auditee')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Auditee / Sumber<span id="ptp-sort-auditee" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th onclick="togglePtpSort('partName')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Part &amp; Problem<span id="ptp-sort-partName" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th onclick="togglePtpSort('status')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 text-center cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Status<span id="ptp-sort-status" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th onclick="togglePtpSort('lastUpdated')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 text-center cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Update<span id="ptp-sort-lastUpdated" class="ml-1 text-[10px] text-blue-300">↕</span></th>
+                <th class="p-2.5 text-center">Aksi</th>
+              </tr></thead>
               <tbody id="logRegisterBody" class="divide-y divide-slate-200 bg-white"></tbody>
             </table>
           </div>
@@ -469,7 +468,6 @@
   <!-- ===================================================================== -->
   <script>
     window.PORTAL_CONFIG = {
-      // >>> GANTI dengan URL Web App Apps Script Anda (/exec) <<<
       APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzXRt6r0rsJzvRSEyOY_K-VwWwfoUXB-WjcSG2aAde_vGR_Tp3Ml9BmoZnuK5TahqNU/exec',
       TURNSTILE_SITEKEY: '0x4AAAAAAF_JNNxBwXPQpQm_'
     };
@@ -482,6 +480,7 @@
     const add90 = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d+90).toLocaleDateString('sv-SE'); };
     const pd = s => { if (!/^\d{4}-\d{2}-\d{2}/.test(s || '')) return null; const d = new Date(s.slice(0,10) + 'T00:00:00'); return isNaN(d) ? null : d; };
     const icons = () => { try { lucide.createIcons(); } catch (e) {} };
+    const readB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(f); });
 
     let toastT;
     function toast(msg, type) {
@@ -490,16 +489,12 @@
       clearTimeout(toastT); toastT = setTimeout(() => t.className += ' translate-y-24 opacity-0', 3200);
     }
 
-    /* --- Jembatan API Aman (fetch POST / google.script.run) --- */
     function apiCall(fn, ...args) {
-      const publicFns = ['apiLogin', 'apiVerifyMfa', 'apiSecurityStatus'];
-      const finalArgs = publicFns.includes(fn) ? args : args;
       const token = sessionStorage.getItem('acj_token') || '';
-
       return fetch(window.PORTAL_CONFIG.APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ fn, args: finalArgs, token })
+        body: JSON.stringify({ fn, args, token })
       })
       .then(r => r.json())
       .then(res => {
@@ -513,10 +508,6 @@
         return res.data !== undefined ? res.data : res;
       });
     }
-
-    /* --- Cloudflare Turnstile (Dinonaktifkan Sementara) --- */
-    const getTurnstileToken = () => '';
-    const resetTurnstile = () => {};
 
     /* --- Login, MFA & Session --- */
     let currentUser = null, pendingMfaToken = null, activeMainMod = 'claim';
@@ -551,7 +542,6 @@
           showLoginError(res.message || 'Login gagal.');
         }
       } catch (err) {
-        resetTurnstile();
         showLoginError(err.message);
       } finally {
         btn.disabled = false; btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>'; icons();
@@ -576,7 +566,7 @@
     }
 
     function cancelMfaStep() {
-      pendingMfaToken = null; $('mfaVerifyStep').classList.add('hidden'); $('loginCredsStep').classList.remove('hidden'); $('loginPassword').value = ''; resetTurnstile();
+      pendingMfaToken = null; $('mfaVerifyStep').classList.add('hidden'); $('loginCredsStep').classList.remove('hidden'); $('loginPassword').value = '';
     }
 
     function enterPortal(user, token, fresh) {
@@ -618,7 +608,6 @@
       $('mainAppContainer').classList.add('hidden');
       $('loginScreen').classList.remove('hidden');
       $('loginForm').reset();
-      resetTurnstile();
       if (expired) toast('Sesi berakhir, silakan login ulang.', 'error');
     }
 
@@ -691,6 +680,7 @@
     /* LOGIKA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, INSPECTION)      */
     /* =================================================================== */
     const Q_DATA = { claim: [], ng: [], insp: [] }, Q_PG = { claim: 1, ng: 1, insp: 1 }, Q_CHARTS = {}, Q_DRILL = {};
+    const Q_SRT = { claim: null, ng: null, insp: null };
     const Q_WSEL = { ng: new Set(), insp: new Set() }, Q_DSEL = { ng: new Set() };
     const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
     const MS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -700,20 +690,20 @@
     const weekOf = d => Math.ceil((d.getDate() + ((new Date(d.getFullYear(), d.getMonth(), 1).getDay() + 6) % 7)) / 7);
 
     const Q_MOD = {
-      claim: { title: 'Claim Customer', sheet: 'Claim_Customer', idk: 'idRegister', dk: 'tanggalClaim', color: 'blue',
+      claim: { title: 'Claim Customer', sheet: 'Claim_Customer', idk: 'idRegister', dk: 'tanggalClaim',
         search: ['namaCustomer','namaPart','partNomor','noClaim','idRegister','keteranganJenisNG','acjPlant'],
-        cols: [['ID Register','idRegister'],['Tgl Claim','tanggalClaim'],['Plant','acjPlant'],['Kategori','kategoriClaim'],['Customer','namaCustomer'],['No Claim','noClaim'],['Nama Part','namaPart'],['Part No','partNomor'],['Jenis NG','keteranganJenisNG'],['Kategori NG','kategoriNG'],['Qty Check','qtyCheck','n'],['Qty NG','qtyNG','n'],['% Defect','prosentase','p'],['Status','statusClaim'],['Official Doc','officialDoc','b'],['PICA','pica','b']] },
-      ng: { title: 'Database NG Internal', sheet: 'Database_NG', idk: 'idNG', dk: 'tanggal', color: 'amber',
+        cols: [['ID Register','idRegister'],['Tgl Claim','tanggalClaim'],['Plant','acjPlant'],['Kategori','kategoriClaim'],['Customer','namaCustomer'],['No Claim','noClaim'],['Nama Part','namaPart'],['Part No','partNomor'],['Jenis NG','keteranganJenisNG'],['Kategori NG','kategoriNG'],['Frekuensi','frekuensiClaim'],['Qty Check','qtyCheck','n'],['Qty NG','qtyNG','n'],['% Defect','prosentase','p'],['Penyebab','penyebabProblem'],['Lokasi','lokasiPenemuan'],['Finish Mon.','finishMonitoring'],['Status','statusClaim'],['Official Doc','officialDoc','b'],['PICA','pica','b']] },
+      ng: { title: 'Database NG Internal', sheet: 'Database_NG', idk: 'idNG', dk: 'tanggal',
         search: ['namaPart','jenisNG','faktorPenyebab','divisi','noMesin','namaOperator','idNG'],
-        cols: [['ID NG','idNG'],['Tanggal','tanggal'],['Nama Part','namaPart'],['Qty NG','qtyNG','n'],['Qty Produksi','qtyProduksi','n'],['Ratio NG','ratioNG','p'],['Jenis Defect','jenisNG'],['Faktor Penyebab','faktorPenyebab'],['Divisi','divisi'],['No Mesin','noMesin'],['Operator','namaOperator']] },
-      insp: { title: 'Data Inspection', sheet: 'Data_Inspection', idk: 'uid', dk: 'tanggal', color: 'emerald',
+        cols: [['ID NG','idNG'],['Tanggal','tanggal'],['Nama Part','namaPart'],['Qty NG','qtyNG','n'],['Qty Prod','qtyProduksi','n'],['Ratio NG','ratioNG','p'],['Jenis Defect','jenisNG'],['Faktor Penyebab','faktorPenyebab'],['Divisi','divisi'],['No Mesin','noMesin'],['Operator','namaOperator']] },
+      insp: { title: 'Data Inspection', sheet: 'Data_Inspection', idk: 'uid', dk: 'tanggal',
         search: ['namaPart','customer','proses','operator','keterangan','no'],
         cols: [['Tanggal','tanggal'],['Nama Part','namaPart'],['Customer','customer'],['Proses','proses'],['Qty OK','qtyOK','n'],['Qty NG','qtyNG','n'],['Qty Repair','qtyRepair','n'],['Total Check','totalCheck','n'],['Operator','operator'],['Keterangan','keterangan']] }
     };
 
     const Q_FIELDS = {
       claim: [
-        {k:'idRegister',l:'ID Register (Otomatis)',t:'text',ro:1},{k:'tanggalClaim',l:'Tanggal Claim',t:'date',req:1},
+        {k:'idRegister',l:'ID Register (otomatis)',t:'text',ro:1},{k:'tanggalClaim',l:'Tanggal Claim',t:'date',req:1},
         {k:'acjPlant',l:'ACJ Plant',t:'sel',o:PLANTS},{k:'namaCustomer',l:'Nama Customer',t:'text',req:1,list:'dlCust'},
         {k:'noClaim',l:'No. Claim Customer',t:'text'},{k:'kategoriClaim',l:'Kategori Claim',t:'sel',o:['Claim','Informasi']},
         {k:'lokasiPenemuan',l:'Lokasi Penemuan',t:'sel',o:['Receiving Inspection','In-Process','Customer']},{k:'frekuensiClaim',l:'Frekuensi Claim',t:'sel',o:['Pertama kali','Berulang / rutin']},
@@ -725,27 +715,27 @@
         {k:'statusClaim',l:'Status Claim',t:'sel',o:['Monitoring','Closed']},
         {k:'officialDoc',l:'Lampiran Official Doc (PDF/JPG/PNG, maks 4 MB)',t:'file'},{k:'pica',l:'Lampiran PICA (PDF/JPG/PNG, maks 4 MB)',t:'file'}],
       ng: [
-        {k:'idNG',l:'ID NG (Otomatis)',t:'text',ro:1},{k:'tanggal',l:'Tanggal',t:'date',req:1},
+        {k:'idNG',l:'ID NG (otomatis)',t:'text',ro:1},{k:'tanggal',l:'Tanggal',t:'date',req:1},
         {k:'namaPart',l:'Nama Part',t:'text',req:1},{k:'qtyNG',l:'Qty NG (Pcs)',t:'number',min:0,req:1,def:1},
-        {k:'qtyProduksi',l:'Qty Produksi (Pcs)',t:'number',min:0,req:1,def:0},{k:'ratioNG',l:'Ratio NG (%)',t:'text',ro:1},
+        {k:'qtyProduksi',l:'Qty Produksi (Pcs)',t:'number',min:0,req:1,def:0},{k:'ratioNG',l:'Ratio NG (%) (otomatis)',t:'text',ro:1},
         {k:'jenisNG',l:'Jenis NG',t:'text',req:1},{k:'faktorPenyebab',l:'Faktor Penyebab',t:'text',req:1},
         {k:'divisi',l:'Divisi',t:'sel',o:DIVISI},{k:'noMesin',l:'No. Mesin',t:'text'},{k:'namaOperator',l:'Nama Operator',t:'text'}],
       insp: [
-        {k:'no',l:'No (Kosongkan = Otomatis)',t:'text'},{k:'tanggal',l:'Tanggal',t:'date',req:1},
+        {k:'no',l:'No (kosongkan = otomatis)',t:'text'},{k:'tanggal',l:'Tanggal',t:'date',req:1},
         {k:'namaPart',l:'Nama Part',t:'text',req:1},{k:'customer',l:'Customer',t:'text',req:1,list:'dlCust'},
         {k:'proses',l:'Proses',t:'text',req:1},{k:'operator',l:'Operator',t:'text',req:1},
         {k:'qtyOK',l:'Qty OK',t:'number',min:0,req:1,def:0},{k:'qtyNG',l:'Qty NG',t:'number',min:0,req:1,def:0},
-        {k:'qtyRepair',l:'Qty Repair',t:'number',min:0,req:1,def:0},{k:'totalCheck',l:'Total Check',t:'text',ro:1},
+        {k:'qtyRepair',l:'Qty Repair',t:'number',min:0,req:1,def:0},{k:'totalCheck',l:'Total Check (otomatis)',t:'text',ro:1},
         {k:'keterangan',l:'Keterangan',t:'text',w:1}]
     };
 
-    /* --- Widget Minggu Kalender (Senin-Minggu) & Multi-Divisi --- */
     function weekListQ(m) {
       const moEl = $(`qf-${m}-month`), yEl = $(`qf-${m}-year`);
-      const mo = moEl ? Number(moEl.value) : 0; if (!mo) return [];
+      const mo = moEl ? Number(moEl.value) : 0;
+      if (!mo) return [];
       const yv = yEl ? yEl.value : 'ALL';
       if (yv === 'ALL') {
-        const ys = [...yEl.options].map(o => Number(o.value)).filter(Boolean);
+        const ys = yEl ? [...yEl.options].map(o => Number(o.value)).filter(Boolean) : [];
         const n = Math.max(0, ...ys.map(y => weekOf(new Date(y, mo, 0))));
         return Array.from({ length: n }, (_, i) => ({ n: i + 1, txt: 'Minggu ' + (i + 1) }));
       }
@@ -755,6 +745,37 @@
         return { n: i + 1, txt: `Minggu ${i + 1} · ${a === b ? a : a + '–' + b} ${MS[mo - 1]}` };
       });
     }
+
+    function toggleQSort(m, k) {
+      const cur = Q_SRT[m];
+      Q_SRT[m] = !cur || cur.k !== k ? { k, dir: 'asc' } : cur.dir === 'asc' ? { k, dir: 'desc' } : null;
+      Q_PG[m] = 1;
+      renderQualityTable(m);
+    }
+
+    function sortQualityRows(m, rows) {
+      const c = Q_MOD[m], s = Q_SRT[m];
+      const empty = v => v == null || v === '';
+      // Default: urutkan dari tanggal terbaru ke terlama (dan ID terbaru di atas jika tanggal sama)
+      if (!s) {
+        return rows.slice().sort((a, b) => {
+          const da = String(a[c.dk] || ''), db = String(b[c.dk] || '');
+          if (da !== db) return db.localeCompare(da);
+          return String(b[c.idk] || '').localeCompare(String(a[c.idk] || ''), 'id', { numeric: true });
+        });
+      }
+      const col = c.cols.find(x => x[1] === s.k), t = col ? col[2] : '', dir = s.dir === 'asc' ? 1 : -1;
+      return rows.slice().sort((a, b) => {
+        const va = a[s.k], vb = b[s.k];
+        if (empty(va) && empty(vb)) return 0;
+        if (empty(va)) return 1;
+        if (empty(vb)) return -1;
+        if (t === 'n' || t === 'p') return (num(va) - num(vb)) * dir;
+        if (t === 'b') return ((va ? 1 : 0) - (vb ? 1 : 0)) * dir;
+        return String(va).localeCompare(String(vb), 'id', { numeric: true, sensitivity: 'base' }) * dir;
+      });
+    }
+
     function buildWeeksQ(m) {
       const box = $(`qwk-${m}-box`), lbl = $(`qwk-${m}-lbl`); if (!box || !lbl) return;
       const list = weekListQ(m), set = Q_WSEL[m], off = $(`qf-${m}-month`).value === 'ALL';
@@ -767,6 +788,7 @@
         : '';
       if (!list.length) $(`qwk-${m}`).removeAttribute('open');
     }
+
     function buildDivQ() {
       const box = $('qdv-ng-box'), lbl = $('qdv-ng-lbl'); if (!box || !lbl) return;
       const set = Q_DSEL.ng, list = DIVISI.filter(x => set.has(x));
@@ -775,6 +797,7 @@
       box.innerHTML = `<button type="button" onclick="Q_DSEL.ng.clear();buildDivQ();Q_PG.ng=1;renderQualityModule('ng')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-semibold text-blue-800">Semua Divisi (hapus pilihan)</button>` +
         DIVISI.map(x => `<label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"><input type="checkbox" ${set.has(x)?'checked':''} onchange="this.checked?Q_DSEL.ng.add('${x}'):Q_DSEL.ng.delete('${x}');buildDivQ();Q_PG.ng=1;renderQualityModule('ng')" class="accent-blue-900"><span>${x}</span></label>`).join('');
     }
+
     document.addEventListener('click', e => {
       const sm = e.target.closest('summary[id^="qwk-"]');
       if (sm) { const m = sm.dataset.m; if ($(`qf-${m}-month`).value === 'ALL') { e.preventDefault(); toast('Pilih bulan terlebih dahulu untuk memfilter per minggu.', 'info'); } return; }
@@ -784,7 +807,7 @@
     function buildQualityShell() {
       $('qualityModulesWrapper').innerHTML = Object.keys(Q_MOD).map(m => {
         const c = Q_MOD[m];
-        const th = '<th class="p-2.5">Aksi</th>' + c.cols.map(x => `<th class="p-2.5 whitespace-nowrap ${x[2]==='n'||x[2]==='p'?'text-right':''}">${x[0]}</th>`).join('');
+        const th = '<th class="p-2.5">Aksi</th>' + c.cols.map(x => `<th onclick="toggleQSort('${m}','${x[1]}')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap ${x[2]==='n'||x[2]==='p'?'text-right':''}">${x[0]}<span id="qsort-${m}-${x[1]}" class="ml-1 text-[10px] text-blue-300">↕</span></th>`).join('');
         let filtersHtml = `
           <select id="qf-${m}-year" onchange="Q_PG['${m}']=1;${m!=='claim'?`buildWeeksQ('${m}');`:''}renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Tahun</option></select>
           <select id="qf-${m}-month" onchange="Q_PG['${m}']=1;${m!=='claim'?`Q_WSEL['${m}'].clear();buildWeeksQ('${m}');`:''}renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Bulan</option>${MONTHS.map((x, i) => `<option value="${i+1}">${x}</option>`).join('')}</select>`;
@@ -843,20 +866,16 @@
             </div>
           </div>
 
-          <!-- Filter Bar -->
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2.5">
             <span class="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><i data-lucide="filter" class="w-3.5 h-3.5 text-blue-900"></i> Filter:</span>
             ${filtersHtml}
             <button type="button" onclick="resetQualityFilter('${m}')" class="text-xs text-blue-800 hover:underline font-semibold ml-auto">Reset Filter</button>
           </div>
 
-          <!-- KPI Cards -->
           <div id="qkpi-${m}" class="grid grid-cols-2 ${m === 'claim' || m === 'ng' ? 'lg:grid-cols-6' : 'lg:grid-cols-4'} gap-3"></div>
 
-          <!-- Charts -->
           ${chartsHtml}
 
-          <!-- Tabel Log Register -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex flex-wrap items-center gap-2">
@@ -939,6 +958,7 @@
       if (m === 'claim' && $('cmpYear')) $('cmpYear').value = 'ALL';
       if (Q_WSEL[m]) { Q_WSEL[m].clear(); buildWeeksQ(m); }
       if (Q_DSEL[m]) { Q_DSEL[m].clear(); buildDivQ(); }
+      Q_SRT[m] = null;
       $(`qq-${m}`).value = ''; clearQDrill(m); Q_PG[m] = 1; renderQualityModule(m);
     }
 
@@ -949,7 +969,7 @@
       const kt = $(`qf-${m}-kategori`) ? $(`qf-${m}-kategori`).value : 'ALL';
       const q = ($(`qq-${m}`).value || '').toLowerCase().trim(), dr = applyDrill && Q_DRILL[m];
 
-      return Q_DATA[m].filter(r => {
+      const out = Q_DATA[m].filter(r => {
         const d = pd(r[c.dk]);
         if ((y !== 'ALL' || mo !== 'ALL' || (Q_WSEL[m] && Q_WSEL[m].size)) && !d) return false;
         if (y !== 'ALL' && d.getFullYear() != y) return false;
@@ -963,6 +983,7 @@
         if (dr && r[dr.field] !== dr.value) return false;
         return true;
       });
+      return sortQualityRows(m, out);
     }
 
     const qSum = (rows, kf, vf) => { const o = {}; rows.forEach(r => { const k = kf(r); o[k] = (o[k] || 0) + vf(r); }); return o; };
@@ -1139,586 +1160,56 @@
       $('qpn-' + m).textContent = `${Q_PG[m]} / ${pages}`;
       $('qprev-' + m).disabled = Q_PG[m] <= 1;
       $('qnext-' + m).disabled = Q_PG[m] >= pages;
-    }
 
-    /* --- Laporan Eksekutif PDF Lengkap (Tema Navy/Amber Ramah Tinta + Log Terpisah) --- */
-    function snapQChart(cfg, w, h, title) {
-      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-      const o = cfg.options || {};
-      const ch = new Chart(cv, {
-        type: cfg.type,
-        data: cfg.data,
-        plugins: [{ id: 'bg', beforeDraw(c) { const x = c.ctx; x.save(); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.restore(); } }],
-        options: Object.assign({}, o, {
-          responsive: false,
-          animation: false,
-          devicePixelRatio: 1,
-          plugins: Object.assign({}, o.plugins, { title: { display: !!title, text: title, font: { size: 13, weight: 'bold' } } })
-        })
+      c.cols.forEach(x => {
+        const ind = $(`qsort-${m}-${x[1]}`);
+        if (!ind) return;
+        const s = Q_SRT[m];
+        if (s && s.k === x[1]) {
+          ind.textContent = s.dir === 'asc' ? '▲ A-Z' : '▼ Z-A';
+          ind.className = 'ml-1 text-[10px] text-amber-300 font-bold';
+        } else if (!s && x[1] === c.dk) {
+          ind.textContent = '▼ Terbaru';
+          ind.className = 'ml-1 text-[10px] text-amber-300 font-bold';
+        } else {
+          ind.textContent = '↕';
+          ind.className = 'ml-1 text-[10px] text-blue-300';
+        }
       });
-      const u = cv.toDataURL('image/png'); ch.destroy(); return u;
     }
 
-    function cfgCustQ(d) {
-      const map = qSum(d, r => r.namaCustomer || 'Unknown', () => 1), keys = Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 5);
-      return {
-        type: 'bar',
-        data: { labels: keys.length ? keys : ['Tidak ada data'], datasets: [{ label: 'Total Kasus', data: keys.length ? keys.map(k => map[k]) : [0], backgroundColor: '#0284c7', borderRadius: 5 }] },
-        options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-      };
-    }
-
-    function cfgTrendClaimQ(d) {
-      const c = new Array(12).fill(0), q = new Array(12).fill(0);
-      d.forEach(r => { const x = pd(r.tanggalClaim); if (x) { c[x.getMonth()]++; q[x.getMonth()] += num(r.qtyNG); } });
-      return {
-        type: 'line',
-        data: { labels: MS, datasets: [
-          { label: 'Kasus Claim', data: c, borderColor: '#1e3a8a', backgroundColor: 'rgba(30,58,138,.1)', fill: true, tension: .3, yAxisID: 'y' },
-          { label: 'Qty NG (Pcs)', data: q, borderColor: '#d97706', borderDash: [4, 4], tension: .3, yAxisID: 'y1' }
-        ]},
-        options: { plugins: { legend: qLeg }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } }
-      };
-    }
-
-    function cfgCompareClaimQ(a, b, ya, yb) {
-      const f = d => { const c = new Array(12).fill(0); d.forEach(r => { const x = pd(r.tanggalClaim); if (x) c[x.getMonth()]++; }); return c; };
-      return {
-        type: 'bar',
-        data: { labels: MS, datasets: [
-          { label: String(ya), data: f(a), backgroundColor: '#94a3b8', borderRadius: 3 },
-          { label: String(yb), data: f(b), backgroundColor: '#1e3a8a', borderRadius: 3 }
-        ]},
-        options: { plugins: { legend: qLeg }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-      };
-    }
-
-    function cfgYearTrendQ(year, divSet) {
-      const colors = { Bor:'#3b82f6', CNC:'#6366f1', Cutting:'#06b6d4', Harden:'#ef4444', Hexagon:'#f59e0b', Punch:'#10b981', Rolling:'#8b5cf6', Turret:'#ec4899', Lainnya:'#94a3b8' };
-      const by = {}, tot = new Array(12).fill(0);
-      Q_DATA.ng.forEach(r => {
-        const d = pd(r.tanggal); if (!d || d.getFullYear() !== year || (divSet && divSet.size && !divSet.has(r.divisi))) return;
-        const dv = colors[r.divisi] ? r.divisi : 'Lainnya';
-        (by[dv] = by[dv] || new Array(12).fill(0))[d.getMonth()] += num(r.qtyNG);
-        tot[d.getMonth()] += num(r.qtyNG);
-      });
-      const ds = [{ type: 'line', label: 'Total Qty NG', data: tot, borderColor: '#0f172a', borderWidth: 2.5, backgroundColor: 'transparent', pointRadius: 3, tension: .3, order: 0 }];
-      Object.keys(by).forEach(k => ds.push({ type: 'bar', label: 'Div. ' + k, data: by[k], backgroundColor: colors[k], stack: 's', order: 1 }));
-      return {
-        type: 'bar',
-        data: { labels: MS, datasets: ds },
-        options: { plugins: { legend: qLeg }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Qty Defect (Pcs)', font: { size: 10 } } } } }
-      };
-    }
-
-    function execReport() {
-      toast('Menyiapkan Laporan Eksekutif PDF (Landscape)...', 'info');
-      setTimeout(() => {
-        try {
-          const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('Library PDF belum termuat.');
-          const doc = new J('l', 'pt', 'a4'), W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-          const M = 28, CW = W - 2 * M, HALF = (CW - 12) / 2, now = new Date().toLocaleString('id-ID');
-          const byWho = currentUser ? `${currentUser.fullName} (${currentUser.role})` : 'System';
-          const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-
-          // Tema Matching Aplikasi (Navy Blueprint #1e3a8a + Amber #f59e0b) & Ramah Tinta
-          const NAVY = [30, 58, 138];
-          const AMBER = [217, 119, 6];
-          const TINT_BLUE = [239, 246, 255];
-          const TINT_SLATE = [248, 250, 252];
-
-          const header = (title, badge) => {
-            doc.setFillColor(...TINT_BLUE); doc.rect(M, 20, CW, 54, 'F');
-            doc.setDrawColor(...NAVY); doc.setLineWidth(0.8); doc.rect(M, 20, CW, 54, 'S');
-            doc.setFillColor(...NAVY); doc.rect(M, 20, 5, 54, 'F');
-            doc.setFillColor(245, 158, 11); doc.rect(M + 5, 20, 2.5, 54, 'F');
-
-            doc.setTextColor(...NAVY); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('PT. ADHI CHANDRA JAYA', M + 15, 37);
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
-            doc.text('Metal Processing for Automotive Parts, Electronics and House Accessories', M + 15, 49);
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(...AMBER);
-            doc.text('ISO 9001:2015  •  INTEGRATED QUALITY & E-PTP PORTAL', M + 15, 62);
-
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...NAVY); doc.text(badge, W - M - 12, 37, { align: 'right' });
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(71, 85, 105); doc.text(`Waktu Cetak: ${now} | User: ${byWho}`, W - M - 12, 50, { align: 'right' });
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(15, 23, 42); doc.text(title, M, 90);
-            doc.setDrawColor(203, 213, 225); doc.setLineWidth(0.6); doc.line(M, 96, W - M, 96);
-          };
-
-          const banner = (y, list) => {
-            const t = list.map(([k, v]) => `${k}: [ ${v} ]`).join('   |   ');
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-            const ls = doc.splitTextToSize(t, CW - 124), h = Math.max(20, 11 + ls.length * 9);
-            doc.setFillColor(...TINT_SLATE); doc.roundedRect(M, y, CW, h, 3, 3, 'F');
-            doc.setDrawColor(203, 213, 225); doc.roundedRect(M, y, CW, h, 3, 3, 'S');
-            doc.setFont('helvetica', 'bold'); doc.setTextColor(...NAVY); doc.text('FILTER ANALISIS AKTIF:', M + 8, y + 13);
-            doc.setFont('helvetica', 'normal'); doc.setTextColor(51, 65, 85); doc.text(ls, M + 112, y + 13);
-            return y + h + 8;
-          };
-
-          const kbox = (x, y, w, label, val, col, sub) => {
-            doc.setFillColor(255, 255, 255); doc.roundedRect(x, y, w, 36, 4, 4, 'F');
-            doc.setDrawColor(203, 213, 225); doc.roundedRect(x, y, w, 36, 4, 4, 'S');
-            doc.setFillColor(...col); doc.rect(x, y + 4, 2.5, 28, 'F');
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(100, 116, 139); doc.text(label, x + 8, y + 11);
-            doc.setFontSize(10); doc.setTextColor(...col); doc.text(String(val).slice(0, 40), x + 8, y + 24);
-            if (sub) { doc.setFontSize(6.5); doc.setTextColor(100, 116, 139); doc.text(sub, x + 8, y + 32); }
-          };
-
-          const kRow = (y, items) => {
-            const w = (CW - (items.length - 1) * 6) / items.length;
-            items.forEach((it, i) => kbox(M + i * (w + 6), y, w, ...it));
-            return y + 44;
-          };
-
-          const legend = (x, y, w, h, title, items) => {
-            doc.setFillColor(255, 255, 255); doc.roundedRect(x, y, w, h, 4, 4, 'F');
-            doc.setDrawColor(203, 213, 225); doc.roundedRect(x, y, w, h, 4, 4, 'S');
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY); doc.text(title, x + 10, y + 14);
-            const sp = Math.min(20, (h - 30) / Math.max(1, items.length)); let ry = y + 30;
-            items.forEach(it => {
-              doc.setFillColor(...rgb(it.color)); doc.roundedRect(x + 10, ry - 7, 8, 8, 2, 2, 'F');
-              doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(30, 41, 59);
-              doc.text(it.label.length > 24 ? it.label.slice(0, 22) + '...' : it.label, x + 23, ry);
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(71, 85, 105);
-              doc.text(it.prod != null ? `${fmt(it.qty)} NG / ${fmt(it.prod)} prod (${it.rt})` : `${fmt(it.qty)} pcs (${it.pct}%)`, x + w - 10, ry, { align: 'right' });
-              ry += sp;
-            });
-          };
-
-          const lbl = (v, all, f) => v === 'ALL' ? all : (f ? f(v) : v);
-          const qv = (m, k) => {
-            if (k === 'divisi') { const s = Q_DSEL[m]; return s && s.size ? DIVISI.filter(x => s.has(x)).join(', ') : 'ALL'; }
-            if (k === 'week') { const s = Q_WSEL[m]; return s && s.size && $(`qf-${m}-month`).value !== 'ALL' ? [...s].sort((a, b) => a - b).join(', ') : 'ALL'; }
-            const el = $(`qf-${m}-${k}`); return el ? el.value : 'ALL';
-          };
-
-          // Log Part NG Tertinggi: Tanpa kolom Part Name berulang di dalam baris,
-          // dan dipisah menjadi tabel tersendiri dengan jarak antar Part #1, #2, dan #3.
-          const TOPN = 3, LOGMAX = 10;
-          const partLog = (data, pieItems, fallback, head, widths, rowFn, title, badge, bannerList) => {
-            doc.addPage(); header(title, badge);
-            let curY = banner(104, bannerList);
-            const tops = pieItems.filter(it => it.label !== 'Part Lainnya').slice(0, TOPN);
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
-            doc.text(`Log ${TOPN} part NG tertinggi (sesuai pie chart) - maksimal ${LOGMAX} data per part, diurutkan Qty NG terbesar pada periode/filter aktif.`, M, curY + 4);
-            curY += 16;
-
-            if (!tops.length) {
-              doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
-              doc.text('Tidak ada data NG pada filter ini.', M, curY + 12);
-              return curY + 24;
-            }
-
-            const cs = {}, fixed = widths.slice(0, -1).reduce((a, w) => a + w[0], 0);
-            widths.forEach((w, i) => { cs[i] = { cellWidth: i === widths.length - 1 ? CW - fixed : w[0], halign: w[1] || 'left' }; });
-
-            tops.forEach((it, i) => {
-              const all = data.filter(r => (r.namaPart || fallback) === it.label && num(r.qtyNG) > 0)
-                .sort((a, b) => num(b.qtyNG) - num(a.qtyNG) || String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
-
-              // Jika ruang tersisa di halaman terlalu sempit (< 95pt), pindah ke halaman baru
-              if (curY > H - 95) {
-                doc.addPage();
-                header(title + ' (lanjutan)', badge);
-                curY = 112;
-              }
-
-              // Kotak Header Identitas Part (#1, #2, #3) - Ramah Tinta
-              const pCol = rgb(it.color);
-              doc.setFillColor(...TINT_SLATE); doc.roundedRect(M, curY, CW, 17, 3, 3, 'F');
-              doc.setDrawColor(...pCol); doc.setLineWidth(0.6); doc.roundedRect(M, curY, CW, 17, 3, 3, 'S');
-              doc.setFillColor(...pCol); doc.rect(M, curY, 4, 17, 'F');
-
-              doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY);
-              const summaryTxt = it.prod != null
-                ? `Total ${fmt(it.qty)} pcs NG dari ${fmt(it.prod)} pcs produksi (Ratio NG ${it.rt})`
-                : `Total ${fmt(it.qty)} pcs NG (${it.pct}%)`;
-              doc.text(`#${i + 1}  ${it.label}`, M + 10, curY + 11.5);
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(71, 85, 105);
-              doc.text(`${summaryTxt}  •  Menampilkan ${Math.min(all.length, LOGMAX)} dari ${all.length} data`, W - M - 8, curY + 11.5, { align: 'right' });
-
-              const p0 = doc.internal.getCurrentPageInfo().pageNumber;
-              doc.autoTable({
-                startY: curY + 20, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid', tableWidth: CW,
-                styles: { fontSize: 6.4, cellPadding: 1.8, overflow: 'ellipsize', lineColor: [203, 213, 225], lineWidth: 0.4, textColor: [30, 41, 59] },
-                headStyles: { fillColor: TINT_BLUE, textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.5 },
-                columnStyles: cs,
-                head: [head],
-                body: all.slice(0, LOGMAX).map((r, j) => rowFn(r, j + 1)),
-                didDrawPage: d => { if (d.pageNumber > p0) header(title + ' (lanjutan)', badge); }
-              });
-
-              // Beri jarak spasi 18pt sebelum tabel peringkat part berikutnya
-              curY = doc.lastAutoTable.finalY + 18;
-            });
-
-            return curY;
-          };
-          const D10 = v => String(v || '-').slice(0, 10);
-
-          // ---- HALAMAN 1: CLAIM CUSTOMER (TAHUN PEMBANDING vs TAHUN LAPORAN) ----
-          const selY = $('qf-claim-year').value, cmpY = $('cmpYear') ? $('cmpYear').value : 'ALL';
-          const yrs = Q_DATA.claim.map(r => pd(r.tanggalClaim)).filter(Boolean).map(d => d.getFullYear());
-          const curY = selY === 'ALL' ? (yrs.length ? Math.max(...yrs) : new Date().getFullYear()) : Number(selY);
-          let prevY = cmpY === 'ALL' ? curY - 1 : Number(cmpY);
-          if (prevY === curY) prevY = curY - 1;
-          const dP = getFilteredQuality('claim', false, prevY), dN = getFilteredQuality('claim', false, curY);
-
-          header('1. LAPORAN AUDIT REGISTER CLAIM CUSTOMER', 'BAGIAN 1 - CLAIM');
-          let y = banner(104, [
-            ['Tahun', `${prevY} (pembanding) vs ${curY}`],
-            ['Bulan', lbl(qv('claim', 'month'), 'Semua Bulan', v => MONTHS[v - 1])],
-            ['Customer', lbl(qv('claim', 'customer'), 'Semua Customer')],
-            ['Plant', lbl(qv('claim', 'plant'), 'Semua Plant')],
-            ['Kategori', lbl(qv('claim', 'kategori'), 'Semua Kategori')],
-            ...($('qq-claim').value ? [['Pencarian', $('qq-claim').value]] : [])
-          ]);
-
-          const yearBlock = (yy, yr, data, tag, col) => {
-            doc.setFillColor(...TINT_SLATE); doc.roundedRect(M, yy, CW, 14, 3, 3, 'F');
-            doc.setDrawColor(...col); doc.roundedRect(M, yy, CW, 14, 3, 3, 'S');
-            doc.setFillColor(...col); doc.rect(M, yy, 4, 14, 'F');
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...col);
-            doc.text(`TAHUN ${yr}  -  ${tag}`, M + 10, yy + 10);
-            yy += 18;
-            const cl = data.filter(c => c.statusClaim === 'Closed').length, nCl = data.filter(c => (c.kategoriClaim || 'Claim') === 'Claim').length;
-            yy = kRow(yy, [
-              ['TOTAL KASUS', fmt(data.length) + ' Kasus', NAVY],
-              ['KATEGORI CLAIM', fmt(nCl) + ' Kasus', [225, 29, 72]],
-              ['KATEGORI INFORMASI', fmt(data.length - nCl) + ' Kasus', [2, 132, 199]],
-              ['MONITORING', fmt(data.length - cl) + ' Kasus', AMBER],
-              ['CLOSED', fmt(cl) + ' Kasus', [5, 150, 105]],
-              ['TOTAL QTY DEFECT', fmt(data.reduce((a, c) => a + num(c.qtyNG), 0)) + ' Pcs', [225, 29, 72]]
-            ]);
-            doc.addImage(snapQChart(cfgCustQ(data), 620, 216, 'Top 5 Customer Terbanyak (Kasus) - ' + yr), 'PNG', M, yy, HALF, 135);
-            doc.addImage(snapQChart(cfgTrendClaimQ(data), 620, 216, 'Tren Kasus & Qty Defect Bulanan - ' + yr), 'PNG', M + HALF + 12, yy, HALF, 135);
-            return yy + 135 + 8;
-          };
-          y = yearBlock(y, prevY, dP, 'PEMBANDING (TAHUN SEBELUMNYA)', [71, 85, 105]);
-          y = yearBlock(y, curY, dN, 'TAHUN LAPORAN' + (selY === 'ALL' ? ' (otomatis: tahun terbaru pada data)' : ''), NAVY);
-
-          // ---- HALAMAN 1.1: PERBANDINGAN & LOG REGISTER CLAIM CUSTOMER ----
-          const T2 = '1.1 PERBANDINGAN & LOG REGISTER CLAIM CUSTOMER', B2 = 'BAGIAN 1 - CLAIM';
-          doc.addPage(); header(T2, B2);
-          y = 112;
-          {
-            const st = a => {
-              const chk = a.reduce((s, r) => s + num(r.qtyCheck), 0), ng = a.reduce((s, r) => s + num(r.qtyNG), 0);
-              const cl = a.filter(r => (r.kategoriClaim || 'Claim') === 'Claim').length;
-              return { n: a.length, cl, inf: a.length - cl, chk, ng, pct: chk ? ng / chk * 100 : 0, closed: a.filter(r => r.statusClaim === 'Closed').length };
-            };
-            const a = st(dP), b = st(dN), sg = v => (v > 0 ? '+' : '');
-            const rows = [['Total Kasus', 'n', 1], ['Kategori Claim', 'cl', 1], ['Kategori Informasi', 'inf', 0], ['Status Closed', 'closed', 0], ['Total Qty Check (pcs)', 'chk', 0], ['Total Qty NG (pcs)', 'ng', 1], ['% NG terhadap Check', 'pct', 1]];
-            const body = rows.map(([l, k]) => {
-              const d = b[k] - a[k], isP = k === 'pct';
-              const pc = isP ? '-' : (a[k] === 0 ? (b[k] === 0 ? '0%' : 'baru') : sg(d) + (d / a[k] * 100).toFixed(1) + '%');
-              return [l, isP ? a[k].toFixed(2) + '%' : fmt(a[k]), isP ? b[k].toFixed(2) + '%' : fmt(b[k]), isP ? sg(d) + d.toFixed(2) + ' pp' : sg(d) + fmt(d), pc];
-            });
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY);
-            doc.text(`Perbandingan Claim Customer: ${prevY} vs ${curY}`, M, y);
-            doc.addImage(snapQChart(cfgCompareClaimQ(dP, dN, prevY, curY), 620, 189, `Kasus Claim per Bulan: ${prevY} vs ${curY}`), 'PNG', M, y + 14, HALF, 118);
-            doc.autoTable({
-              startY: y + 14, margin: { left: M + HALF + 12, right: M, top: 106 }, tableWidth: HALF, theme: 'grid',
-              styles: { fontSize: 6.5, cellPadding: 2, lineColor: [203, 213, 225], lineWidth: 0.4, textColor: [30, 41, 59] },
-              headStyles: { fillColor: TINT_BLUE, textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.5 },
-              columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right', fontStyle: 'bold' }, 3: { halign: 'right' }, 4: { halign: 'right' } },
-              head: [['Indikator', String(prevY), String(curY), 'Selisih', '% Perubahan']], body,
-              didParseCell: d => {
-                if (d.section === 'body' && d.column.index >= 3) {
-                  const r = rows[d.row.index], dv = b[r[1]] - a[r[1]];
-                  d.cell.styles.textColor = !r[2] || dv === 0 ? [71, 85, 105] : dv > 0 ? [190, 18, 60] : [4, 120, 87];
-                  d.cell.styles.fontStyle = 'bold';
-                }
-              }
-            });
-            y += 14 + 118 + 14;
-          }
-          const MAXR = 100;
-          const logTableClaim = (yr, data, tag, col, yy) => {
-            if (yy > H - 100) { doc.addPage(); header(T2 + ' (lanjutan)', B2); yy = 112; }
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...col);
-            doc.text(`Log Register Claim Customer - Tahun ${yr} (${tag}) | ${data.length} data`, M, yy);
-            const p0 = doc.internal.getCurrentPageInfo().pageNumber;
-            doc.autoTable({
-              startY: yy + 6, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid',
-              styles: { fontSize: 6.5, cellPadding: 2.5, lineColor: [203, 213, 225], lineWidth: 0.4, textColor: [30, 41, 59] },
-              headStyles: { fillColor: TINT_SLATE, textColor: col, fontStyle: 'bold', lineColor: col, lineWidth: 0.5 },
-              head: [['ID Reg', 'Tanggal', 'Plant', 'Kategori', 'Customer', 'No Claim', 'Nama Part', 'Jenis NG', 'Check', 'NG', '%', 'Status', 'Doc', 'PICA']],
-              body: data.length ? data.slice(0, MAXR).map(c => [c.idRegister, c.tanggalClaim, c.acjPlant, c.kategoriClaim || 'Claim', c.namaCustomer, c.noClaim || '-', c.namaPart, c.keteranganJenisNG, fmt(c.qtyCheck), fmt(c.qtyNG), num(c.prosentase) + '%', c.statusClaim, c.officialDoc ? 'Ada' : '-', c.pica ? 'Ada' : '-']) : [['-', 'Tidak ada data claim pada filter ini', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-']],
-              didDrawPage: d => { if (d.pageNumber > p0) header(T2 + ' (lanjutan)', B2); }
-            });
-            return doc.lastAutoTable.finalY;
-          };
-          let fyC = logTableClaim(prevY, dP, 'Pembanding', [71, 85, 105], y);
-          logTableClaim(curY, dN, 'Tahun Laporan', NAVY, fyC + 20);
-
-          // ---- HALAMAN 2: DATABASE NG INTERNAL ----
-          const dn = getFilteredQuality('ng', false);
-          doc.addPage(); header('2. EVALUASI DATABASE NG INTERNAL PRODUKSI', 'BAGIAN 2 - NG');
-          const ngBanner = [
-            ['Tahun', lbl(qv('ng', 'year'), 'Semua Tahun')],
-            ['Bulan', lbl(qv('ng', 'month'), 'Semua Bulan', v => MONTHS[v - 1])],
-            ['Minggu', lbl(qv('ng', 'week'), 'Semua Minggu', v => 'Minggu ' + v)],
-            ['Divisi', lbl(qv('ng', 'divisi'), 'Semua Divisi')],
-            ...($('qq-ng').value ? [['Pencarian', $('qq-ng').value]] : [])
-          ];
-          y = banner(104, ngBanner);
-          const dv = qSum(dn, r => r.divisi || 'Lainnya', r => num(r.qtyNG)), df = qSum(dn, r => r.jenisNG || 'Lainnya', r => num(r.qtyNG));
-          const td = Object.keys(dv).sort((a, b) => dv[b] - dv[a])[0], tf = Object.keys(df).sort((a, b) => df[b] - df[a])[0];
-          const tqN = dn.reduce((a, n) => a + num(n.qtyNG), 0), tpN = dn.reduce((a, n) => a + num(n.qtyProduksi), 0);
-          y = kRow(y, [
-            ['TOTAL DEFECT NG', fmt(tqN) + ' Pcs', [225, 29, 72]],
-            ['TOTAL QTY PRODUKSI', fmt(tpN) + ' Pcs', NAVY],
-            ['RATIO NG', tpN > 0 ? (tqN / tpN * 100).toFixed(2) + '%' : '-', [225, 29, 72], 'NG ÷ produksi'],
-            ['TOP DIVISI DEFECT', td ? `${td} (${fmt(dv[td])} pcs)` : '-', AMBER],
-            ['TOP JENIS PROBLEM', tf ? `${tf} (${fmt(df[tf])} pcs)` : '-', NAVY]
-          ]);
-          const yvNg = $('qf-ng-year').value;
-          const yrNg = yvNg !== 'ALL' ? Number(yvNg) : (Q_DATA.ng.map(r => pd(r.tanggal)).filter(Boolean).map(d => d.getFullYear()).sort((a, b) => b - a)[0] || new Date().getFullYear());
-          const TW = 500, TH = H - y - 60;
-          doc.addImage(snapQChart(cfgYearTrendQ(yrNg, Q_DSEL.ng), 1000, Math.round(1000 * TH / TW), `Tren Jumlah NG Tahun ${yrNg} (Akumulasi Bulanan per Divisi)`), 'PNG', M, y, TW, TH);
-          const rx = M + TW + 12, rw = CW - TW - 12, pie = buildPieCfg(qSum(dn, r => r.namaPart || 'Tanpa Nama', r => num(r.qtyNG)));
-          pie.cfg.options.plugins.legend = { display: false };
-          const prodMap = qSum(dn, r => r.namaPart || 'Tanpa Nama', r => num(r.qtyProduksi));
-          const prodRest = tpN - pie.items.filter(it => it.label !== 'Part Lainnya').reduce((a, it) => a + (prodMap[it.label] || 0), 0);
-          pie.items.forEach(it => {
-            it.prod = it.label === 'Part Lainnya' ? Math.max(prodRest, 0) : (prodMap[it.label] || 0);
-            it.rt = it.prod > 0 ? (it.qty / it.prod * 100).toFixed(2) + '%' : 'n/a';
-          });
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY); doc.text('Top 5 Part NG Tertinggi', rx, y + 8);
-          const ps = Math.min(130, TH * 0.5); doc.addImage(snapQChart(pie.cfg, 400, 400), 'PNG', rx + (rw - ps) / 2, y + 14, ps, ps);
-          legend(rx, y + ps + 20, rw, TH - ps - 20, 'Rincian Part NG Kritis', pie.items);
-
-          // ---- HALAMAN 2.1: LOG PART NG TERTINGGI (NG INTERNAL) ----
-          partLog(dn, pie.items, 'Tanpa Nama',
-            ['No', 'Tanggal', 'ID NG', 'Qty NG', 'Qty Prod', 'Ratio NG', 'Jenis Defect', 'Faktor Penyebab', 'Divisi', 'No Mesin', 'Operator'],
-            [[24, 'center'], [58], [62], [40, 'right'], [46, 'right'], [44, 'right'], [120], [150], [52], [60], [130]],
-            (r, n) => [n, D10(r.tanggal), r.idNG || '-', fmt(r.qtyNG), num(r.qtyProduksi) > 0 ? fmt(r.qtyProduksi) : '-', num(r.qtyProduksi) > 0 ? num(r.ratioNG).toFixed(2) + '%' : '-', r.jenisNG || '-', r.faktorPenyebab || '-', r.divisi || '-', r.noMesin || '-', r.namaOperator || '-'],
-            '2.1 LOG PART NG TERTINGGI - DATABASE NG INTERNAL PRODUKSI', 'BAGIAN 2 - LOG NG', ngBanner);
-
-          // ---- HALAMAN 2.2: PARETO MULTI-DIMENSI (GABUNGAN & PER DIVISI) ----
-          const ngBase = [['Tahun', lbl(qv('ng', 'year'), 'Semua Tahun')], ['Bulan', lbl(qv('ng', 'month'), 'Semua Bulan', v => MONTHS[v - 1])], ['Minggu', lbl(qv('ng', 'week'), 'Semua Minggu', v => 'Minggu ' + v)]];
-          const paretoPage = (title, data, list, suffix) => {
-            doc.addPage(); header(title, 'BAGIAN 2 - PARETO NG');
-            const yy = banner(104, list), PH = (H - yy - 40) / 2 - 6;
-            [['namaPart', '1. Pareto by Jumlah Part NG'], ['jenisNG', '2. Pareto by Jenis Problem NG'], ['namaOperator', '3. Pareto by Nama Operator'], ['noMesin', '4. Pareto by Nomor Mesin']].forEach(([f, t], i) => {
-              const cfg = buildParetoCfg(qSum(data, r => r[f] || 'Tidak diisi', r => num(r.qtyNG)), 8, '#1e3a8a', '#ef4444', 'Qty NG').cfg;
-              doc.addImage(snapQChart(cfg, 770, Math.round(770 * PH / HALF), t + suffix), 'PNG', M + (i % 2) * (HALF + 12), yy + Math.floor(i / 2) * (PH + 12), HALF, PH);
-            });
-          };
-          paretoPage('2.2 EVALUASI PARETO MULTI-DIMENSI DEFECT NG (GABUNGAN DIVISI)', dn, [...ngBase, ['Divisi', lbl(qv('ng', 'divisi'), 'Semua Divisi')]], '');
-          const divPick = DIVISI.filter(x => Q_DSEL.ng.has(x)), divList = divPick.length ? divPick : DIVISI.filter(x => dn.some(r => r.divisi === x));
-          divList.forEach((dvn, k) => {
-            const dd = dn.filter(r => r.divisi === dvn);
-            paretoPage(`2.2.${k + 1} EVALUASI PARETO MULTI-DIMENSI DEFECT NG - DIVISI ${dvn.toUpperCase()}`, dd, [...ngBase, ['Divisi', dvn], ['Total NG', fmt(dd.reduce((a, r) => a + num(r.qtyNG), 0)) + ' Pcs']], ' - ' + dvn);
-          });
-
-          // ---- HALAMAN 3: MONITORING DATA INSPECTION ----
-          const di = getFilteredQuality('insp', false), T = k => di.reduce((a, r) => a + num(r[k]), 0), tc = T('totalCheck'), pc = v => `${tc ? (v / tc * 100).toFixed(2) : '0.00'}%`;
-          const inspBanner = [
-            ['Tahun', lbl(qv('insp', 'year'), 'Semua Tahun')],
-            ['Bulan', lbl(qv('insp', 'month'), 'Semua Bulan', v => MONTHS[v - 1])],
-            ['Minggu', lbl(qv('insp', 'week'), 'Semua Minggu', v => 'Minggu ' + v)],
-            ['Customer', lbl(qv('insp', 'customer'), 'Semua Customer')],
-            ...($('qq-insp').value ? [['Pencarian', $('qq-insp').value]] : [])
-          ];
-          doc.addPage(); header('3. MONITORING DATA INSPECTION', 'BAGIAN 3 - INSPECTION');
-          y = banner(104, inspBanner);
-          y = kRow(y, [
-            ['TOTAL PART CHECK', fmt(tc) + ' Pcs', NAVY, '100%'],
-            ['PART OK (LOLOS)', fmt(T('qtyOK')) + ' Pcs', [5, 150, 105], pc(T('qtyOK'))],
-            ['PART NG (DEFECT)', fmt(T('qtyNG')) + ' Pcs', [225, 29, 72], pc(T('qtyNG'))],
-            ['PART REPAIR', fmt(T('qtyRepair')) + ' Pcs', AMBER, pc(T('qtyRepair'))]
-          ]);
-          const ip = qSum(di, r => r.namaPart || 'Tanpa Part', r => num(r.qtyNG)), IH = 230;
-          doc.addImage(snapQChart(buildParetoCfg(ip, 8, '#ef4444', '#1e3a8a', 'Qty NG (Pcs)').cfg, 770, Math.round(770 * IH / HALF), 'Pareto Chart NG Tertinggi Data Inspection (80/20)'), 'PNG', M, y, HALF, IH);
-          const ipie = buildPieCfg(ip); ipie.cfg.options.plugins.legend = { display: false };
-          const rx2 = M + HALF + 12; doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY); doc.text('Top 5 Part NG Tertinggi Inspeksi', rx2, y + 8);
-          doc.addImage(snapQChart(ipie.cfg, 400, 400), 'PNG', rx2, y + 14, IH - 14, IH - 14);
-          legend(rx2 + IH - 6, y + 14, HALF - IH + 6, IH - 14, 'Rincian Part', ipie.items);
-
-          // ---- HALAMAN 3.1: LOG PART NG TERTINGGI (INSPECTION) ----
-          partLog(di, ipie.items, 'Tanpa Part',
-            ['No', 'Tanggal', 'Customer', 'Proses', 'Qty NG', 'Qty Repair', 'Total Check', 'Operator', 'Keterangan'],
-            [[24, 'center'], [58], [140], [110], [40, 'right'], [44, 'right'], [48, 'right'], [110], [211]],
-            (r, n) => [n, D10(r.tanggal), r.customer || '-', r.proses || '-', fmt(r.qtyNG), fmt(r.qtyRepair), fmt(r.totalCheck), r.operator || '-', r.keterangan || '-'],
-            '3.1 LOG PART NG TERTINGGI - MONITORING DATA INSPECTION (LAMPIRAN)', 'BAGIAN 3 - INSPECTION', inspBanner);
-
-          // =====================================================================
-          // BAGIAN 4: CHART & LOG REGISTER E-PTP (AF-PROD-014)
-          // =====================================================================
-          doc.addPage();
-          header('4. MONITORING & LOG REGISTER E-PTP (AF-PROD-014)', 'BAGIAN 4 - E-PTP');
-
-          const isPtpClosed = r => String(r.status || '').toLowerCase().includes('closed');
-          const ptpClosed = ptpLogRecords.filter(isPtpClosed);
-          const ptpProg = ptpLogRecords.filter(r => !isPtpClosed(r));
-          const todayDt = new Date(); todayDt.setHours(0, 0, 0, 0);
-          const ptpAge = r => {
-            const dt = new Date((r.tanggalTerbit || '') + 'T00:00:00');
-            return isNaN(dt) ? null : Math.max(0, Math.floor((todayDt - dt) / 86400000));
-          };
-          const agesArr = ptpProg.map(ptpAge).filter(a => a !== null);
-          const avgAge = agesArr.length ? Math.round(agesArr.reduce((a, b) => a + b, 0) / agesArr.length) : 0;
-          const ptpPct = ptpLogRecords.length ? Math.round(ptpClosed.length / ptpLogRecords.length * 100) : 0;
-
-          y = kRow(106, [
-            ['TOTAL PTP TERBIT', fmt(ptpLogRecords.length) + ' Dokumen', NAVY],
-            ['PTP ON PROGRESS', fmt(ptpProg.length) + ' Dokumen', AMBER],
-            ['PTP CLOSED', `${fmt(ptpClosed.length)} Dokumen (${ptpPct}%)`, [5, 150, 105]],
-            ['RATA-RATA UMUR OPEN', avgAge + ' Hari', [225, 29, 72]]
-          ]);
-
-          const mBuckets = [];
-          for (let i = 5; i >= 0; i--) {
-            const d = new Date(todayDt.getFullYear(), todayDt.getMonth() - i, 1);
-            mBuckets.push({
-              key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
-              label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }),
-              c: 0, p: 0
-            });
-          }
-          ptpLogRecords.forEach(r => {
-            const mb = mBuckets.find(x => x.key === String(r.tanggalTerbit || '').substring(0, 7));
-            if (mb) { if (isPtpClosed(r)) mb.c++; else mb.p++; }
-          });
-          const chartMonthImg = snapQChart({
-            type: 'bar',
-            data: {
-              labels: mBuckets.map(x => x.label),
-              datasets: [
-                { label: 'Closed', data: mBuckets.map(x => x.c), backgroundColor: '#10b981', stack: 's' },
-                { label: 'On Progress', data: mBuckets.map(x => x.p), backgroundColor: '#f59e0b', stack: 's' }
-              ]
-            },
-            options: {
-              plugins: { legend: qLeg },
-              scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } }
-            }
-          }, 600, 210, 'Tren Terbit & Penyelesaian PTP (6 Bulan Terakhir)');
-
-          const audMap = {};
-          ptpLogRecords.forEach(r => {
-            const k = (r.auditee && r.auditee !== '-') ? r.auditee : 'Lainnya';
-            audMap[k] = audMap[k] || { c: 0, p: 0 };
-            if (isPtpClosed(r)) audMap[k].c++; else audMap[k].p++;
-          });
-          const audKeys = Object.keys(audMap).sort((a, b) => (audMap[b].c + audMap[b].p) - (audMap[a].c + audMap[a].p)).slice(0, 6);
-          const chartAudImg = snapQChart({
-            type: 'bar',
-            data: {
-              labels: audKeys.length ? audKeys : ['Belum ada data'],
-              datasets: [
-                { label: 'On Progress', data: audKeys.map(k => audMap[k].p), backgroundColor: '#f59e0b', stack: 's' },
-                { label: 'Closed', data: audKeys.map(k => audMap[k].c), backgroundColor: '#10b981', stack: 's' }
-              ]
-            },
-            options: {
-              indexAxis: 'y',
-              plugins: { legend: qLeg },
-              scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }, y: { stacked: true } }
-            }
-          }, 600, 210, 'Distribusi Status E-PTP per Auditee / Departemen');
-
-          doc.addImage(chartMonthImg, 'PNG', M, y, HALF, 132);
-          doc.addImage(chartAudImg, 'PNG', M + HALF + 12, y, HALF, 132);
-
-          const ptpStartY = y + 148;
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...NAVY);
-          doc.text(`Log Register Permintaan Tindakan Perbaikan (Total: ${ptpLogRecords.length} Dokumen)`, M, ptpStartY - 6);
-
-          const p0Ptp = doc.internal.getCurrentPageInfo().pageNumber;
-          doc.autoTable({
-            startY: ptpStartY, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid',
-            styles: { fontSize: 6.8, cellPadding: 2.5, lineColor: [203, 213, 225], lineWidth: 0.4, textColor: [30, 41, 59] },
-            headStyles: { fillColor: TINT_BLUE, textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.5 },
-            head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Auditor', 'Sumber', 'Part Name', 'Uraian Problem', 'Status', 'Umur']],
-            body: ptpLogRecords.length
-              ? ptpLogRecords.map(r => {
-                  const closed = isPtpClosed(r);
-                  const age = ptpAge(r);
-                  return [
-                    r.noReg,
-                    r.tanggalTerbit || '-',
-                    r.auditee || '-',
-                    r.auditor || '-',
-                    r.sumber || '-',
-                    r.partName || '-',
-                    r.problem || '-',
-                    closed ? 'CLOSED' : 'ON PROGRESS',
-                    closed ? 'Selesai' : (age !== null ? age + ' hari' : '-')
-                  ];
-                })
-              : [['-', 'Belum ada data Log Register E-PTP', '-', '-', '-', '-', '-', '-', '-']],
-            didParseCell: d => {
-              if (d.section === 'body' && d.column.index === 7) {
-                const isCl = d.cell.raw === 'CLOSED';
-                d.cell.styles.textColor = isCl ? [4, 120, 87] : [180, 83, 9];
-                d.cell.styles.fontStyle = 'bold';
-              }
-            },
-            didDrawPage: d => { if (d.pageNumber > p0Ptp) header('4.1 LOG REGISTER E-PTP (lanjutan)', 'BAGIAN 4 - E-PTP'); }
-          });
-
-          // ---- LEMBAR VERIFIKASI & PENGESAHAN ----
-          const fyLast = doc.lastAutoTable.finalY;
-          const sH = 60, sy = H - 26 - sH, cw3 = CW / 3;
-          if (fyLast > sy - 18) { doc.addPage(); header('5. LEMBAR VERIFIKASI & PENGESAHAN', 'PENGESAHAN'); }
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY);
-          doc.text('LEMBAR VERIFIKASI & PENGESAHAN LAPORAN AUDIT MUTU:', M, sy - 8);
-          ['Dipersiapkan Oleh:', 'Diverifikasi Oleh:', 'Disetujui Oleh:'].forEach((t, i) => {
-            const sx = M + i * cw3;
-            doc.setFillColor(255, 255, 255); doc.rect(sx, sy, cw3 - 6, sH, 'F');
-            doc.setDrawColor(...NAVY); doc.setLineWidth(0.5); doc.rect(sx, sy, cw3 - 6, sH, 'S');
-            doc.setFontSize(7); doc.setTextColor(71, 85, 105); doc.text(t, sx + 8, sy + 11);
-            doc.setDrawColor(148, 163, 184); doc.line(sx + 10, sy + 38, sx + cw3 - 16, sy + 38);
-            doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 116, 139);
-            doc.text(['QC Inspector', 'Kabag Quality', 'Kabag Produksi'][i], sx + 8, sy + 50);
-            doc.setFont('helvetica', 'bold');
-          });
-
-          // Nomor Halaman di Semua Halaman PDF
-          const totalPages = doc.internal.getNumberOfPages();
-          for (let p = 1; p <= totalPages; p++) {
-            doc.setPage(p);
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(148, 163, 184);
-            doc.text('Dokumen ini dihasilkan otomatis oleh ACJ Integrated Quality & E-PTP Portal', M, H - 14);
-            doc.text(`Halaman ${p} dari ${totalPages}`, W - M, H - 14, { align: 'right' });
-          }
-
-          doc.save(`ACJ_Executive_Quality_Report_${prevY}_vs_${curY}.pdf`);
-          toast('Laporan Eksekutif PDF lengkap berhasil diunduh!', 'success');
-        } catch (err) { toast('Gagal membuat PDF: ' + err.message, 'error'); }
-      }, 50);
-    }
-
+    /* --- Modal Input & Edit Modul Quality --- */
     let qEditing = null;
     function openQualityForm(m, id) {
       if (!isEditor()) return toast('Hanya Admin / QA Auditor yang dapat menginput data!', 'error');
-      const rec = id ? Q_DATA[m].find(x => x[Q_MOD[m].idk] === id) : null;
+      const rec = id ? Q_DATA[m].find(x => String(x[Q_MOD[m].idk]) === String(id)) : null;
       qEditing = { m, id: rec ? rec[Q_MOD[m].idk] : '' };
+
       const fieldsHtml = Q_FIELDS[m].map(x => {
-        const fid = 'qfm-' + x.k, base = 'w-full px-3 py-2 border border-slate-300 rounded-lg text-xs ' + (x.ro ? 'bg-slate-100 font-mono' : 'bg-white');
-        let inp = x.t === 'sel' ? `<select id="${fid}" class="${base}">${x.o.map(o => `<option>${esc(o)}</option>`).join('')}</select>`
-          : x.t === 'file' ? `<input type="file" id="${fid}" accept=".pdf,image/jpeg,image/png" class="text-xs">`
-          : `<input id="${fid}" type="${x.t}" ${x.ro ? 'readonly' : ''} ${x.req ? 'required' : ''} ${x.list ? `list="${x.list}"` : ''} class="${base}">`;
-        return `<div class="${x.w || x.t === 'file' ? 'sm:col-span-2' : ''}"><label class="block text-xs font-bold text-slate-700 mb-1">${x.l}</label>${inp}</div>`;
+        const fid = 'qfm-' + x.k, base = 'w-full px-3 py-2 border border-slate-300 rounded-xl text-xs ' + (x.ro ? 'bg-slate-100 font-mono' : 'bg-white');
+        let inp;
+        if (x.t === 'sel') inp = `<select id="${fid}" class="${base}">${x.o.map(o => `<option>${esc(o)}</option>`).join('')}</select>`;
+        else if (x.t === 'file') inp = `<input type="file" id="${fid}" accept=".pdf,image/jpeg,image/png" class="text-xs"><span id="${fid}-n" class="block text-[11px] text-blue-700 mt-1"></span>`;
+        else inp = `<input id="${fid}" type="${x.t}" ${x.ro ? 'readonly' : ''} ${x.req ? 'required' : ''} ${x.list ? `list="${x.list}"` : ''} ${x.min != null ? `min="${x.min}"` : ''} class="${base}">`;
+        return `<div class="${x.w || x.t === 'file' ? 'sm:col-span-2' : ''}"><label class="block text-xs font-semibold text-slate-700 mb-1">${x.l}${x.req ? ' <span class="text-rose-500">*</span>' : ''}</label>${inp}</div>`;
       }).join('');
 
       $('qualityModal').innerHTML = `<div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full mx-auto my-6 overflow-hidden">
-        <div class="px-6 py-4 bg-blue-950 text-white flex justify-between items-center"><h3 class="font-bold text-sm">${rec ? 'Edit' : 'Input'} ${Q_MOD[m].title}</h3><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="text-slate-300 hover:text-white text-lg font-bold">&times;</button></div>
-        <form id="qFormElement" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">${fieldsHtml}
-          <div class="sm:col-span-2 pt-3 border-t flex justify-end gap-2"><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="px-4 py-2 border rounded-lg text-xs font-semibold">Batal</button><button id="qSaveBtn" class="px-5 py-2 bg-blue-900 hover:bg-blue-950 text-white rounded-lg text-xs font-bold">Simpan Data</button></div>
+        <div class="px-6 py-4 bg-blue-950 text-white flex justify-between items-center"><h3 class="font-bold text-sm">${rec ? 'Edit' : 'Input Baru'} ${Q_MOD[m].title}</h3><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="text-slate-300 hover:text-white text-lg font-bold">&times;</button></div>
+        <form id="qFormEl" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">${fieldsHtml}
+          <div class="sm:col-span-2 pt-3 border-t flex justify-end gap-2"><button type="button" onclick="$('qualityModal').classList.add('hidden')" class="px-4 py-2 border rounded-xl text-xs font-semibold">Batal</button><button id="qSaveBtn" class="px-5 py-2 bg-blue-900 hover:bg-blue-950 text-white rounded-xl text-xs font-bold">Simpan Data</button></div>
         </form></div>`;
 
       Q_FIELDS[m].forEach(x => {
-        if (x.t === 'file') return;
+        if (x.t === 'file') {
+          $(`qfm-${x.k}-n`).textContent = rec && rec[x.k] ? 'File sudah terunggah (unggah baru untuk mengganti)' : '';
+          return;
+        }
         const v = rec ? rec[x.k] : (x.def != null ? x.def : x.t === 'date' ? todayStr() : '');
-        $('qfm-' + x.k).value = v == null ? '' : v;
+        $(`qfm-${x.k}`).value = v == null ? '' : v;
       });
-      $('qFormElement').addEventListener('input', calcQualityForm);
-      $('qFormElement').addEventListener('submit', submitQualityForm);
+      $('qFormEl').addEventListener('input', calcQualityForm);
+      $('qFormEl').addEventListener('submit', submitQualityForm);
       calcQualityForm();
       $('qualityModal').classList.remove('hidden');
     }
@@ -1733,7 +1224,6 @@
       if (m === 'ng') $('qfm-ratioNG').value = (g('qtyProduksi') > 0 ? (g('qtyNG') / g('qtyProduksi') * 100).toFixed(2) : '0.00') + '%';
     }
 
-    const readB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(f); });
     async function submitQualityForm(e) {
       e.preventDefault();
       const { m, id } = qEditing, btn = $('qSaveBtn'); btn.disabled = true; btn.textContent = 'Menyimpan...';
@@ -1743,11 +1233,14 @@
           if (x.ro) continue;
           if (x.t === 'file') {
             const file = $('qfm-' + x.k).files[0]; if (!file) continue;
+            if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) throw new Error('Tipe file hanya PDF/JPG/PNG.');
+            if (file.size > 4 * 1024 * 1024) throw new Error('Ukuran file maksimal 4 MB.');
             f[x.k + 'Base64'] = await readB64(file); f[x.k + 'Name'] = file.name;
           } else f[x.k] = $('qfm-' + x.k).value;
         }
         const r = await apiCall('apiSave', m, f);
         if (r.success) { $('qualityModal').classList.add('hidden'); toast(r.message, 'success'); syncAllSystems(false); }
+        else toast(r.message, 'error');
       } catch (err) { toast('Gagal simpan: ' + err.message, 'error'); }
       finally { btn.disabled = false; btn.textContent = 'Simpan Data'; }
     }
@@ -1756,33 +1249,421 @@
       if (!confirm('Yakin menghapus data ini? Tercatat di Audit Log.')) return;
       try {
         const r = await apiCall('apiDelete', m, id);
-        if (r.success) { toast(r.message, 'success'); syncAllSystems(false); }
-      } catch (e) { toast(e.message, 'error'); }
+        toast(r.message, r.success ? 'success' : 'error');
+        if (r.success) syncAllSystems(false);
+      } catch (e) { toast('Gagal hapus: ' + e.message, 'error'); }
     }
 
     async function openPrivateFile(url) {
       const w = window.open('', '_blank');
       try {
         const r = await apiCall('apiGetFile', url);
+        if (!r.success) { if (w) w.close(); return toast(r.message, 'error'); }
         const bin = atob(r.data), arr = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        w.location = URL.createObjectURL(new Blob([arr], { type: r.mime }));
-      } catch (e) { if (w) w.close(); toast('Gagal membuka lampiran: ' + e.message, 'error'); }
+        const u = URL.createObjectURL(new Blob([arr], { type: r.mime }));
+        if (w) w.location = u;
+      } catch (e) { if (w) w.close(); toast('Gagal membuka file: ' + e.message, 'error'); }
     }
 
     function exportQualityExcel(m) {
-      const c = Q_MOD[m], rows = getFilteredQuality(m);
+      if (!isEditor()) return toast('Export Excel hanya untuk Admin / QA Auditor!', 'error');
+      const c = Q_MOD[m], rows = getFilteredQuality(m, true);
       if (!rows.length) return toast('Tidak ada data untuk diexport.', 'error');
+      const cellVal = (x, r) => x[2] === 'n' || x[2] === 'p' ? num(r[x[1]]) : x[2] === 'b' ? (r[x[1]] ? 'Ada' : '-') : (r[x[1]] || '-');
       const hdr = ['NO', ...c.cols.map(x => x[0].toUpperCase())];
-      const aoa = [['PT. ADHI CHANDRA JAYA - ' + c.title.toUpperCase()], [], hdr];
-      rows.forEach((r, i) => aoa.push([i + 1, ...c.cols.map(x => r[x[1]] || '-')]));
+      const aoa = [['PT. ADHI CHANDRA JAYA - QUALITY ASSURANCE DEPARTMENT'], ['LAPORAN ' + c.title.toUpperCase()], [], ['Waktu Ekspor', ': ' + new Date().toLocaleString('id-ID')], ['Jumlah Data', ': ' + rows.length], [], hdr];
+      rows.forEach((r, i) => aoa.push([i + 1, ...c.cols.map(x => cellVal(x, r))]));
+      aoa.push(['TOTAL', ...c.cols.map(x => x[2] === 'n' ? rows.reduce((a, r) => a + num(r[x[1]]), 0) : '')]);
       const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = hdr.map(h => ({ wch: Math.max(10, Math.min(32, h.length + 6)) }));
       const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, c.sheet);
       XLSX.writeFile(wb, `ACJ_${c.sheet}_${todayStr().replace(/-/g, '')}.xlsx`);
+      toast('File Excel berhasil diunduh!', 'success');
     }
 
     /* =================================================================== */
-    /* LOGIKA MODUL E-PTP (AF-PROD-014 DARI APLIKASI B)                    */
+    /* LAPORAN EKSEKUTIF PDF (LANDSCAPE - RAMAH TINTA + E-PTP)             */
+    /* =================================================================== */
+    function snapChart(cfg, w, h, title) {
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const o = cfg.options || {};
+      const ch = new Chart(cv, {
+        type: cfg.type, data: cfg.data,
+        plugins: [{ id: 'bg', beforeDraw(c) { const x = c.ctx; x.save(); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.restore(); } }],
+        options: Object.assign({}, o, { responsive: false, animation: false, devicePixelRatio: 1, plugins: Object.assign({}, o.plugins, { title: { display: !!title, text: title, font: { size: 13, weight: 'bold' } } }) })
+      });
+      const u = cv.toDataURL('image/png'); ch.destroy(); return u;
+    }
+
+    function claimYears() {
+      const sel = $('qf-claim-year') ? $('qf-claim-year').value : 'ALL', cmp = $('cmpYear') ? $('cmpYear').value : 'ALL';
+      const yrs = Q_DATA.claim.map(r => pd(r.tanggalClaim)).filter(Boolean).map(d => d.getFullYear());
+      const curY = sel === 'ALL' ? (yrs.length ? Math.max(...yrs) : new Date().getFullYear()) : Number(sel);
+      let prevY = cmp === 'ALL' ? curY - 1 : Number(cmp);
+      if (prevY === curY) prevY = curY - 1;
+      return { curY, prevY, auto: sel === 'ALL' };
+    }
+
+    function execReport() {
+      toast('Menyiapkan Laporan Eksekutif PDF...', 'info');
+      setTimeout(() => {
+        try {
+          const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('Library PDF belum termuat.');
+          const doc = new J('l', 'pt', 'a4'), W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+          const M = 28, CW = W - 2 * M, HALF = (CW - 12) / 2, now = new Date().toLocaleString('id-ID');
+          const byStr = currentUser ? `${currentUser.fullName} (${currentUser.role})` : 'System';
+          const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+          const NAVY = [30, 58, 138], AMBER = [245, 158, 11], SLATE_DARK = [15, 23, 42], BORDER_GRAY = [203, 213, 225];
+
+          // Header Ramah Tinta
+          const header = (title, badge) => {
+            doc.setFillColor(248, 250, 252); doc.rect(M, 20, CW, 54, 'F');
+            doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.7); doc.rect(M, 20, CW, 54, 'S');
+            doc.setFillColor(...NAVY); doc.rect(M, 20, 5, 54, 'F');
+            doc.setFillColor(...AMBER); doc.rect(M + 5, 20, 2.5, 54, 'F');
+
+            doc.setTextColor(...NAVY); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('PT. ADHI CHANDRA JAYA', M + 15, 38);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
+            doc.text('Metal Processing for Automotive Parts, Electronics and House Accessories', M + 15, 50);
+
+            doc.setFillColor(239, 246, 255); doc.setDrawColor(...NAVY); doc.roundedRect(W - M - 135, 26, 125, 16, 3, 3, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY); doc.text(badge, W - M - 72.5, 36.5, { align: 'center' });
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100, 116, 139); doc.text(`Waktu Cetak: ${now} | User: ${byStr}`, W - M - 10, 54, { align: 'right' });
+
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...SLATE_DARK); doc.text(title, M, 91);
+            doc.setDrawColor(...NAVY); doc.setLineWidth(1.2); doc.line(M, 97, M + 180, 97);
+            doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.6); doc.line(M + 180, 97, W - M, 97);
+          };
+
+          const banner = (y, list) => {
+            const t = list.map(([k, v]) => `${k}: [ ${v} ]`).join('   |   ');
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+            const ls = doc.splitTextToSize(t, CW - 124), h = Math.max(20, 11 + ls.length * 9);
+            doc.setFillColor(255, 255, 255); doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.5); doc.roundedRect(M, y, CW, h, 3, 3, 'FD');
+            doc.setFillColor(...AMBER); doc.rect(M, y, 3, h, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setTextColor(...NAVY); doc.text('FILTER ANALISIS AKTIF:', M + 9, y + 13);
+            doc.setFont('helvetica', 'normal'); doc.setTextColor(51, 65, 85); doc.text(ls, M + 114, y + 13);
+            return y + h + 8;
+          };
+
+          const kbox = (x, y, w, label, val, col, sub) => {
+            doc.setFillColor(255, 255, 255); doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.6); doc.roundedRect(x, y, w, 36, 4, 4, 'FD');
+            doc.setFillColor(...col); doc.rect(x, y, 3, 36, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(100, 116, 139); doc.text(label, x + 9, y + 11);
+            doc.setFontSize(10); doc.setTextColor(...col); doc.text(String(val).slice(0, 40), x + 9, y + 24); if (sub) { doc.setFontSize(6.5); doc.text(sub, x + 9, y + 32); }
+          };
+          const kRow = (y, items) => { const w = (CW - (items.length - 1) * 6) / items.length; items.forEach((it, i) => kbox(M + i * (w + 6), y, w, ...it)); return y + 44; };
+
+          const legend = (x, y, w, h, title, items) => {
+            doc.setFillColor(255, 255, 255); doc.setDrawColor(...BORDER_GRAY); doc.roundedRect(x, y, w, h, 4, 4, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY); doc.text(title, x + 10, y + 14);
+            const sp = Math.min(20, (h - 30) / Math.max(1, items.length)); let ry = y + 30;
+            items.forEach(it => {
+              doc.setFillColor(...rgb(it.color)); doc.roundedRect(x + 10, ry - 7, 8, 8, 2, 2, 'F');
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(30, 41, 59); doc.text(it.label.length > 24 ? it.label.slice(0, 22) + '...' : it.label, x + 23, ry);
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(71, 85, 105); doc.text(it.prod != null ? `${fmt(it.qty)} NG / ${fmt(it.prod)} prod (${it.rt})` : `${fmt(it.qty)} pcs (${it.pct}%)`, x + w - 10, ry, { align: 'right' }); ry += sp;
+            });
+          };
+
+          const lbl = (v, all, f) => v === 'ALL' ? all : (f ? f(v) : v);
+          const TOPN = 3, LOGMAX = 10;
+
+          // Log Part NG Tertinggi (Tanpa kolom Part Name berulang + Spasi lega antar peringkat #1, #2, #3)
+          const partLog = (data, pieItems, fallback, head, widths, rowFn, title, badge, bannerList) => {
+            doc.addPage(); header(title, badge);
+            let y0 = banner(104, bannerList);
+            const tops = pieItems.filter(it => it.label !== 'Part Lainnya').slice(0, TOPN);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(71, 85, 105);
+            doc.text(`Log ${TOPN} part NG tertinggi (sesuai pie chart) - maksimal ${LOGMAX} data per part, diurutkan Qty NG terbesar pada periode/filter aktif.`, M, y0 + 4);
+            let curY = y0 + 12;
+            const cs = {}, fixed = widths.slice(0, -1).reduce((a, w) => a + w[0], 0);
+            widths.forEach((w, i) => { cs[i] = { cellWidth: i === widths.length - 1 ? CW - fixed : w[0], halign: w[1] || 'left' }; });
+
+            if (!tops.length) {
+              doc.autoTable({ startY: curY, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid', tableWidth: CW,
+                styles: { fontSize: 6.5, cellPadding: 3, lineColor: BORDER_GRAY, lineWidth: 0.5 },
+                headStyles: { fillColor: [239, 246, 255], textColor: NAVY, fontStyle: 'bold' }, head: [head],
+                body: [[{ content: 'Tidak ada data NG pada filter ini', colSpan: head.length, styles: { halign: 'center' } }]] });
+              return doc.lastAutoTable.finalY;
+            }
+
+            tops.forEach((it, i) => {
+              if (curY > H - 110) { doc.addPage(); header(title + ' (lanjutan)', badge); curY = 108; }
+              const all = data.filter(r => (r.namaPart || fallback) === it.label && num(r.qtyNG) > 0)
+                .sort((a, b) => num(b.qtyNG) - num(a.qtyNG) || String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
+
+              doc.setFillColor(248, 250, 252); doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.5);
+              doc.roundedRect(M, curY, CW, 17, 2.5, 2.5, 'FD');
+              doc.setFillColor(...rgb(it.color)); doc.rect(M, curY, 4, 17, 'F');
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...SLATE_DARK);
+              const summaryTxt = it.prod != null
+                ? `Total ${fmt(it.qty)} pcs NG dari ${fmt(it.prod)} pcs produksi (Ratio NG ${it.rt})`
+                : `Total ${fmt(it.qty)} pcs NG (${it.pct}%)`;
+              doc.text(`#${i + 1}   ${it.label}`, M + 10, curY + 11.5);
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(71, 85, 105);
+              doc.text(`${summaryTxt}   |   Menampilkan ${Math.min(all.length, LOGMAX)} dari ${all.length} data`, W - M - 8, curY + 11.5, { align: 'right' });
+
+              const partBody = all.slice(0, LOGMAX).map((r, j) => rowFn(r, j + 1));
+              const p0 = doc.internal.getCurrentPageInfo().pageNumber;
+              doc.autoTable({ startY: curY + 20, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid', tableWidth: CW,
+                styles: { fontSize: 6.4, cellPadding: 2, overflow: 'ellipsize', lineColor: BORDER_GRAY, lineWidth: 0.45, textColor: [30, 41, 59] },
+                headStyles: { fillColor: [239, 246, 255], textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.5 },
+                alternateRowStyles: { fillColor: [250, 251, 252] },
+                columnStyles: cs, head: [head], body: partBody,
+                didDrawPage: d => { if (d.pageNumber > p0) header(title + ' (lanjutan)', badge); } });
+
+              curY = doc.lastAutoTable.finalY + 18;
+            });
+            return curY;
+          };
+          const D10 = v => String(v || '-').slice(0, 10);
+
+          // ---- HALAMAN 1: CLAIM CUSTOMER ----
+          const { curY, prevY, auto } = claimYears();
+          const dP = getFilteredQuality('claim', false, prevY), dN = getFilteredQuality('claim', false, curY);
+          header('1. LAPORAN AUDIT REGISTER CLAIM CUSTOMER', 'BAGIAN 1 - CLAIM');
+          let y = banner(104, [['Tahun', `${prevY} (pembanding) vs ${curY}`], ['Bulan', lbl($('qf-claim-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Customer', lbl($('qf-claim-customer').value, 'Semua Customer')], ['Plant', lbl($('qf-claim-plant').value, 'Semua Plant')], ['Kategori', lbl($('qf-claim-kategori').value, 'Semua Kategori')]]);
+          const yearBlock = (yy, yr, data, tag, col) => {
+            doc.setFillColor(248, 250, 252); doc.setDrawColor(...col); doc.setLineWidth(0.7); doc.roundedRect(M, yy, CW, 14, 3, 3, 'FD');
+            doc.setFillColor(...col); doc.rect(M, yy, 4, 14, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...col);
+            doc.text(`TAHUN ${yr}  -  ${tag}`, M + 10, yy + 10);
+            yy += 18;
+            const cl = data.filter(c => c.statusClaim === 'Closed').length, nCl = data.filter(c => (c.kategoriClaim || 'Claim') === 'Claim').length;
+            yy = kRow(yy, [['TOTAL KASUS', fmt(data.length) + ' Kasus', NAVY], ['KATEGORI CLAIM', fmt(nCl) + ' Kasus', [225,29,72]], ['KATEGORI INFORMASI', fmt(data.length - nCl) + ' Kasus', [2,132,199]], ['MONITORING', fmt(data.length - cl) + ' Kasus', [217,119,6]], ['CLOSED', fmt(cl) + ' Kasus', [5,150,105]], ['TOTAL QTY DEFECT', fmt(data.reduce((a, c) => a + num(c.qtyNG), 0)) + ' Pcs', [225,29,72]]]);
+            const cMap = qSum(data, r => r.namaCustomer || 'Unknown', () => 1), cKeys = Object.keys(cMap).sort((a,b) => cMap[b]-cMap[a]).slice(0, 5);
+            const custCfg = { type: 'bar', data: { labels: cKeys.length ? cKeys : ['Tidak ada data'], datasets: [{ label: 'Kasus', data: cKeys.map(k => cMap[k]), backgroundColor: '#1e3a8a', borderRadius: 4 }] }, options: { indexAxis: 'y', plugins: { legend: { display: false } } } };
+            const tC = new Array(12).fill(0), tQ = new Array(12).fill(0);
+            data.forEach(r => { const x = pd(r.tanggalClaim); if (x) { tC[x.getMonth()]++; tQ[x.getMonth()] += num(r.qtyNG); } });
+            const trCfg = { type: 'line', data: { labels: MS, datasets: [{ label: 'Kasus', data: tC, borderColor: '#1e3a8a', tension: 0.3, yAxisID: 'y' }, { label: 'Qty NG', data: tQ, borderColor: '#f59e0b', borderDash: [4,4], tension: 0.3, yAxisID: 'y1' }] }, options: { plugins: { legend: qLeg }, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } } };
+            doc.addImage(snapChart(custCfg, 620, 216, 'Top 5 Customer Terbanyak (Kasus) - ' + yr), 'PNG', M, yy, HALF, 134);
+            doc.addImage(snapChart(trCfg, 620, 216, 'Tren Kasus & Qty Defect Bulanan - ' + yr), 'PNG', M + HALF + 12, yy, HALF, 134);
+            return yy + 142;
+          };
+          y = yearBlock(y, prevY, dP, 'PEMBANDING (TAHUN SEBELUMNYA)', [100, 116, 139]);
+          y = yearBlock(y, curY, dN, 'TAHUN LAPORAN' + (auto ? ' (otomatis: tahun terbaru)' : ''), NAVY);
+
+          // ---- HALAMAN 2: PERBANDINGAN + LOG REGISTER CLAIM ----
+          const T2 = '1.1 PERBANDINGAN & LOG REGISTER CLAIM CUSTOMER', B2 = 'BAGIAN 1 - CLAIM';
+          doc.addPage(); header(T2, B2);
+          y = 112;
+          {
+            const st = a => { const chk = a.reduce((s, r) => s + num(r.qtyCheck), 0), ng = a.reduce((s, r) => s + num(r.qtyNG), 0), cl = a.filter(r => (r.kategoriClaim || 'Claim') === 'Claim').length;
+              return { n: a.length, cl, inf: a.length - cl, chk, ng, pct: chk ? ng / chk * 100 : 0, closed: a.filter(r => r.statusClaim === 'Closed').length }; };
+            const a = st(dP), b = st(dN), sg = v => (v > 0 ? '+' : '');
+            const rows = [['Total Kasus', 'n', 1], ['Kategori Claim', 'cl', 1], ['Kategori Informasi', 'inf', 0], ['Status Closed', 'closed', 0], ['Total Qty Check (pcs)', 'chk', 0], ['Total Qty NG (pcs)', 'ng', 1], ['% NG terhadap Check', 'pct', 1]];
+            const body = rows.map(([l, k]) => {
+              const d = b[k] - a[k], isP = k === 'pct';
+              const pc = isP ? '-' : (a[k] === 0 ? (b[k] === 0 ? '0%' : 'baru') : sg(d) + (d / a[k] * 100).toFixed(1) + '%');
+              return [l, isP ? a[k].toFixed(2) + '%' : fmt(a[k]), isP ? b[k].toFixed(2) + '%' : fmt(b[k]), isP ? sg(d) + d.toFixed(2) + ' pp' : sg(d) + fmt(d), pc];
+            });
+            const fM = d => { const c = new Array(12).fill(0); d.forEach(r => { const x = pd(r.tanggalClaim); if (x) c[x.getMonth()]++; }); return c; };
+            const cmpCfg = { type: 'bar', data: { labels: MS, datasets: [{ label: String(prevY), data: fM(dP), backgroundColor: '#94a3b8' }, { label: String(curY), data: fM(dN), backgroundColor: '#1e3a8a' }] }, options: { plugins: { legend: qLeg } } };
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY);
+            doc.text(`Perbandingan Claim Customer: ${prevY} vs ${curY}`, M, y);
+            doc.addImage(snapChart(cmpCfg, 620, 189, `Kasus Claim per Bulan: ${prevY} vs ${curY}`), 'PNG', M, y + 8, HALF, 118);
+            doc.autoTable({ startY: y + 8, margin: { left: M + HALF + 12, right: M, top: 106 }, tableWidth: HALF, theme: 'grid',
+              styles: { fontSize: 6.5, cellPadding: 2, lineColor: BORDER_GRAY, lineWidth: 0.5, textColor: [30, 41, 59] },
+              headStyles: { fillColor: [239, 246, 255], textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.6 },
+              columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right', fontStyle: 'bold' }, 3: { halign: 'right' }, 4: { halign: 'right' } },
+              head: [['Indikator', String(prevY), String(curY), 'Selisih', '% Perubahan']], body });
+            y += 138;
+          }
+          const logTable = (yr, data, tag, col, yy) => {
+            if (yy > H - 100) { doc.addPage(); header(T2 + ' (lanjutan)', B2); yy = 112; }
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...col);
+            doc.text(`Log Register Claim Customer - Tahun ${yr} (${tag}) | ${data.length} data`, M, yy);
+            const p0 = doc.internal.getCurrentPageInfo().pageNumber;
+            doc.autoTable({ startY: yy + 6, margin: { left: M, right: M, top: 106, bottom: 30 }, theme: 'grid',
+              styles: { fontSize: 6.5, cellPadding: 2.5, lineColor: BORDER_GRAY, lineWidth: 0.4, textColor: [30, 41, 59] },
+              headStyles: { fillColor: [241, 245, 249], textColor: col, fontStyle: 'bold', lineColor: col, lineWidth: 0.6 },
+              alternateRowStyles: { fillColor: [250, 251, 252] },
+              head: [['ID Reg','Tanggal','Plant','Kategori','Customer','No Claim','Nama Part','Jenis NG','Check','NG','%','Status']],
+              body: data.length ? data.slice(0, 100).map(c => [c.idRegister, c.tanggalClaim, c.acjPlant, c.kategoriClaim || 'Claim', c.namaCustomer, c.noClaim || '-', c.namaPart, c.keteranganJenisNG, fmt(c.qtyCheck), fmt(c.qtyNG), num(c.prosentase) + '%', c.statusClaim]) : [['-','Tidak ada data claim','-','-','-','-','-','-','-','-','-','-']],
+              didDrawPage: d => { if (d.pageNumber > p0) header(T2 + ' (lanjutan)', B2); } });
+            return doc.lastAutoTable.finalY;
+          };
+          let fyC = logTable(prevY, dP, 'Pembanding', [71, 85, 105], y);
+          logTable(curY, dN, 'Tahun Laporan', NAVY, fyC + 20);
+
+          // ---- HALAMAN 3: DATABASE NG INTERNAL ----
+          const dn = getFilteredQuality('ng', false);
+          doc.addPage(); header('2. EVALUASI DATABASE NG INTERNAL PRODUKSI', 'BAGIAN 2 - NG');
+          const ngWStr = Q_WSEL.ng.size ? [...Q_WSEL.ng].sort((a,b)=>a-b).map(w => 'Minggu ' + w).join(', ') : 'Semua Minggu';
+          const ngDStr = Q_DSEL.ng.size ? DIVISI.filter(x => Q_DSEL.ng.has(x)).join(', ') : 'Semua Divisi';
+          y = banner(104, [['Tahun', lbl($('qf-ng-year').value, 'Semua Tahun')], ['Bulan', lbl($('qf-ng-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Minggu', ngWStr], ['Divisi', ngDStr]]);
+          const dv = qSum(dn, r => r.divisi || 'Lainnya', r => num(r.qtyNG)), df = qSum(dn, r => r.jenisNG || 'Lainnya', r => num(r.qtyNG));
+          const td = Object.keys(dv).sort((a, b) => dv[b] - dv[a])[0], tf = Object.keys(df).sort((a, b) => df[b] - df[a])[0];
+          const tqN = dn.reduce((a, n) => a + num(n.qtyNG), 0), tpN = dn.reduce((a, n) => a + num(n.qtyProduksi), 0);
+          y = kRow(y, [['TOTAL DEFECT NG', fmt(tqN) + ' Pcs', [225,29,72]], ['TOTAL QTY PRODUKSI', fmt(tpN) + ' Pcs', NAVY], ['RATIO NG', tpN > 0 ? (tqN / tpN * 100).toFixed(2) + '%' : '-', [217,119,6]], ['TOP DIVISI DEFECT', td ? `${td} (${fmt(dv[td])} pcs)` : '-', [217,119,6]], ['TOP JENIS PROBLEM', tf ? `${tf} (${fmt(df[tf])} pcs)` : '-', NAVY]]);
+          const yrNg = $('qf-ng-year').value !== 'ALL' ? Number($('qf-ng-year').value) : (Q_DATA.ng.map(r => pd(r.tanggal)).filter(Boolean).map(x => x.getFullYear()).sort((a,b)=>b-a)[0] || new Date().getFullYear());
+          const dCols = { Bor:'#3b82f6', CNC:'#6366f1', Cutting:'#06b6d4', Harden:'#ef4444', Hexagon:'#f59e0b', Punch:'#10b981', Rolling:'#8b5cf6', Turret:'#ec4899', Lainnya:'#94a3b8' };
+          const byDv = {}, totM = new Array(12).fill(0);
+          Q_DATA.ng.forEach(r => { const dt = pd(r.tanggal); if (!dt || dt.getFullYear() !== yrNg || (Q_DSEL.ng.size && !Q_DSEL.ng.has(r.divisi))) return; const k = dCols[r.divisi] ? r.divisi : 'Lainnya'; (byDv[k] = byDv[k] || new Array(12).fill(0))[dt.getMonth()] += num(r.qtyNG); totM[dt.getMonth()] += num(r.qtyNG); });
+          const dsTr = [{ type: 'line', label: 'Total NG', data: totM, borderColor: '#0f172a', borderWidth: 2, order: 0 }]; Object.keys(byDv).forEach(k => dsTr.push({ type: 'bar', label: k, data: byDv[k], backgroundColor: dCols[k], stack: 's', order: 1 }));
+          const TW = 500, TH = H - y - 60;
+          doc.addImage(snapChart({ type: 'bar', data: { labels: MS, datasets: dsTr }, options: { plugins: { legend: qLeg }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } } }, 1000, Math.round(1000 * TH / TW), `Tren Jumlah NG Tahun ${yrNg} per Divisi`), 'PNG', M, y, TW, TH);
+          const rx = M + TW + 12, rw = CW - TW - 12, pie = buildPieCfg(qSum(dn, r => r.namaPart || 'Tanpa Nama', r => num(r.qtyNG)));
+          pie.cfg.options.plugins.legend = { display: false };
+          const prodMap = qSum(dn, r => r.namaPart || 'Tanpa Nama', r => num(r.qtyProduksi));
+          const prodRest = tpN - pie.items.filter(it => it.label !== 'Part Lainnya').reduce((a, it) => a + (prodMap[it.label] || 0), 0);
+          pie.items.forEach(it => {
+            it.prod = it.label === 'Part Lainnya' ? Math.max(prodRest, 0) : (prodMap[it.label] || 0);
+            it.rt = it.prod > 0 ? (it.qty / it.prod * 100).toFixed(2) + '%' : 'n/a';
+          });
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY); doc.text('Top 5 Part NG Tertinggi', rx, y + 8);
+          const ps = Math.min(130, TH * 0.5); doc.addImage(snapChart(pie.cfg, 400, 400), 'PNG', rx + (rw - ps) / 2, y + 14, ps, ps);
+          legend(rx, y + ps + 20, rw, TH - ps - 20, 'Rincian Part NG Kritis', pie.items);
+
+          // ---- HALAMAN 3.1: LOG PART NG TERTINGGI (DATABASE NG - TANPA KOLOM PART NAME BERULANG) ----
+          partLog(dn, pie.items, 'Tanpa Nama', ['No', 'Tanggal', 'ID NG', 'Qty NG', 'Qty Prod', 'Ratio NG', 'Jenis Defect', 'Faktor Penyebab', 'Divisi', 'No Mesin', 'Operator'],
+            [[24, 'center'], [58], [62], [40, 'right'], [46, 'right'], [44, 'right'], [120], [150], [52], [60], [130]],
+            (r, n) => [n, D10(r.tanggal), r.idNG || '-', fmt(r.qtyNG), num(r.qtyProduksi) > 0 ? fmt(r.qtyProduksi) : '-', num(r.qtyProduksi) > 0 ? num(r.ratioNG).toFixed(2) + '%' : '-', r.jenisNG || '-', r.faktorPenyebab || '-', r.divisi || '-', r.noMesin || '-', r.namaOperator || '-'],
+            '2.1 LOG PART NG TERTINGGI - DATABASE NG INTERNAL PRODUKSI', 'BAGIAN 2 - LOG NG',
+            [['Tahun', lbl($('qf-ng-year').value, 'Semua Tahun')], ['Bulan', lbl($('qf-ng-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Minggu', ngWStr], ['Divisi', ngDStr]]);
+
+          // ---- HALAMAN 3.2: PARETO MULTI-DIMENSI NG ----
+          doc.addPage(); header('2.2 EVALUASI PARETO MULTI-DIMENSI DEFECT NG', 'BAGIAN 2 - PARETO NG');
+          const yyP = banner(104, [['Tahun', lbl($('qf-ng-year').value, 'Semua Tahun')], ['Bulan', lbl($('qf-ng-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Divisi', ngDStr]]), PH = (H - yyP - 40) / 2 - 6;
+          [['namaPart','1. Pareto by Part NG'], ['jenisNG','2. Pareto by Jenis Problem'], ['namaOperator','3. Pareto by Operator'], ['noMesin','4. Pareto by Nomor Mesin']].forEach(([f, t], i) => {
+            const cfg = buildParetoCfg(qSum(dn, r => r[f] || 'Tidak diisi', r => num(r.qtyNG)), 8, '#1e3a8a', '#f59e0b', 'Qty NG').cfg;
+            doc.addImage(snapChart(cfg, 770, Math.round(770 * PH / HALF), t), 'PNG', M + (i % 2) * (HALF + 12), yyP + Math.floor(i / 2) * (PH + 12), HALF, PH);
+          });
+
+          // ---- HALAMAN 4: DATA INSPECTION ----
+          const di = getFilteredQuality('insp', false), tc = di.reduce((a, r) => a + num(r.totalCheck), 0), pc = v => `${tc ? (v / tc * 100).toFixed(2) : '0.00'}%`;
+          const inspWStr = Q_WSEL.insp.size ? [...Q_WSEL.insp].sort((a,b)=>a-b).map(w => 'Minggu ' + w).join(', ') : 'Semua Minggu';
+          doc.addPage(); header('3. MONITORING DATA INSPECTION', 'BAGIAN 3 - INSPECTION');
+          y = banner(104, [['Tahun', lbl($('qf-insp-year').value, 'Semua Tahun')], ['Bulan', lbl($('qf-insp-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Minggu', inspWStr], ['Customer', lbl($('qf-insp-customer').value, 'Semua Customer')]]);
+          y = kRow(y, [['TOTAL PART CHECK', fmt(tc) + ' Pcs', NAVY, '100%'], ['PART OK (LOLOS)', fmt(di.reduce((a, r) => a + num(r.qtyOK), 0)) + ' Pcs', [5,150,105], pc(di.reduce((a, r) => a + num(r.qtyOK), 0))], ['PART NG (DEFECT)', fmt(di.reduce((a, r) => a + num(r.qtyNG), 0)) + ' Pcs', [225,29,72], pc(di.reduce((a, r) => a + num(r.qtyNG), 0))], ['PART REPAIR', fmt(di.reduce((a, r) => a + num(r.qtyRepair), 0)) + ' Pcs', [217,119,6], pc(di.reduce((a, r) => a + num(r.qtyRepair), 0))]]);
+          const ip = qSum(di, r => r.namaPart || 'Tanpa Part', r => num(r.qtyNG)), IH = 230;
+          doc.addImage(snapChart(buildParetoCfg(ip, 8, '#ef4444', '#1e3a8a', 'Qty NG (Pcs)').cfg, 770, Math.round(770 * IH / HALF), 'Pareto Chart NG Tertinggi Data Inspection'), 'PNG', M, y, HALF, IH);
+          const ipie = buildPieCfg(ip); ipie.cfg.options.plugins.legend = { display: false };
+          const rx2 = M + HALF + 12; doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY); doc.text('Top 5 Part NG Tertinggi Inspeksi', rx2, y + 8);
+          doc.addImage(snapChart(ipie.cfg, 400, 400), 'PNG', rx2, y + 14, IH - 14, IH - 14);
+          legend(rx2 + IH - 6, y + 14, HALF - IH + 6, IH - 14, 'Rincian Part', ipie.items);
+
+          // ---- HALAMAN 4.1: LOG PART NG TERTINGGI (INSPECTION - TANPA KOLOM PART NAME BERULANG) ----
+          partLog(di, ipie.items, 'Tanpa Part', ['No', 'Tanggal', 'Customer', 'Proses', 'Qty NG', 'Qty Repair', 'Total Check', 'Operator', 'Keterangan'],
+            [[24, 'center'], [58], [140], [110], [40, 'right'], [44, 'right'], [48, 'right'], [110], [211]],
+            (r, n) => [n, D10(r.tanggal), r.customer || '-', r.proses || '-', fmt(r.qtyNG), fmt(r.qtyRepair), fmt(r.totalCheck), r.operator || '-', r.keterangan || '-'],
+            '3.1 LOG PART NG TERTINGGI - MONITORING DATA INSPECTION', 'BAGIAN 3 - INSPECTION',
+            [['Tahun', lbl($('qf-insp-year').value, 'Semua Tahun')], ['Bulan', lbl($('qf-insp-month').value, 'Semua Bulan', v => MONTHS[v - 1])], ['Minggu', inspWStr], ['Customer', lbl($('qf-insp-customer').value, 'Semua Customer')]]);
+
+          // ---- HALAMAN 5: E-PTP (AF-PROD-014) + PENGESAHAN ----
+          const ptpAll = ptpLogRecords || [];
+          const isPtpClosed = r => String(r.status || '').toLowerCase().includes('closed');
+          const ptpClosed = ptpAll.filter(isPtpClosed), ptpOpen = ptpAll.filter(r => !isPtpClosed(r));
+          const tday = new Date(); tday.setHours(0, 0, 0, 0);
+          const ptpAge = r => { const d = pd(r.tanggalTerbit); return d ? Math.max(0, Math.floor((tday - d) / 86400000)) : null; };
+          const ptpAges = ptpOpen.map(ptpAge).filter(a => a !== null);
+          const avgPtpAge = ptpAges.length ? Math.round(ptpAges.reduce((a, b) => a + b, 0) / ptpAges.length) : 0;
+
+          doc.addPage(); header('4. MONITORING & EVALUASI E-PTP (AF-PROD-014)', 'BAGIAN 4 - E-PTP');
+          y = banner(104, [['Modul', 'Permintaan Tindakan Perbaikan (AF-PROD-014)'], ['Total Dokumen', `${ptpAll.length} PTP`], ['Status', `${ptpOpen.length} On Progress | ${ptpClosed.length} Closed`]]);
+          y = kRow(y, [
+            ['TOTAL PTP TERBIT', fmt(ptpAll.length) + ' Dokumen', NAVY],
+            ['ON PROGRESS (OPEN)', fmt(ptpOpen.length) + ' Dokumen', [217, 119, 6]],
+            ['CLOSED (SELESAI)', fmt(ptpClosed.length) + ' Dokumen', [5, 150, 105], (ptpAll.length ? Math.round(ptpClosed.length / ptpAll.length * 100) : 0) + '% selesai'],
+            ['RATA-RATA UMUR OPEN', avgPtpAge + ' Hari', [225, 29, 72]]
+          ]);
+
+          const mBuckets = [];
+          for (let i = 5; i >= 0; i--) {
+            const d = new Date(tday.getFullYear(), tday.getMonth() - i, 1);
+            mBuckets.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), lbl: MS[d.getMonth()] + ' ' + String(d.getFullYear()).slice(-2), c: 0, p: 0 });
+          }
+          ptpAll.forEach(r => {
+            const m = mBuckets.find(x => x.key === String(r.tanggalTerbit || '').slice(0, 7));
+            if (m) { if (isPtpClosed(r)) m.c++; else m.p++; }
+          });
+          const ptpTrendCfg = {
+            type: 'bar',
+            data: {
+              labels: mBuckets.map(m => m.lbl),
+              datasets: [
+                { label: 'Closed', data: mBuckets.map(m => m.c), backgroundColor: '#10b981', stack: 's' },
+                { label: 'On Progress', data: mBuckets.map(m => m.p), backgroundColor: '#f59e0b', stack: 's' }
+              ]
+            },
+            options: { plugins: { legend: qLeg }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } } }
+          };
+
+          const audMap = {};
+          ptpAll.forEach(r => {
+            const k = r.auditee && r.auditee !== '-' ? r.auditee : 'Lainnya';
+            if (!audMap[k]) audMap[k] = { c: 0, p: 0 };
+            if (isPtpClosed(r)) audMap[k].c++; else audMap[k].p++;
+          });
+          const audKeys = Object.keys(audMap).sort((a, b) => (audMap[b].c + audMap[b].p) - (audMap[a].c + audMap[a].p)).slice(0, 6);
+          const ptpAudCfg = {
+            type: 'bar',
+            data: {
+              labels: audKeys.length ? audKeys : ['Tidak ada data'],
+              datasets: [
+                { label: 'On Progress', data: audKeys.map(k => audMap[k].p), backgroundColor: '#f59e0b', stack: 's' },
+                { label: 'Closed', data: audKeys.map(k => audMap[k].c), backgroundColor: '#1e3a8a', stack: 's' }
+              ]
+            },
+            options: { indexAxis: 'y', plugins: { legend: qLeg }, scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }, y: { stacked: true } } }
+          };
+
+          const CH_PTP = 138;
+          doc.addImage(snapChart(ptpTrendCfg, 620, 220, 'Tren Penerbitan E-PTP (6 Bulan Terakhir)'), 'PNG', M, y, HALF, CH_PTP);
+          doc.addImage(snapChart(ptpAudCfg, 620, 220, 'Distribusi E-PTP per Auditee / Departemen'), 'PNG', M + HALF + 12, y, HALF, CH_PTP);
+          y += CH_PTP + 12;
+
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...NAVY);
+          doc.text(`Log Register E-PTP (AF-PROD-014) | Total ${ptpAll.length} Dokumen`, M, y);
+          const p0Ptp = doc.internal.getCurrentPageInfo().pageNumber;
+          doc.autoTable({
+            startY: y + 5, margin: { left: M, right: M, top: 106, bottom: 95 }, theme: 'grid',
+            styles: { fontSize: 6.3, cellPadding: 2, overflow: 'ellipsize', lineColor: BORDER_GRAY, lineWidth: 0.4, textColor: [30, 41, 59] },
+            headStyles: { fillColor: [239, 246, 255], textColor: NAVY, fontStyle: 'bold', lineColor: NAVY, lineWidth: 0.6 },
+            alternateRowStyles: { fillColor: [250, 251, 252] },
+            columnStyles: { 0: { cellWidth: 72, fontStyle: 'bold' }, 1: { cellWidth: 55 }, 2: { cellWidth: 85 }, 3: { cellWidth: 85 }, 4: { cellWidth: 100 }, 6: { cellWidth: 58, halign: 'center' }, 7: { cellWidth: 42, halign: 'center' } },
+            head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Sumber', 'Part Name', 'Uraian Problem', 'Status', 'Umur']],
+            body: ptpAll.length ? ptpAll.slice(0, 80).map(r => {
+              const closedFlag = isPtpClosed(r);
+              const ageVal = ptpAge(r);
+              return [r.noReg, D10(r.tanggalTerbit), r.auditee, r.sumber, r.partName, r.problem, closedFlag ? 'CLOSED' : 'ON PROGRESS', closedFlag ? 'Selesai' : (ageVal !== null ? ageVal + ' hr' : '-')];
+            }) : [['-', 'Belum ada data E-PTP', '-', '-', '-', '-', '-', '-']],
+            didParseCell: d => {
+              if (d.section === 'body' && d.column.index === 6) {
+                const ok = d.cell.raw === 'CLOSED';
+                d.cell.styles.textColor = ok ? [4, 120, 87] : [180, 83, 9];
+                d.cell.styles.fontStyle = 'bold';
+              }
+            },
+            didDrawPage: d => { if (d.pageNumber > p0Ptp) header('4.1 LOG REGISTER E-PTP (lanjutan)', 'BAGIAN 4 - E-PTP'); }
+          });
+
+          const fy = doc.lastAutoTable.finalY;
+
+          // Lembar Pengesahan
+          const sH = 60, sy = H - 26 - sH, cw3 = CW / 3;
+          if (fy > sy - 18) { doc.addPage(); header('5. LEMBAR VERIFIKASI & PENGESAHAN', 'PENGESAHAN'); }
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...NAVY); doc.text('LEMBAR VERIFIKASI & PENGESAHAN LAPORAN AUDIT MUTU:', M, sy - 8);
+          ['Dipersiapkan Oleh:', 'Diverifikasi Oleh:', 'Disetujui Oleh:'].forEach((t, i) => {
+            const sx = M + i * cw3; doc.setDrawColor(...BORDER_GRAY); doc.setLineWidth(0.7); doc.rect(sx, sy, cw3 - 6, sH, 'S');
+            doc.setFontSize(7); doc.setTextColor(71, 85, 105); doc.text(t, sx + 8, sy + 11); doc.line(sx + 10, sy + 38, sx + cw3 - 16, sy + 38);
+            doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 116, 139); doc.text(['QC Inspector', 'Kabag Quality', 'Kabag Produksi'][i], sx + 8, sy + 50); doc.setFont('helvetica', 'bold');
+          });
+
+          const n = doc.internal.getNumberOfPages();
+          for (let p = 1; p <= n; p++) {
+            doc.setPage(p); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(148, 163, 184);
+            doc.text('Dokumen dihasilkan otomatis oleh ACJ Integrated Quality & E-PTP Portal', M, H - 14); doc.text(`Halaman ${p} dari ${n}`, W - M, H - 14, { align: 'right' });
+          }
+          doc.save(`ACJ_Executive_Quality_PTP_Report_${todayStr().replace(/-/g, '')}.pdf`);
+          toast('Laporan Eksekutif PDF (Ramah Tinta) berhasil diunduh!', 'success');
+        } catch (err) { console.error(err); toast('Gagal membuat PDF: ' + err.message, 'error'); }
+      }, 50);
+    }
+
+    /* =================================================================== */
+    /* LOGIKA MODUL E-PTP (SIGNATURE PAD, FORM 3 TAHAP, LOG REGISTER)      */
     /* =================================================================== */
     let sigPads = {}, base64FotoPart = '', ptpLogRecords = [], refNewFiles = [], refExisting = [];
 
@@ -1794,6 +1675,7 @@
       }
       resizeAllCanvases();
     }
+
     function resizeAllCanvases() {
       Object.values(sigPads).forEach(pad => {
         const canvas = pad.canvas; if (!canvas || canvas.offsetWidth === 0) return;
@@ -1923,11 +1805,12 @@
     async function executePtpAction(actionType) {
       const payload = collectPtpPayload();
       if (actionType === 'PREVIEW') payload.refFilesNew = [];
-      showStatusModal(true, 'Memproses Dokumen PTP...', 'Mohon tunggu sebentar, terhubung ke server aman.');
+      const titles = { SAVE: 'Menyimpan Data PTP...', PREVIEW: 'Menyiapkan Print Preview...', PDF: 'Mencetak PDF PTP (1 Halaman)...' };
+      showStatusModal(true, titles[actionType], 'Mohon tunggu sebentar, sedang memproses ke Google Workspace.');
       try {
         const res = await apiCall('handlePtpAction', actionType, payload);
         if (actionType !== 'PREVIEW') {
-          if (res.refAttachments) refExisting = res.refAttachments;
+          if (Array.isArray(res.refAttachments)) refExisting = res.refAttachments;
           refNewFiles = []; renderRefList(); syncAllSystems(false);
         }
         if (actionType === 'PREVIEW') {
@@ -1937,11 +1820,17 @@
         } else if (actionType === 'SAVE') {
           showStatusModal(false, 'Data Tersimpan!', res.message);
         } else if (actionType === 'PDF') {
-          showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `No. Reg. ${res.noReg} tersimpan di Google Drive.`, `<a href="${res.pdfUrl}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a>`);
+          showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `Dokumen PDF ${res.noReg} tersimpan di Google Drive.`, `<a href="${esc(res.pdfUrl)}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a>`);
         }
       } catch (err) {
-        showStatusModal(false, 'Terjadi Kesalahan', err.message);
+        showStatusModal(false, 'Gagal Memproses', err.message);
       }
+    }
+
+    let ptpSortState = null;
+    function togglePtpSort(k) {
+      ptpSortState = !ptpSortState || ptpSortState.k !== k ? { k, dir: 'asc' } : ptpSortState.dir === 'asc' ? { k, dir: 'desc' } : null;
+      renderLogRegisterTable();
     }
 
     function renderLogRegisterTable() {
@@ -1952,11 +1841,38 @@
       $('statClosedBadge').textContent = `Closed: ${closedCount}`;
       renderDashboard();
 
-      const filtered = ptpLogRecords.filter(i => {
+      let filtered = ptpLogRecords.filter(i => {
         const isClosed = i.status.toLowerCase().includes('closed');
         if (sf === 'CLOSED' && !isClosed) return false;
         if (sf === 'OPEN' && isClosed) return false;
         return !kw || i.noReg.toLowerCase().includes(kw) || i.partName.toLowerCase().includes(kw) || i.auditee.toLowerCase().includes(kw);
+      });
+
+      // Default urut dari terbaru ke terlama
+      if (!ptpSortState) {
+        filtered = filtered.slice().sort((a, b) => {
+          const da = String(a.tanggalTerbit || ''), db = String(b.tanggalTerbit || '');
+          if (da !== db) return db.localeCompare(da);
+          return String(b.noReg || '').localeCompare(String(a.noReg || ''), 'id', { numeric: true });
+        });
+      } else {
+        const dir = ptpSortState.dir === 'asc' ? 1 : -1, k = ptpSortState.k;
+        filtered = filtered.slice().sort((a, b) => String(a[k] || '').localeCompare(String(b[k] || ''), 'id', { numeric: true, sensitivity: 'base' }) * dir);
+      }
+
+      ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'status', 'lastUpdated'].forEach(colKey => {
+        const ind = $('ptp-sort-' + colKey);
+        if (!ind) return;
+        if (ptpSortState && ptpSortState.k === colKey) {
+          ind.textContent = ptpSortState.dir === 'asc' ? '▲ A-Z' : '▼ Z-A';
+          ind.className = 'ml-1 text-[10px] text-amber-300 font-bold';
+        } else if (!ptpSortState && colKey === 'tanggalTerbit') {
+          ind.textContent = '▼ Terbaru';
+          ind.className = 'ml-1 text-[10px] text-amber-300 font-bold';
+        } else {
+          ind.textContent = '↕';
+          ind.className = 'ml-1 text-[10px] text-blue-300';
+        }
       });
 
       const canDel = isEditor();
@@ -1996,8 +1912,21 @@
       const maxM = Math.max(1, ...months.map(m => m.c + m.p));
       $('dashMonthly').innerHTML = months.map(m => `<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[10px] font-bold mb-1">${m.c + m.p || ''}</span><div class="w-full max-w-[40px] flex flex-col justify-end" style="height:75%"><div class="bg-amber-300 rounded-t" style="height:${m.p/maxM*100}%"></div><div class="bg-emerald-500" style="height:${m.c/maxM*100}%"></div></div><span class="text-[10px] text-slate-500 mt-1">${m.label}</span></div>`).join('');
 
+      const bySrc = {};
+      ptpLogRecords.forEach(r => { const k = r.sumber || '-'; (bySrc[k] = bySrc[k] || { c: 0, p: 0 }); if (isClosed(r)) bySrc[k].c++; else bySrc[k].p++; });
+      const srcRows = Object.entries(bySrc).sort((a, b) => (b[1].c + b[1].p) - (a[1].c + a[1].p));
+      const maxS = Math.max(1, ...srcRows.map(([, v]) => v.c + v.p));
+      $('dashSumber').innerHTML = srcRows.length ? srcRows.map(([k, v]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${v.p} On Progress &bull; ${v.c} Closed</span></div><div class="flex h-2.5 rounded bg-slate-100 overflow-hidden" style="width:${(v.c+v.p)/maxS*100}%"><div class="bg-emerald-500" style="width:${v.c/(v.c+v.p)*100}%"></div><div class="bg-amber-300 flex-1"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Belum ada data.</p>';
+
+      const byAud = {};
+      prog.forEach(r => { const k = r.auditee && r.auditee !== '-' ? r.auditee : '(tanpa auditee)'; byAud[k] = (byAud[k] || 0) + 1; });
+      const audRows = Object.entries(byAud).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const maxA = Math.max(1, ...audRows.map(a => a[1]));
+      $('dashAuditee').innerHTML = audRows.length ? audRows.map(([k, n]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${n}</span></div><div class="h-2.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-400" style="width:${n/maxA*100}%"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Tidak ada PTP On Progress.</p>';
+
       const actions = r => `<button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Buka</button>` + (r.pdfUrl ? ` <a href="${esc(r.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '');
-      $('dashProgressBody').innerHTML = prog.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5">${esc(r.partName)}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
+      const progSorted = prog.slice().sort((a, b) => String(a.tanggalTerbit).localeCompare(String(b.tanggalTerbit)));
+      $('dashProgressBody').innerHTML = progSorted.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5">${esc(r.partName)}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
       $('dashClosedBody').innerHTML = closed.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5">${esc(r.partName)}</td><td class="p-2.5 text-center text-[11px]">${esc(r.lastUpdated)}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
     }
 
