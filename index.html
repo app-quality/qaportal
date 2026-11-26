@@ -186,6 +186,10 @@
             <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-400"></i>
             <span id="loggedUserName">User</span>
           </span>
+          <button type="button" onclick="execReport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Cetak Laporan Eksekutif PDF (Landscape)">
+            <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> Laporan PDF
+          </button>
+          <span id="lastSyncTime" class="text-[11px] text-blue-200 hidden sm:inline">Sync: --:--</span>
           <button type="button" onclick="syncAllSystems(true)" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Sinkronkan Semua Data">
             <i id="syncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
           </button>
@@ -581,20 +585,31 @@
       sessionStorage.setItem('acj_user', JSON.stringify(user));
       $('loginScreen').classList.add('hidden');
       $('mainAppContainer').classList.remove('hidden');
-      $('loggedUserName').textContent = `${user.fullName} (${user.role})`;
+      $('loggedUserName').textContent = `${user.fullName} • ${user.dept || '-'} (${user.role})`;
 
-      if (user.role === 'AUDITOR' && !$('namaTtdAuditor').value) $('namaTtdAuditor').value = user.fullName;
+      if ((user.role === 'AUDITOR' || user.role === 'Admin') && !$('namaTtdAuditor').value) $('namaTtdAuditor').value = user.fullName;
       if (user.role === 'AUDITEE_PROD' && !$('namaAuditeeProd').value) $('namaAuditeeProd').value = user.fullName;
       if (user.role === 'AUDITEE_INSP' && !$('namaAuditeeInsp').value) $('namaAuditeeInsp').value = user.fullName;
+      if (user.role === 'APPROVER_TMJ' && !$('namaApproved').value) $('namaApproved').value = user.fullName;
 
       initSignaturePads();
       initDefaultActionRows();
       switchMainModule('claim');
       syncAllSystems(false);
+      startAutoSync();
       if (fresh) toast('Selamat datang, ' + user.fullName, 'success');
     }
 
+    let autoSyncTimer = null;
+    function startAutoSync() {
+      clearInterval(autoSyncTimer);
+      autoSyncTimer = setInterval(() => {
+        if (!document.hidden && currentUser) syncAllSystems(false);
+      }, 120000);
+    }
+
     function logoutUser(expired) {
+      clearInterval(autoSyncTimer);
       const tok = sessionStorage.getItem('acj_token');
       if (tok && !expired) apiCall('apiLogout', tok).catch(() => {});
       currentUser = null;
@@ -663,6 +678,7 @@
           renderLogRegisterTable();
           if (ptpRes.spreadsheetUrl) { $('openSheetsLogBtn').href = ptpRes.spreadsheetUrl; $('openSheetsLogBtn').classList.remove('hidden'); }
         }
+        if ($('lastSyncTime')) $('lastSyncTime').textContent = 'Sync: ' + new Date().toLocaleTimeString('id-ID');
         if (manual) toast('Semua database berhasil disinkronkan!', 'success');
       } catch (e) {
         toast('Gagal sinkronisasi: ' + e.message, 'error');
@@ -674,11 +690,14 @@
     /* =================================================================== */
     /* LOGIKA MODUL QUALITY (CLAIM CUSTOMER, DATABASE NG, INSPECTION)      */
     /* =================================================================== */
-    const Q_DATA = { claim: [], ng: [], insp: [] }, Q_PG = { claim: 1, ng: 1, insp: 1 }, Q_CHARTS = {};
+    const Q_DATA = { claim: [], ng: [], insp: [] }, Q_PG = { claim: 1, ng: 1, insp: 1 }, Q_CHARTS = {}, Q_DRILL = {};
+    const Q_WSEL = { ng: new Set(), insp: new Set() }, Q_DSEL = { ng: new Set() };
     const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
     const MS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
     const PLANTS = ['Sangiang','Cikarang','Kalisabi','Jatake'];
     const DIVISI = ['Bor','CNC','Cutting','Harden','Hexagon','Punch','Rolling','Turret'];
+    const PIE_COL = ['#ef4444','#f97316','#f59e0b','#3b82f6','#8b5cf6','#94a3b8'];
+    const weekOf = d => Math.ceil((d.getDate() + ((new Date(d.getFullYear(), d.getMonth(), 1).getDay() + 6) % 7)) / 7);
 
     const Q_MOD = {
       claim: { title: 'Claim Customer', sheet: 'Claim_Customer', idk: 'idRegister', dk: 'tanggalClaim', color: 'blue',
@@ -720,47 +739,130 @@
         {k:'keterangan',l:'Keterangan',t:'text',w:1}]
     };
 
+    /* --- Widget Minggu Kalender (Senin-Minggu) & Multi-Divisi --- */
+    function weekListQ(m) {
+      const moEl = $(`qf-${m}-month`), yEl = $(`qf-${m}-year`);
+      const mo = moEl ? Number(moEl.value) : 0; if (!mo) return [];
+      const yv = yEl ? yEl.value : 'ALL';
+      if (yv === 'ALL') {
+        const ys = [...yEl.options].map(o => Number(o.value)).filter(Boolean);
+        const n = Math.max(0, ...ys.map(y => weekOf(new Date(y, mo, 0))));
+        return Array.from({ length: n }, (_, i) => ({ n: i + 1, txt: 'Minggu ' + (i + 1) }));
+      }
+      const y = Number(yv), last = new Date(y, mo, 0).getDate(), off = (new Date(y, mo - 1, 1).getDay() + 6) % 7, n = weekOf(new Date(y, mo, 0));
+      return Array.from({ length: n }, (_, i) => {
+        const a = Math.max(1, i * 7 - off + 1), b = Math.min(last, (i + 1) * 7 - off);
+        return { n: i + 1, txt: `Minggu ${i + 1} · ${a === b ? a : a + '–' + b} ${MS[mo - 1]}` };
+      });
+    }
+    function buildWeeksQ(m) {
+      const box = $(`qwk-${m}-box`), lbl = $(`qwk-${m}-lbl`); if (!box || !lbl) return;
+      const list = weekListQ(m), set = Q_WSEL[m], off = $(`qf-${m}-month`).value === 'ALL';
+      [...set].forEach(n => { if (!list.some(w => w.n === n)) set.delete(n); });
+      lbl.textContent = off ? 'Minggu (pilih bulan dulu) ▾' : (set.size ? 'Minggu ' + [...set].sort((a,b)=>a-b).join(', ') : 'Semua Minggu') + ' ▾';
+      lbl.className = 'list-none select-none text-xs border rounded-lg px-3 py-1.5 whitespace-nowrap ' + (off ? 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed' : set.size ? 'bg-blue-50 border-blue-300 text-blue-900 font-bold cursor-pointer' : 'bg-slate-50 border-slate-300 cursor-pointer');
+      box.innerHTML = list.length
+        ? `<button type="button" onclick="Q_WSEL['${m}'].clear();buildWeeksQ('${m}');Q_PG['${m}']=1;renderQualityModule('${m}')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-semibold text-blue-800">Semua Minggu (hapus pilihan)</button>` +
+          list.map(w => `<label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"><input type="checkbox" ${set.has(w.n)?'checked':''} onchange="this.checked?Q_WSEL['${m}'].add(${w.n}):Q_WSEL['${m}'].delete(${w.n});buildWeeksQ('${m}');Q_PG['${m}']=1;renderQualityModule('${m}')" class="accent-blue-900"><span>${w.txt}</span></label>`).join('')
+        : '';
+      if (!list.length) $(`qwk-${m}`).removeAttribute('open');
+    }
+    function buildDivQ() {
+      const box = $('qdv-ng-box'), lbl = $('qdv-ng-lbl'); if (!box || !lbl) return;
+      const set = Q_DSEL.ng, list = DIVISI.filter(x => set.has(x));
+      lbl.textContent = (list.length ? 'Divisi: ' + list.join(', ') : 'Semua Divisi') + ' ▾';
+      lbl.className = 'list-none select-none text-xs border rounded-lg px-3 py-1.5 whitespace-nowrap max-w-[240px] truncate cursor-pointer ' + (list.length ? 'bg-blue-50 border-blue-300 text-blue-900 font-bold' : 'bg-slate-50 border-slate-300');
+      box.innerHTML = `<button type="button" onclick="Q_DSEL.ng.clear();buildDivQ();Q_PG.ng=1;renderQualityModule('ng')" class="w-full text-left px-2 py-1.5 rounded-lg hover:bg-slate-100 font-semibold text-blue-800">Semua Divisi (hapus pilihan)</button>` +
+        DIVISI.map(x => `<label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"><input type="checkbox" ${set.has(x)?'checked':''} onchange="this.checked?Q_DSEL.ng.add('${x}'):Q_DSEL.ng.delete('${x}');buildDivQ();Q_PG.ng=1;renderQualityModule('ng')" class="accent-blue-900"><span>${x}</span></label>`).join('');
+    }
+    document.addEventListener('click', e => {
+      const sm = e.target.closest('summary[id^="qwk-"]');
+      if (sm) { const m = sm.dataset.m; if ($(`qf-${m}-month`).value === 'ALL') { e.preventDefault(); toast('Pilih bulan terlebih dahulu untuk memfilter per minggu.', 'info'); } return; }
+      document.querySelectorAll('details[id^="qwk-"][open], details[id^="qdv-"][open]').forEach(d => { if (!d.contains(e.target)) d.removeAttribute('open'); });
+    });
+
     function buildQualityShell() {
       $('qualityModulesWrapper').innerHTML = Object.keys(Q_MOD).map(m => {
         const c = Q_MOD[m];
         const th = '<th class="p-2.5">Aksi</th>' + c.cols.map(x => `<th class="p-2.5 whitespace-nowrap ${x[2]==='n'||x[2]==='p'?'text-right':''}">${x[0]}</th>`).join('');
+        let filtersHtml = `
+          <select id="qf-${m}-year" onchange="Q_PG['${m}']=1;${m!=='claim'?`buildWeeksQ('${m}');`:''}renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Tahun</option></select>
+          <select id="qf-${m}-month" onchange="Q_PG['${m}']=1;${m!=='claim'?`Q_WSEL['${m}'].clear();buildWeeksQ('${m}');`:''}renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Bulan</option>${MONTHS.map((x, i) => `<option value="${i+1}">${x}</option>`).join('')}</select>`;
+
+        if (m === 'claim') {
+          filtersHtml += `
+            <select id="qf-claim-customer" onchange="Q_PG.claim=1;renderQualityModule('claim')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 max-w-[180px]"><option value="ALL">Semua Customer</option></select>
+            <select id="qf-claim-plant" onchange="Q_PG.claim=1;renderQualityModule('claim')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
+            <select id="qf-claim-kategori" onchange="Q_PG.claim=1;renderQualityModule('claim')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Kategori</option><option value="Claim">Claim</option><option value="Informasi">Informasi</option></select>
+            <select id="cmpYear" title="Tahun pembanding untuk Laporan Eksekutif PDF" class="text-xs bg-amber-50 border border-amber-300 text-amber-900 font-semibold rounded-lg px-3 py-1.5"><option value="ALL">Pembanding PDF: otomatis (tahun lalu)</option></select>`;
+        } else {
+          filtersHtml += `<details id="qwk-${m}" class="relative"><summary id="qwk-${m}-lbl" data-m="${m}" class="list-none cursor-pointer select-none text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 whitespace-nowrap">Minggu (pilih bulan dulu) ▾</summary><div id="qwk-${m}-box" class="absolute left-0 z-30 mt-1 w-64 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-2 text-xs"></div></details>`;
+          if (m === 'ng') filtersHtml += `<details id="qdv-ng" class="relative"><summary id="qdv-ng-lbl" class="list-none cursor-pointer select-none text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 whitespace-nowrap">Semua Divisi ▾</summary><div id="qdv-ng-box" class="absolute left-0 z-30 mt-1 w-56 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-2 text-xs"></div></details>`;
+          if (m === 'insp') filtersHtml += `<select id="qf-insp-customer" onchange="Q_PG.insp=1;renderQualityModule('insp')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 max-w-[200px]"><option value="ALL">Semua Customer</option></select>`;
+        }
+
+        let chartsHtml = '';
+        if (m === 'claim') {
+          chartsHtml = `
+          <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            <div class="lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto Kategori NG (80/20)</h4><p class="text-[11px] text-slate-500 mb-2">Klik batang untuk filter log</p><div class="relative h-60"><canvas id="qchart-claim-pareto"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tabel Distribusi Pareto</h4><p class="text-[11px] text-slate-500 mb-2">Kontribusi kategori terhadap total defect</p><table class="w-full text-xs"><thead><tr class="text-slate-400 uppercase border-b"><th class="py-1 text-left">Kategori</th><th class="text-right">Qty</th><th class="text-right">%</th><th class="text-right">Kum.</th></tr></thead><tbody id="claim-dist-tbody"></tbody></table></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Customer</h4><p class="text-[11px] text-slate-500 mb-2">Jumlah kasus (klik untuk filter)</p><div class="relative h-56"><canvas id="qchart-claim-cust"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tren Kasus &amp; Qty NG</h4><p class="text-[11px] text-slate-500 mb-2">Akumulasi bulanan</p><div class="relative h-56"><canvas id="qchart-claim-trend"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Claim per Plant</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan untuk filter</p><div class="relative h-56"><canvas id="qchart-claim-plant"></canvas></div></div>
+            <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Jumlah Claim per Nama Part</h4><p class="text-[11px] text-slate-500 mb-2">10 part terbanyak, dipisah kategori Claim &amp; Informasi (klik batang untuk filter log)</p><div class="relative h-64"><canvas id="qchart-claim-part"></canvas></div></div>
+          </div>`;
+        } else if (m === 'ng') {
+          chartsHtml = `
+          <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto Jumlah NG per Part</h4><p class="text-[11px] text-slate-500 mb-2">80/20, klik batang untuk filter log</p><div class="relative h-60"><canvas id="qchart-ng-pareto"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan part untuk langsung filter log register</p><div class="relative h-60"><canvas id="qchart-ng-pie"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tren NG Satu Tahun</h4><p class="text-[11px] text-slate-500 mb-2">Per bulan &amp; divisi (klik bulan untuk filter)</p><div class="relative h-60"><canvas id="qchart-ng-trend"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto Multi-Dimensi</h4><p class="text-[11px] text-slate-500">Klik batang untuk filter log</p></div><select id="ng-multi-dim" onchange="renderQualityModule('ng')" class="text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200 rounded-lg px-2 py-1"><option value="namaPart">By Part NG</option><option value="jenisNG">By Jenis Problem</option><option value="namaOperator">By Operator</option><option value="noMesin">By No Mesin</option></select></div><div class="relative h-60"><canvas id="qchart-ng-multi"></canvas></div></div>
+          </div>`;
+        } else {
+          chartsHtml = `
+          <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto NG Tertinggi (80/20)</h4><p class="text-[11px] text-slate-500 mb-2">Part dengan Qty NG terbanyak (klik batang untuk filter)</p><div class="relative h-60"><canvas id="qchart-insp-pareto"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan part untuk langsung filter log register</p><div class="relative h-60"><canvas id="qchart-insp-pie"></canvas></div></div>
+          </div>`;
+        }
+
         return `
         <section id="qsec-${m}" class="${m === 'claim' ? '' : 'hidden'} space-y-5">
           <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Monitoring</span>
               <h2 class="text-2xl font-extrabold mt-0.5">${c.title}</h2>
-              <p class="text-xs text-slate-300 mt-1">Analisis Pareto, Tren Defect &amp; Log Register Terintegrasi</p>
+              <p class="text-xs text-slate-300 mt-1">Dashboard Analitik Pareto, Distribusi Defect &amp; Log Register Terintegrasi</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button type="button" onclick="openQualityForm('${m}')" class="q-adm bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>
               <button type="button" onclick="exportQualityExcel('${m}')" class="q-adm bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="sheet" class="w-4 h-4"></i> Excel</button>
+              <button type="button" onclick="execReport()" class="bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-amber-300"></i> Laporan Eksekutif PDF</button>
             </div>
           </div>
 
           <!-- Filter Bar -->
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-3">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2.5">
             <span class="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><i data-lucide="filter" class="w-3.5 h-3.5 text-blue-900"></i> Filter:</span>
-            <select id="qf-${m}-year" onchange="Q_PG['${m}']=1;renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Tahun</option></select>
-            <select id="qf-${m}-month" onchange="Q_PG['${m}']=1;renderQualityModule('${m}')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Bulan</option>${MONTHS.map((x, i) => `<option value="${i+1}">${x}</option>`).join('')}</select>
-            ${m === 'claim' ? `<select id="qf-claim-plant" onchange="Q_PG.claim=1;renderQualityModule('claim')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>` : ''}
-            ${m === 'ng' ? `<select id="qf-ng-divisi" onchange="Q_PG.ng=1;renderQualityModule('ng')" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5"><option value="ALL">Semua Divisi</option>${DIVISI.map(d => `<option value="${d}">${d}</option>`).join('')}</select>` : ''}
+            ${filtersHtml}
             <button type="button" onclick="resetQualityFilter('${m}')" class="text-xs text-blue-800 hover:underline font-semibold ml-auto">Reset Filter</button>
           </div>
 
           <!-- KPI Cards -->
-          <div id="qkpi-${m}" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+          <div id="qkpi-${m}" class="grid grid-cols-2 ${m === 'claim' || m === 'ng' ? 'lg:grid-cols-6' : 'lg:grid-cols-4'} gap-3"></div>
 
           <!-- Charts -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800 mb-2">Analisis Pareto (80/20)</h4><div class="relative h-60"><canvas id="qchart-${m}-1"></canvas></div></div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800 mb-2">Tren &amp; Distribusi Bulanan</h4><div class="relative h-60"><canvas id="qchart-${m}-2"></canvas></div></div>
-          </div>
+          ${chartsHtml}
 
           <!-- Tabel Log Register -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h3 class="font-bold text-sm text-blue-950">Log Register ${c.title}</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="font-bold text-sm text-blue-950">Log Register ${c.title}</h3>
+                <span id="qdrill-${m}" class="hidden text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200"></span>
+              </div>
               <input id="qq-${m}" oninput="Q_PG['${m}']=1;renderQualityTable('${m}')" placeholder="Cari part, customer, ID..." class="w-full sm:w-72 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-900">
             </div>
             <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-blue-950 text-white uppercase"><tr>${th}</tr></thead><tbody id="qtb-${m}" class="divide-y divide-slate-200"></tbody></table></div>
@@ -775,6 +877,28 @@
           </div>
         </section>`;
       }).join('');
+      buildDivQ();
+    }
+
+    function setQDrill(m, field, value) {
+      Q_DRILL[m] = { field, value };
+      Q_PG[m] = 1;
+      const b = $('qdrill-' + m);
+      if (b) {
+        b.classList.remove('hidden');
+        b.innerHTML = `Filter Grafik: ${esc(value)} <button type="button" onclick="clearQDrill('${m}')" class="ml-1 font-black text-rose-900">&times;</button>`;
+      }
+      renderQualityTable(m);
+      const tb = $('qtb-' + m);
+      if (tb) tb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function clearQDrill(m) {
+      Q_DRILL[m] = null;
+      const b = $('qdrill-' + m);
+      if (b) b.classList.add('hidden');
+      Q_PG[m] = 1;
+      renderQualityTable(m);
+      if (m === 'claim') renderQualityModule('claim');
     }
 
     function popQualityFilters(custList) {
@@ -787,96 +911,211 @@
         s.innerHTML = '<option value="ALL">Semua Tahun</option>' + arr.map(y => `<option value="${y}">${y}</option>`).join('');
         s.value = arr.map(String).includes(cur) ? cur : 'ALL';
       });
+      if ($('cmpYear')) {
+        const cv = $('cmpYear').value;
+        $('cmpYear').innerHTML = '<option value="ALL">Pembanding PDF: otomatis (tahun lalu)</option>' + arr.map(y => `<option value="${y}">Pembanding PDF: ${y}</option>`).join('');
+        $('cmpYear').value = arr.map(String).includes(cv) ? cv : 'ALL';
+      }
+      const sc = $('qf-claim-customer');
+      if (sc) {
+        const cur = sc.value, u = [...new Set(Q_DATA.claim.map(c => c.namaCustomer).filter(Boolean))].sort();
+        sc.innerHTML = '<option value="ALL">Semua Customer</option>' + u.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+        sc.value = u.includes(cur) ? cur : 'ALL';
+      }
+      const si = $('qf-insp-customer');
+      if (si) {
+        const cur = si.value, u = [...new Set(Q_DATA.insp.map(i => i.customer).filter(Boolean))].sort();
+        si.innerHTML = '<option value="ALL">Semua Customer</option>' + u.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+        si.value = u.includes(cur) ? cur : 'ALL';
+      }
+      ['ng', 'insp'].forEach(buildWeeksQ);
     }
 
     function resetQualityFilter(m) {
       $(`qf-${m}-year`).value = 'ALL'; $(`qf-${m}-month`).value = 'ALL';
       if ($(`qf-${m}-plant`)) $(`qf-${m}-plant`).value = 'ALL';
-      if ($(`qf-${m}-divisi`)) $(`qf-${m}-divisi`).value = 'ALL';
-      $(`qq-${m}`).value = ''; Q_PG[m] = 1; renderQualityModule(m);
+      if ($(`qf-${m}-customer`)) $(`qf-${m}-customer`).value = 'ALL';
+      if ($(`qf-${m}-kategori`)) $(`qf-${m}-kategori`).value = 'ALL';
+      if (m === 'claim' && $('cmpYear')) $('cmpYear').value = 'ALL';
+      if (Q_WSEL[m]) { Q_WSEL[m].clear(); buildWeeksQ(m); }
+      if (Q_DSEL[m]) { Q_DSEL[m].clear(); buildDivQ(); }
+      $(`qq-${m}`).value = ''; clearQDrill(m); Q_PG[m] = 1; renderQualityModule(m);
     }
 
-    function getFilteredQuality(m) {
-      const c = Q_MOD[m], y = $(`qf-${m}-year`).value, mo = $(`qf-${m}-month`).value;
+    function getFilteredQuality(m, applyDrill, yearOverride) {
+      const c = Q_MOD[m], y = yearOverride !== undefined ? String(yearOverride) : $(`qf-${m}-year`).value, mo = $(`qf-${m}-month`).value;
       const pl = $(`qf-${m}-plant`) ? $(`qf-${m}-plant`).value : 'ALL';
-      const dv = $(`qf-${m}-divisi`) ? $(`qf-${m}-divisi`).value : 'ALL';
-      const q = ($(`qq-${m}`).value || '').toLowerCase().trim();
+      const cu = $(`qf-${m}-customer`) ? $(`qf-${m}-customer`).value : 'ALL';
+      const kt = $(`qf-${m}-kategori`) ? $(`qf-${m}-kategori`).value : 'ALL';
+      const q = ($(`qq-${m}`).value || '').toLowerCase().trim(), dr = applyDrill && Q_DRILL[m];
+
       return Q_DATA[m].filter(r => {
         const d = pd(r[c.dk]);
-        if ((y !== 'ALL' || mo !== 'ALL') && !d) return false;
+        if ((y !== 'ALL' || mo !== 'ALL' || (Q_WSEL[m] && Q_WSEL[m].size)) && !d) return false;
         if (y !== 'ALL' && d.getFullYear() != y) return false;
         if (mo !== 'ALL' && d.getMonth() + 1 != mo) return false;
+        if (Q_WSEL[m] && Q_WSEL[m].size && !Q_WSEL[m].has(weekOf(d))) return false;
+        if (Q_DSEL[m] && Q_DSEL[m].size && !Q_DSEL[m].has(r.divisi)) return false;
         if (pl !== 'ALL' && r.acjPlant !== pl) return false;
-        if (dv !== 'ALL' && r.divisi !== dv) return false;
+        if (cu !== 'ALL' && (r.namaCustomer !== undefined ? r.namaCustomer : r.customer) !== cu) return false;
+        if (kt !== 'ALL' && (r.kategoriClaim || 'Claim') !== kt) return false;
         if (q && !c.search.some(k => String(r[k] || '').toLowerCase().includes(q))) return false;
+        if (dr && r[dr.field] !== dr.value) return false;
         return true;
       });
     }
 
+    const qSum = (rows, kf, vf) => { const o = {}; rows.forEach(r => { const k = kf(r); o[k] = (o[k] || 0) + vf(r); }); return o; };
+    const qLeg = { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } };
+
+    function buildParetoCfg(map, limit, barCol, lineCol, unit, onPick) {
+      const keys = Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, limit);
+      const vals = keys.map(k => map[k]), tot = vals.reduce((a, b) => a + b, 0);
+      let run = 0; const cum = vals.map(v => { run += v; return tot ? +(run / tot * 100).toFixed(1) : 0; });
+      return { keys, vals, cum, tot, cfg: {
+        type: 'bar',
+        data: { labels: keys.length ? keys : ['Tidak ada data'], datasets: [
+          { type: 'bar', label: unit, data: vals.length ? vals : [0], backgroundColor: barCol, borderRadius: 4, yAxisID: 'y' },
+          { type: 'line', label: 'Kumulatif %', data: cum.length ? cum : [0], borderColor: lineCol, borderWidth: 2, pointRadius: 3, yAxisID: 'y1' }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg },
+          onClick: (e, els) => { if (onPick && els.length && keys[els[0].index]) onPick(keys[els[0].index]); },
+          scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } } } }
+      }};
+    }
+
+    function buildPieCfg(map, onPick) {
+      const ks = Object.keys(map).sort((a, b) => map[b] - map[a]), top = ks.slice(0, 5);
+      const labels = top.slice(), data = top.map(k => map[k]), rest = ks.slice(5).reduce((a, k) => a + map[k], 0);
+      if (rest > 0) { labels.push('Part Lainnya'); data.push(rest); }
+      const tot = data.reduce((a, b) => a + b, 0);
+      return {
+        items: labels.map((l, i) => ({ label: l, qty: data[i], pct: tot ? (data[i] / tot * 100).toFixed(1) : '0.0', color: PIE_COL[i] })),
+        cfg: {
+          type: 'pie',
+          data: { labels: labels.length ? labels : ['Tidak ada data'], datasets: [{ data: data.length ? data : [1], backgroundColor: data.length ? PIE_COL.slice(0, labels.length) : ['#e2e8f0'], borderWidth: 2, borderColor: '#fff' }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg, tooltip: { callbacks: { label: c => ` ${c.label}: ${fmt(c.raw)} pcs (${tot ? (c.raw / tot * 100).toFixed(1) : 0}%)` } } },
+            onClick: (e, els) => { if (onPick && els.length && labels[els[0].index] && labels[els[0].index] !== 'Part Lainnya') onPick(labels[els[0].index]); } }
+        }
+      };
+    }
+
+    function drawQChart(id, cfg) {
+      if (Q_CHARTS[id]) Q_CHARTS[id].destroy();
+      const el = $(id); if (el) Q_CHARTS[id] = new Chart(el, cfg);
+    }
+
     function renderQualityModule(m) {
       document.querySelectorAll('.q-adm').forEach(el => el.classList.toggle('hidden', !isEditor()));
-      const d = getFilteredQuality(m);
-      const kpiCard = (lbl, val, sub, cls) => `<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><p class="text-[11px] font-bold uppercase text-slate-500">${lbl}</p><h3 class="text-2xl font-extrabold ${cls} mt-1">${val}</h3><span class="text-[11px] text-slate-400">${sub}</span></div>`;
+      const d = getFilteredQuality(m, false);
+      const kpiCard = (lbl, val, sub, cls, field, fval) => {
+        const click = field !== undefined ? `onclick="${fval ? `setQDrill('${m}','${field}','${esc(fval)}')` : `clearQDrill('${m}')`}" class="cursor-pointer hover:shadow-md transition bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm"` : `class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm"`;
+        return `<div ${click}><p class="text-[10px] font-bold uppercase text-slate-500">${lbl}</p><h3 class="text-xl font-extrabold ${cls} mt-0.5 truncate">${val}</h3><span class="text-[10px] text-slate-400">${sub}</span></div>`;
+      };
 
       if (m === 'claim') {
+        const nClaim = d.filter(c => (c.kategoriClaim || 'Claim') === 'Claim').length, nInfo = d.length - nClaim;
         $('qkpi-claim').innerHTML =
-          kpiCard('Total Kasus', fmt(d.length), 'Sesuai filter', 'text-blue-950') +
-          kpiCard('Monitoring', fmt(d.filter(x => x.statusClaim === 'Monitoring').length), 'Dalam evaluasi', 'text-amber-600') +
-          kpiCard('Closed', fmt(d.filter(x => x.statusClaim === 'Closed').length), 'Terselesaikan', 'text-emerald-600') +
-          kpiCard('Total Qty NG', fmt(d.reduce((a, x) => a + num(x.qtyNG), 0)) + ' Pcs', 'Total defect', 'text-rose-600');
-        drawParetoChart('qchart-claim-1', d, r => r.namaCustomer || 'Unknown', r => num(r.qtyNG), 'Qty NG');
-        drawMonthlyChart('qchart-claim-2', d, 'tanggalClaim', 'qtyNG');
+          kpiCard('Total Kasus', fmt(d.length), 'Klik reset filter log', 'text-blue-950', 'kategoriClaim', '') +
+          kpiCard('Kategori Claim', fmt(nClaim), (d.length ? (nClaim/d.length*100).toFixed(1) : '0.0') + '% komplain', 'text-rose-600', 'kategoriClaim', 'Claim') +
+          kpiCard('Kategori Informasi', fmt(nInfo), (d.length ? (nInfo/d.length*100).toFixed(1) : '0.0') + '% early warning', 'text-sky-600', 'kategoriClaim', 'Informasi') +
+          kpiCard('Monitoring', fmt(d.filter(c => c.statusClaim === 'Monitoring').length), 'Dalam evaluasi', 'text-amber-600', 'statusClaim', 'Monitoring') +
+          kpiCard('Closed', fmt(d.filter(c => c.statusClaim === 'Closed').length), 'Terselesaikan', 'text-emerald-600', 'statusClaim', 'Closed') +
+          kpiCard('Total Qty NG', fmt(d.reduce((a, c) => a + num(c.qtyNG), 0)) + ' Pcs', 'Pieces defect', 'text-rose-700');
+
+        const p = buildParetoCfg(qSum(d, r => r.kategoriNG || 'Visual', r => num(r.qtyNG)), 10, '#1e3a8a', '#f59e0b', 'Qty NG', v => setQDrill('claim', 'kategoriNG', v));
+        drawQChart('qchart-claim-pareto', p.cfg);
+        $('claim-dist-tbody').innerHTML = p.keys.length ? p.keys.map((k, i) => `<tr class="border-b border-slate-100"><td class="py-1.5 font-semibold">${esc(k)}</td><td class="text-right font-bold text-rose-600">${fmt(p.vals[i])}</td><td class="text-right">${p.tot ? (p.vals[i]/p.tot*100).toFixed(1) : 0}%</td><td class="text-right font-bold ${p.cum[i]<=80?'text-blue-800':'text-slate-500'}">${p.cum[i]}%</td></tr>`).join('') : '<tr><td colspan="4" class="py-3 text-center text-slate-400">Tidak ada data</td></tr>';
+
+        const cMap = qSum(d, r => r.namaCustomer || 'Unknown', () => 1), cKeys = Object.keys(cMap).sort((a,b) => cMap[b]-cMap[a]).slice(0, 5);
+        drawQChart('qchart-claim-cust', {
+          type: 'bar',
+          data: { labels: cKeys.length ? cKeys : ['Tidak ada data'], datasets: [{ label: 'Kasus', data: cKeys.map(k => cMap[k]), backgroundColor: '#0284c7', borderRadius: 4 }] },
+          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, onClick: (e, els) => { if (els.length && cKeys[els[0].index]) setQDrill('claim', 'namaCustomer', cKeys[els[0].index]); } }
+        });
+
+        const tC = new Array(12).fill(0), tQ = new Array(12).fill(0);
+        d.forEach(r => { const x = pd(r.tanggalClaim); if (x) { tC[x.getMonth()]++; tQ[x.getMonth()] += num(r.qtyNG); } });
+        drawQChart('qchart-claim-trend', {
+          type: 'line',
+          data: { labels: MS, datasets: [
+            { label: 'Kasus Claim', data: tC, borderColor: '#1e3a8a', backgroundColor: 'rgba(30,58,138,0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+            { label: 'Qty NG (Pcs)', data: tQ, borderColor: '#f59e0b', borderDash: [4,4], tension: 0.3, yAxisID: 'y1' }
+          ]},
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg }, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } }
+        });
+
+        const plMap = qSum(d.filter(r => PLANTS.includes(r.acjPlant)), r => r.acjPlant, () => 1);
+        drawQChart('qchart-claim-plant', {
+          type: 'doughnut',
+          data: { labels: PLANTS, datasets: [{ data: PLANTS.map(pl => plMap[pl] || 0), backgroundColor: ['#1e3a8a','#0284c7','#10b981','#f59e0b'] }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg }, onClick: (e, els) => { if (els.length) setQDrill('claim', 'acjPlant', PLANTS[els[0].index]); } }
+        });
+
+        const ptTot = {}, ptCl = {}, ptInf = {};
+        d.forEach(r => { const pt = r.namaPart || 'Tanpa Part'; ptTot[pt] = (ptTot[pt]||0)+1; if ((r.kategoriClaim||'Claim')==='Informasi') ptInf[pt] = (ptInf[pt]||0)+1; else ptCl[pt] = (ptCl[pt]||0)+1; });
+        const ptKeys = Object.keys(ptTot).sort((a,b) => ptTot[b]-ptTot[a]).slice(0, 10);
+        drawQChart('qchart-claim-part', {
+          type: 'bar',
+          data: { labels: ptKeys.length ? ptKeys : ['Tidak ada data'], datasets: [
+            { label: 'Claim', data: ptKeys.map(k => ptCl[k]||0), backgroundColor: '#e11d48', borderRadius: 4, stack: 's' },
+            { label: 'Informasi', data: ptKeys.map(k => ptInf[k]||0), backgroundColor: '#0ea5e9', borderRadius: 4, stack: 's' }
+          ]},
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg }, onClick: (e, els) => { if (els.length && ptKeys[els[0].index]) setQDrill('claim', 'namaPart', ptKeys[els[0].index]); }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+        });
+
       } else if (m === 'ng') {
-        const tq = d.reduce((a, x) => a + num(x.qtyNG), 0), tp = d.reduce((a, x) => a + num(x.qtyProduksi), 0);
+        const tq = d.reduce((a, n) => a + num(n.qtyNG), 0), tp = d.reduce((a, n) => a + num(n.qtyProduksi), 0);
+        const dv = qSum(d, r => r.divisi || 'Lainnya', r => num(r.qtyNG)), df = qSum(d, r => r.jenisNG || 'Lainnya', r => num(r.qtyNG));
+        const td = Object.keys(dv).sort((a,b) => dv[b]-dv[a])[0], tf = Object.keys(df).sort((a,b) => df[b]-df[a])[0];
         $('qkpi-ng').innerHTML =
-          kpiCard('Total Qty NG', fmt(tq) + ' Pcs', 'Defect internal', 'text-rose-600') +
-          kpiCard('Qty Produksi', fmt(tp) + ' Pcs', 'Total output', 'text-blue-950') +
-          kpiCard('Ratio NG', tp > 0 ? (tq / tp * 100).toFixed(2) + '%' : '-', 'NG ÷ Produksi', 'text-amber-600') +
-          kpiCard('Frekuensi Lot', fmt(d.length), 'Kejadian tercatat', 'text-slate-700');
-        drawParetoChart('qchart-ng-1', d, r => r.namaPart || 'Unknown', r => num(r.qtyNG), 'Qty NG');
-        drawMonthlyChart('qchart-ng-2', d, 'tanggal', 'qtyNG');
+          kpiCard('Total Defect NG', fmt(tq) + ' Pcs', 'Pieces defect', 'text-rose-600') +
+          kpiCard('Qty Produksi', fmt(tp) + ' Pcs', 'Pieces diproduksi', 'text-blue-950') +
+          kpiCard('Ratio NG', tp > 0 ? (tq/tp*100).toFixed(2) + '%' : '-', 'NG ÷ Produksi', 'text-amber-600') +
+          kpiCard('Total Kasus/Lot', fmt(d.length), 'Frekuensi kejadian', 'text-slate-700') +
+          kpiCard('Top Divisi Defect', esc(td || '-'), fmt(dv[td]) + ' pcs', 'text-amber-700') +
+          kpiCard('Top Jenis Problem', esc(tf || '-'), fmt(df[tf]) + ' pcs', 'text-blue-800');
+
+        const parts = qSum(d, r => r.namaPart || 'Tanpa Part', r => num(r.qtyNG));
+        drawQChart('qchart-ng-pareto', buildParetoCfg(parts, 10, '#1e3a8a', '#ef4444', 'Qty NG (Pcs)', v => setQDrill('ng', 'namaPart', v)).cfg);
+        drawQChart('qchart-ng-pie', buildPieCfg(parts, v => setQDrill('ng', 'namaPart', v)).cfg);
+
+        const yv = $('qf-ng-year').value;
+        const yr = yv !== 'ALL' ? Number(yv) : (Q_DATA.ng.map(r => pd(r.tanggal)).filter(Boolean).map(x => x.getFullYear()).sort((a,b)=>b-a)[0] || new Date().getFullYear());
+        const dCols = { Bor:'#3b82f6', CNC:'#6366f1', Cutting:'#06b6d4', Harden:'#ef4444', Hexagon:'#f59e0b', Punch:'#10b981', Rolling:'#8b5cf6', Turret:'#ec4899', Lainnya:'#94a3b8' };
+        const byDv = {}, totM = new Array(12).fill(0);
+        Q_DATA.ng.forEach(r => {
+          const dt = pd(r.tanggal); if (!dt || dt.getFullYear() !== yr || (Q_DSEL.ng.size && !Q_DSEL.ng.has(r.divisi))) return;
+          const k = dCols[r.divisi] ? r.divisi : 'Lainnya'; (byDv[k] = byDv[k] || new Array(12).fill(0))[dt.getMonth()] += num(r.qtyNG); totM[dt.getMonth()] += num(r.qtyNG);
+        });
+        const dsTrend = [{ type: 'line', label: 'Total Qty NG (' + yr + ')', data: totM, borderColor: '#0f172a', borderWidth: 2, tension: 0.3, order: 0 }];
+        Object.keys(byDv).forEach(k => dsTrend.push({ type: 'bar', label: 'Div. ' + k, data: byDv[k], backgroundColor: dCols[k], stack: 's', order: 1 }));
+        drawQChart('qchart-ng-trend', {
+          type: 'bar', data: { labels: MS, datasets: dsTrend },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: qLeg },
+            onClick: (e, els) => { if (els.length) { $('qf-ng-month').value = String(els[0].index + 1); buildWeeksQ('ng'); renderQualityModule('ng'); toast('Filter bulan: ' + MONTHS[els[0].index], 'info'); } },
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+        });
+
+        const dim = $('ng-multi-dim').value;
+        drawQChart('qchart-ng-multi', buildParetoCfg(qSum(d, r => r[dim] || 'Tidak diisi', r => num(r.qtyNG)), 10, '#0f766e', '#ef4444', 'Qty NG', v => setQDrill('ng', dim, v)).cfg);
+
       } else {
-        const tc = d.reduce((a, x) => a + num(x.totalCheck), 0);
+        const tc = d.reduce((a, x) => a + num(x.totalCheck), 0), pc = v => (tc ? (v/tc*100).toFixed(2) : '0.00') + '% dari total';
         $('qkpi-insp').innerHTML =
-          kpiCard('Total Check', fmt(tc) + ' Pcs', 'Terinspeksi', 'text-blue-950') +
-          kpiCard('Qty OK', fmt(d.reduce((a, x) => a + num(x.qtyOK), 0)) + ' Pcs', 'Lolos inspeksi', 'text-emerald-600') +
-          kpiCard('Qty NG', fmt(d.reduce((a, x) => a + num(x.qtyNG), 0)) + ' Pcs', 'Reject', 'text-rose-600') +
-          kpiCard('Qty Repair', fmt(d.reduce((a, x) => a + num(x.qtyRepair), 0)) + ' Pcs', 'Perbaikan', 'text-amber-600');
-        drawParetoChart('qchart-insp-1', d, r => r.namaPart || 'Unknown', r => num(r.qtyNG), 'Qty NG');
-        drawMonthlyChart('qchart-insp-2', d, 'tanggal', 'qtyNG');
+          kpiCard('Total Part Check', fmt(tc) + ' Pcs', 'Pieces terinspeksi', 'text-blue-950') +
+          kpiCard('Part OK', fmt(d.reduce((a, x) => a + num(x.qtyOK), 0)) + ' Pcs', pc(d.reduce((a, x) => a + num(x.qtyOK), 0)), 'text-emerald-600') +
+          kpiCard('Part NG', fmt(d.reduce((a, x) => a + num(x.qtyNG), 0)) + ' Pcs', pc(d.reduce((a, x) => a + num(x.qtyNG), 0)), 'text-rose-600') +
+          kpiCard('Part Repair', fmt(d.reduce((a, x) => a + num(x.qtyRepair), 0)) + ' Pcs', pc(d.reduce((a, x) => a + num(x.qtyRepair), 0)), 'text-amber-600');
+        const parts = qSum(d, r => r.namaPart || 'Tanpa Part', r => num(r.qtyNG));
+        drawQChart('qchart-insp-pareto', buildParetoCfg(parts, 10, '#ef4444', '#1e3a8a', 'Qty NG (Pcs)', v => setQDrill('insp', 'namaPart', v)).cfg);
+        drawQChart('qchart-insp-pie', buildPieCfg(parts, v => setQDrill('insp', 'namaPart', v)).cfg);
       }
       renderQualityTable(m);
     }
 
-    function drawParetoChart(canvasId, rows, keyFn, valFn, unit) {
-      if (Q_CHARTS[canvasId]) Q_CHARTS[canvasId].destroy();
-      const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); });
-      const keys = Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 8);
-      const vals = keys.map(k => map[k]), tot = vals.reduce((a, b) => a + b, 0);
-      let run = 0; const cum = vals.map(v => { run += v; return tot ? +(run / tot * 100).toFixed(1) : 0; });
-      Q_CHARTS[canvasId] = new Chart($(canvasId), {
-        type: 'bar',
-        data: { labels: keys.length ? keys : ['Tidak ada data'], datasets: [
-          { type: 'bar', label: unit, data: vals.length ? vals : [0], backgroundColor: '#1e3a8a', borderRadius: 4, yAxisID: 'y' },
-          { type: 'line', label: 'Kumulatif %', data: cum.length ? cum : [0], borderColor: '#f59e0b', borderWidth: 2, yAxisID: 'y1' }
-        ]},
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } } } }
-      });
-    }
-
-    function drawMonthlyChart(canvasId, rows, dateKey, valKey) {
-      if (Q_CHARTS[canvasId]) Q_CHARTS[canvasId].destroy();
-      const arr = new Array(12).fill(0);
-      rows.forEach(r => { const d = pd(r[dateKey]); if (d) arr[d.getMonth()] += num(r[valKey]); });
-      Q_CHARTS[canvasId] = new Chart($(canvasId), {
-        type: 'line',
-        data: { labels: MS, datasets: [{ label: 'Qty NG (Pcs)', data: arr, borderColor: '#0284c7', backgroundColor: 'rgba(2,132,199,0.1)', fill: true, tension: 0.3 }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-      });
-    }
-
     function renderQualityTable(m) {
-      const c = Q_MOD[m], rows = getFilteredQuality(m), PAGE = 15, pages = Math.ceil(rows.length / PAGE) || 1;
+      const c = Q_MOD[m], rows = getFilteredQuality(m, true), PAGE = 15, pages = Math.ceil(rows.length / PAGE) || 1;
       Q_PG[m] = Math.min(Math.max(1, Q_PG[m]), pages);
       const st = (Q_PG[m] - 1) * PAGE, adm = isEditor();
 
@@ -900,6 +1139,60 @@
       $('qpn-' + m).textContent = `${Q_PG[m]} / ${pages}`;
       $('qprev-' + m).disabled = Q_PG[m] <= 1;
       $('qnext-' + m).disabled = Q_PG[m] >= pages;
+    }
+
+    /* --- Laporan Eksekutif PDF (Pembanding Otomatis Tahun Lalu) --- */
+    function execReport() {
+      toast('Menyiapkan Laporan Eksekutif PDF (Landscape)...', 'info');
+      setTimeout(() => {
+        try {
+          const J = window.jspdf && window.jspdf.jsPDF; if (!J) throw new Error('Library PDF belum termuat.');
+          const doc = new J('l', 'pt', 'a4'), W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+          const M = 28, CW = W - 2 * M, now = new Date().toLocaleString('id-ID');
+          const selY = $('qf-claim-year').value, cmpY = $('cmpYear') ? $('cmpYear').value : 'ALL';
+          const yrs = Q_DATA.claim.map(r => pd(r.tanggalClaim)).filter(Boolean).map(d => d.getFullYear());
+          const curY = selY === 'ALL' ? (yrs.length ? Math.max(...yrs) : new Date().getFullYear()) : Number(selY);
+          let prevY = cmpY === 'ALL' ? curY - 1 : Number(cmpY);
+          if (prevY === curY) prevY = curY - 1;
+
+          const dPrev = getFilteredQuality('claim', false, prevY);
+          const dCur = getFilteredQuality('claim', false, curY);
+
+          doc.setFillColor(15, 23, 42); doc.rect(M, 20, CW, 50, 'F');
+          doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+          doc.text('PT. ADHI CHANDRA JAYA - EXECUTIVE QUALITY REPORT', M + 14, 40);
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+          doc.text(`Perbandingan Claim Customer (${prevY} vs ${curY}) | Dicetak: ${now}`, M + 14, 56);
+
+          const stats = arr => {
+            const chk = arr.reduce((s, r) => s + num(r.qtyCheck), 0), ng = arr.reduce((s, r) => s + num(r.qtyNG), 0);
+            return [arr.length, arr.filter(r => r.statusClaim === 'Closed').length, chk, ng, chk ? (ng/chk*100).toFixed(2) + '%' : '0.00%'];
+          };
+          const sP = stats(dPrev), sC = stats(dCur);
+          doc.autoTable({
+            startY: 84, margin: { left: M, right: M }, theme: 'grid',
+            headStyles: { fillColor: [30, 58, 138], textColor: 255 },
+            head: [['Indikator Claim Customer', `Tahun Pembanding (${prevY})`, `Tahun Laporan (${curY})`, 'Selisih']],
+            body: [
+              ['Total Kasus Claim & Informasi', fmt(sP[0]), fmt(sC[0]), (sC[0]-sP[0] > 0 ? '+' : '') + fmt(sC[0]-sP[0])],
+              ['Status Closed', fmt(sP[1]), fmt(sC[1]), (sC[1]-sP[1] > 0 ? '+' : '') + fmt(sC[1]-sP[1])],
+              ['Total Qty Check (Pcs)', fmt(sP[2]), fmt(sC[2]), (sC[2]-sP[2] > 0 ? '+' : '') + fmt(sC[2]-sP[2])],
+              ['Total Qty NG (Pcs)', fmt(sP[3]), fmt(sC[3]), (sC[3]-sP[3] > 0 ? '+' : '') + fmt(sC[3]-sP[3])],
+              ['Persentase Defect (%)', sP[4], sC[4], '-']
+            ]
+          });
+
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18, margin: { left: M, right: M }, theme: 'striped',
+            styles: { fontSize: 7 }, headStyles: { fillColor: [15, 23, 42], textColor: 255 },
+            head: [['ID Register', 'Tanggal', 'Plant', 'Kategori', 'Customer', 'Nama Part', 'Jenis NG', 'Qty NG', 'Status']],
+            body: dCur.length ? dCur.map(c => [c.idRegister, c.tanggalClaim, c.acjPlant, c.kategoriClaim, c.namaCustomer, c.namaPart, c.keteranganJenisNG, fmt(c.qtyNG), c.statusClaim]) : [['-', `Tidak ada data pada tahun ${curY}`, '-', '-', '-', '-', '-', '-', '-']]
+          });
+
+          doc.save(`ACJ_Executive_Quality_Report_${prevY}_vs_${curY}.pdf`);
+          toast('Laporan Eksekutif PDF berhasil diunduh!', 'success');
+        } catch (err) { toast('Gagal membuat PDF: ' + err.message, 'error'); }
+      }, 50);
     }
 
     let qEditing = null;
