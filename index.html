@@ -461,6 +461,24 @@
         <div id="statusActions" class="hidden pt-2 flex justify-center gap-2"></div>
       </div>
     </div>
+
+    <!-- Modal Zoom Grafik Layar Penuh -->
+    <div id="chartZoomModal" onclick="if(event.target.id==='chartZoomModal')closeChartZoom()" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-6">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[82vh] flex flex-col overflow-hidden border border-slate-200">
+        <div class="px-5 py-3.5 bg-blue-950 text-white flex items-center justify-between gap-3">
+          <div>
+            <h3 id="chartZoomTitle" class="text-sm sm:text-base font-bold text-white">Detail Grafik</h3>
+            <p id="chartZoomSub" class="text-[11px] text-amber-300">Tampilan diperbesar • Klik batang/irisan untuk memfilter log register</p>
+          </div>
+          <button type="button" onclick="closeChartZoom()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1 transition">
+            <span>Tutup</span> <span class="text-base leading-none">&times;</span>
+          </button>
+        </div>
+        <div class="p-4 sm:p-6 flex-1 relative bg-white">
+          <canvas id="zoomedChartCanvas"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ===================================================================== -->
@@ -828,26 +846,26 @@
         if (m === 'claim') {
           chartsHtml = `
           <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
-            <div class="lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto Kategori NG (80/20)</h4><p class="text-[11px] text-slate-500 mb-2">Klik batang untuk filter log</p><div class="relative h-60"><canvas id="qchart-claim-pareto"></canvas></div></div>
+            <div class="lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto Kategori NG (80/20)</h4><p class="text-[11px] text-slate-500">Klik batang untuk filter log</p></div><button type="button" onclick="openChartZoom('qchart-claim-pareto','Pareto Kategori NG (80/20) - Claim Customer','Klik batang untuk memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-claim-pareto"></canvas></div></div>
             <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tabel Distribusi Pareto</h4><p class="text-[11px] text-slate-500 mb-2">Kontribusi kategori terhadap total defect</p><table class="w-full text-xs"><thead><tr class="text-slate-400 uppercase border-b"><th class="py-1 text-left">Kategori</th><th class="text-right">Qty</th><th class="text-right">%</th><th class="text-right">Kum.</th></tr></thead><tbody id="claim-dist-tbody"></tbody></table></div>
-            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Customer</h4><p class="text-[11px] text-slate-500 mb-2">Jumlah kasus (klik untuk filter)</p><div class="relative h-56"><canvas id="qchart-claim-cust"></canvas></div></div>
-            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tren Kasus &amp; Qty NG</h4><p class="text-[11px] text-slate-500 mb-2">Akumulasi bulanan</p><div class="relative h-56"><canvas id="qchart-claim-trend"></canvas></div></div>
-            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Claim per Plant</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan untuk filter</p><div class="relative h-56"><canvas id="qchart-claim-plant"></canvas></div></div>
-            <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Jumlah Claim per Nama Part</h4><p class="text-[11px] text-slate-500 mb-2">10 part terbanyak, dipisah kategori Claim &amp; Informasi (klik batang untuk filter log)</p><div class="relative h-64"><canvas id="qchart-claim-part"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Top 5 Customer</h4><p class="text-[11px] text-slate-500">Jumlah kasus (klik untuk filter)</p></div><button type="button" onclick="openChartZoom('qchart-claim-cust','Top 5 Customer - Claim Customer','Jumlah kasus per customer (klik batang untuk filter)')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-56"><canvas id="qchart-claim-cust"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Tren Kasus &amp; Qty NG</h4><p class="text-[11px] text-slate-500">Akumulasi bulanan</p></div><button type="button" onclick="openChartZoom('qchart-claim-trend','Tren Kasus & Qty NG Bulanan - Claim Customer','Perbandingan jumlah kasus dan total Qty NG setiap bulan')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-56"><canvas id="qchart-claim-trend"></canvas></div></div>
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Claim per Plant</h4><p class="text-[11px] text-slate-500">Klik irisan untuk filter</p></div><button type="button" onclick="openChartZoom('qchart-claim-plant','Distribusi Claim per Plant','Klik irisan plant untuk memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-56"><canvas id="qchart-claim-plant"></canvas></div></div>
+            <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Jumlah Claim per Nama Part</h4><p class="text-[11px] text-slate-500">10 part terbanyak, dipisah kategori Claim &amp; Informasi (klik batang untuk filter log)</p></div><button type="button" onclick="openChartZoom('qchart-claim-part','Jumlah Claim per Nama Part (Top 10)','Dipisah berdasarkan kategori Claim & Informasi')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-64"><canvas id="qchart-claim-part"></canvas></div></div>
           </div>`;
         } else if (m === 'ng') {
           chartsHtml = `
           <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto Jumlah NG per Part</h4><p class="text-[11px] text-slate-500 mb-2">80/20, klik batang untuk filter log</p><div class="relative h-60"><canvas id="qchart-ng-pareto"></canvas></div></div>
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan part untuk langsung filter log register</p><div class="relative h-60"><canvas id="qchart-ng-pie"></canvas></div></div>
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Tren NG Satu Tahun</h4><p class="text-[11px] text-slate-500 mb-2">Per bulan &amp; divisi (klik bulan untuk filter)</p><div class="relative h-60"><canvas id="qchart-ng-trend"></canvas></div></div>
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto Multi-Dimensi</h4><p class="text-[11px] text-slate-500">Klik batang untuk filter log</p></div><select id="ng-multi-dim" onchange="renderQualityModule('ng')" class="text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200 rounded-lg px-2 py-1"><option value="namaPart">By Part NG</option><option value="jenisNG">By Jenis Problem</option><option value="namaOperator">By Operator</option><option value="noMesin">By No Mesin</option></select></div><div class="relative h-60"><canvas id="qchart-ng-multi"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto Jumlah NG per Part</h4><p class="text-[11px] text-slate-500">80/20, klik batang untuk filter log</p></div><button type="button" onclick="openChartZoom('qchart-ng-pareto','Pareto Jumlah NG per Part (80/20)','Klik batang part untuk memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-ng-pareto"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500">Klik irisan part untuk langsung filter log register</p></div><button type="button" onclick="openChartZoom('qchart-ng-pie','Top 5 Part NG Tertinggi - Database NG','Klik irisan part untuk langsung memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-ng-pie"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Tren NG Satu Tahun</h4><p class="text-[11px] text-slate-500">Per bulan &amp; divisi (klik bulan untuk filter)</p></div><button type="button" onclick="openChartZoom('qchart-ng-trend','Tren NG Satu Tahun per Divisi','Akumulasi bulanan per divisi (klik batang bulan untuk filter)')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-ng-trend"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto Multi-Dimensi</h4><p class="text-[11px] text-slate-500">Klik batang untuk filter log</p></div><div class="flex items-center gap-1.5"><select id="ng-multi-dim" onchange="renderQualityModule('ng')" class="text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200 rounded-lg px-2 py-1"><option value="namaPart">By Part NG</option><option value="jenisNG">By Jenis Problem</option><option value="namaOperator">By Operator</option><option value="noMesin">By No Mesin</option></select><button type="button" onclick="openChartZoom('qchart-ng-multi','Pareto Multi-Dimensi - Database NG','Analisis 80/20 berdasarkan dimensi terpilih')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div></div><div class="relative h-60"><canvas id="qchart-ng-multi"></canvas></div></div>
           </div>`;
         } else {
           chartsHtml = `
           <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Pareto NG Tertinggi (80/20)</h4><p class="text-[11px] text-slate-500 mb-2">Part dengan Qty NG terbanyak (klik batang untuk filter)</p><div class="relative h-60"><canvas id="qchart-insp-pareto"></canvas></div></div>
-            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500 mb-2">Klik irisan part untuk langsung filter log register</p><div class="relative h-60"><canvas id="qchart-insp-pie"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Pareto NG Tertinggi (80/20)</h4><p class="text-[11px] text-slate-500">Part dengan Qty NG terbanyak (klik batang untuk filter)</p></div><button type="button" onclick="openChartZoom('qchart-insp-pareto','Pareto NG Tertinggi (80/20) - Data Inspection','Klik batang part untuk memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-insp-pareto"></canvas></div></div>
+            <div class="lg:col-span-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-start gap-2 mb-2"><div><h4 class="font-bold text-xs text-slate-800">Top 5 Part NG Tertinggi</h4><p class="text-[11px] text-slate-500">Klik irisan part untuk langsung filter log register</p></div><button type="button" onclick="openChartZoom('qchart-insp-pie','Top 5 Part NG Tertinggi - Data Inspection','Klik irisan part untuk langsung memfilter log register')" title="Perbesar Grafik" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-900 transition"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button></div><div class="relative h-60"><canvas id="qchart-insp-pie"></canvas></div></div>
           </div>`;
         }
 
@@ -879,23 +897,24 @@
           <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h3 class="font-bold text-sm text-blue-950">Log Register ${c.title}</h3>
-                <span id="qdrill-${m}" class="hidden text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200"></span>
+                <h3 class="font-bold text-sm text-slate-800">Log Register ${c.title}</h3>
+                <span id="qdrill-${m}" class="hidden text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700"></span>
               </div>
-              <input id="qq-${m}" oninput="Q_PG['${m}']=1;renderQualityTable('${m}')" placeholder="Cari part, customer, ID..." class="w-full sm:w-72 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-900">
+              <input id="qq-${m}" oninput="Q_PG['${m}']=1;renderQualityTable('${m}')" placeholder="Cari part, customer, ID..." class="w-full sm:w-64 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg outline-none" />
             </div>
-            <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-blue-950 text-white uppercase"><tr>${th}</tr></thead><tbody id="qtb-${m}" class="divide-y divide-slate-200"></tbody></table></div>
+            <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-blue-950 text-white uppercase"><tr>${th}</tr></thead><tbody id="qtb-${m}" class="divide-y divide-slate-100"></tbody></table></div>
             <div class="p-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
               <span id="qinfo-${m}"></span>
               <div class="flex items-center gap-2">
-                <button type="button" onclick="Q_PG['${m}']--;renderQualityTable('${m}')" id="qprev-${m}" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                <button type="button" id="qprev-${m}" onclick="Q_PG['${m}']--;renderQualityTable('${m}')" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Prev</button>
                 <span id="qpn-${m}" class="font-bold"></span>
-                <button type="button" onclick="Q_PG['${m}']++;renderQualityTable('${m}')" id="qnext-${m}" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Next</button>
+                <button type="button" id="qnext-${m}" onclick="Q_PG['${m}']++;renderQualityTable('${m}')" class="px-2.5 py-1 border rounded-lg hover:bg-slate-50 disabled:opacity-40">Next</button>
               </div>
             </div>
           </div>
         </section>`;
       }).join('');
+      ['ng', 'insp'].forEach(buildWeeksQ);
       buildDivQ();
     }
 
@@ -903,25 +922,74 @@
       Q_DRILL[m] = { field, value };
       Q_PG[m] = 1;
       const b = $('qdrill-' + m);
-      if (b) {
-        b.classList.remove('hidden');
-        b.innerHTML = `Filter Grafik: ${esc(value)} <button type="button" onclick="clearQDrill('${m}')" class="ml-1 font-black text-rose-900">&times;</button>`;
-      }
+      b.classList.remove('hidden');
+      b.innerHTML = `Filter Grafik: ${esc(value)} <button type="button" onclick="clearQDrill('${m}')" class="font-black ml-1">&times;</button>`;
       renderQualityTable(m);
-      const tb = $('qtb-' + m);
-      if (tb) tb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      $('qtb-' + m).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+
     function clearQDrill(m) {
       Q_DRILL[m] = null;
       const b = $('qdrill-' + m);
       if (b) b.classList.add('hidden');
-      Q_PG[m] = 1;
       renderQualityTable(m);
-      if (m === 'claim') renderQualityModule('claim');
     }
 
-    function popQualityFilters(custList) {
-      $('dlCust').innerHTML = custList.map(c => `<option value="${esc(c)}">`).join('');
+    const Q_CFGS = {};
+    let zoomedChartInstance = null;
+
+    function drawQChart(id, cfg) {
+      Q_CFGS[id] = cfg;
+      if (Q_CHARTS[id]) Q_CHARTS[id].destroy();
+      const el = $(id); if (el) Q_CHARTS[id] = new Chart(el, cfg);
+    }
+
+    function openChartZoom(chartId, title, sub) {
+      const baseCfg = Q_CFGS[chartId];
+      if (!baseCfg) return;
+      $('chartZoomTitle').textContent = title || 'Detail Grafik';
+      $('chartZoomSub').textContent = sub || 'Tampilan diperbesar';
+      $('chartZoomModal').classList.remove('hidden');
+
+      if (zoomedChartInstance) {
+        zoomedChartInstance.destroy();
+        zoomedChartInstance = null;
+      }
+
+      const origOnClick = baseCfg.options && baseCfg.options.onClick;
+      const zoomOpts = Object.assign({}, baseCfg.options, {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: Object.assign({}, baseCfg.options && baseCfg.options.plugins, {
+          legend: { position: 'bottom', labels: { boxWidth: 14, font: { size: 12 } } }
+        }),
+        onClick: origOnClick ? (e, els) => {
+          if (els.length) closeChartZoom();
+          origOnClick(e, els);
+        } : undefined
+      });
+
+      zoomedChartInstance = new Chart($('zoomedChartCanvas'), {
+        type: baseCfg.type,
+        data: baseCfg.data,
+        options: zoomOpts
+      });
+    }
+
+    function closeChartZoom() {
+      $('chartZoomModal').classList.add('hidden');
+      if (zoomedChartInstance) {
+        zoomedChartInstance.destroy();
+        zoomedChartInstance = null;
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('chartZoomModal').classList.contains('hidden')) closeChartZoom();
+    });
+
+    function popQualityFilters(customers) {
+      $('dlCust').innerHTML = customers.map(c => `<option value="${esc(c)}">`).join('');
       const ys = new Set([new Date().getFullYear()]);
       Object.keys(Q_MOD).forEach(m => Q_DATA[m].forEach(r => { const d = pd(r[Q_MOD[m].dk]); if (d) ys.add(d.getFullYear()); }));
       const arr = [...ys].sort((a, b) => b - a);
@@ -1019,11 +1087,6 @@
             onClick: (e, els) => { if (onPick && els.length && labels[els[0].index] && labels[els[0].index] !== 'Part Lainnya') onPick(labels[els[0].index]); } }
         }
       };
-    }
-
-    function drawQChart(id, cfg) {
-      if (Q_CHARTS[id]) Q_CHARTS[id].destroy();
-      const el = $(id); if (el) Q_CHARTS[id] = new Chart(el, cfg);
     }
 
     function renderQualityModule(m) {
