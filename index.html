@@ -113,7 +113,6 @@
                 <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"><i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i></button>
               </div>
             </div>
-            <!-- Widget Cloudflare Turnstile -->
             <div id="ts" class="flex justify-center min-h-[65px]"></div>
             <button type="submit" id="loginSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
               <i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>
@@ -126,6 +125,7 @@
               <p class="text-xs text-slate-300 mt-1">Masukkan 6 digit kode dari aplikasi Authenticator Anda.</p>
             </div>
             <input type="text" id="mfaCodeInput" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();submitMfaVerification();}"
               class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold tracking-[0.45em] text-white outline-none" />
             <button type="button" id="mfaSubmitBtn" onclick="submitMfaVerification()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl flex items-center justify-center gap-2">
               <i data-lucide="key-round" class="w-4 h-4"></i><span>Verifikasi Kode</span>
@@ -189,6 +189,7 @@
           <button type="button" onclick="execReport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Cetak Laporan Eksekutif PDF (Landscape)">
             <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> Laporan PDF
           </button>
+          <span id="bgSyncBadge" class="hidden bg-amber-500/20 text-amber-200 border border-amber-400/40 px-2.5 py-1 rounded-full text-[11px] font-semibold animate-pulse">Menyimpan...</span>
           <span id="lastSyncTime" class="text-[11px] text-blue-200 hidden sm:inline">Sync: --:--</span>
           <button type="button" onclick="syncAllSystems(true)" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Sinkronkan Semua Data">
             <i id="syncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
@@ -204,7 +205,6 @@
 
     <!-- AREA MODUL E-PTP (AF-PROD-014) -->
     <div id="ptpModuleWrapper" class="hidden max-w-7xl mx-auto px-3 sm:px-5 mt-5 space-y-5">
-      <!-- Banner Header Seragam Seperti Dashboard Lainnya -->
       <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
         <div>
           <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Management System</span>
@@ -221,13 +221,11 @@
         </div>
       </div>
 
-      <!-- Baris Tab Utama E-PTP -->
       <div id="ptpOverviewTabs" class="bg-white rounded-t-xl border-b border-slate-200 grid grid-cols-2 overflow-hidden shadow-sm">
         <button type="button" id="tabBtn5" onclick="switchPtpTab(5)" class="ptp-subtab active py-3 px-3 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard PTP</span></button>
         <button type="button" id="tabBtn4" onclick="switchPtpTab(4)" class="ptp-subtab py-3 px-3 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="list-checks" class="w-4 h-4"></i><span>Log Register (<span id="logTotalBadge">0</span>)</span></button>
       </div>
 
-      <!-- Baris Navigasi Form Input / Edit E-PTP -->
       <div id="ptpEditorNav" class="hidden bg-white rounded-t-xl border-b border-slate-200 overflow-hidden shadow-sm">
         <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
@@ -504,7 +502,7 @@
         </div>
 
         <div id="actionButtonsBar" class="hidden mt-8 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-xs text-slate-500">Simpan sementara ke Database atau langsung cetak PDF 1 halaman.</p>
+          <p class="text-xs text-slate-500"><b>Simpan Data</b> memperbarui layar seketika, <b>Simpan &amp; Cetak PDF</b> membuat arsip 1 halaman A4 resmi.</p>
           <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
             <button type="button" onclick="executePtpAction('PREVIEW')" class="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="eye" class="w-4 h-4 text-slate-600"></i><span>Preview Form</span></button>
             <button type="button" onclick="executePtpAction('SAVE')" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan Data</span></button>
@@ -596,10 +594,24 @@
     let CURRENT_USER = null, SESSION_TOKEN = '', PENDING_MFA_TOKEN = '';
     let QUALITY_DATA = { claims: [], ngRecords: [], inspections: [], customerList: [] };
     let ACTIVE_MODULE = 'claim';
+    let PENDING_BG_SAVES = 0;
     const PLANTS = ['Sangiang', 'Cikarang', 'Kalisabi', 'Jatake'];
     const DIVISI = ['Bor', 'CNC', 'Cutting', 'Harden', 'Hexagon', 'Punch', 'Rolling', 'Turret'];
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const COLORS = ['#1e3a8a', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
+
+    function setBgSaving(delta) {
+      PENDING_BG_SAVES = Math.max(0, PENDING_BG_SAVES + delta);
+      const b = $('bgSyncBadge');
+      if (b) b.classList.toggle('hidden', PENDING_BG_SAVES === 0);
+    }
+
+    window.addEventListener('beforeunload', e => {
+      if (PENDING_BG_SAVES > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
 
     function getEndpointUrl() {
       const u = String(window.PORTAL_CONFIG.APPS_SCRIPT_URL || '').trim();
@@ -656,6 +668,9 @@
 
     async function handleLoginSubmit(e) {
       e.preventDefault();
+      if (!$('mfaVerifyStep').classList.contains('hidden')) {
+        return submitMfaVerification();
+      }
       $('loginErrorBox').classList.add('hidden');
       const btn = $('loginSubmitBtn');
       btn.disabled = true;
@@ -664,6 +679,7 @@
         const cfToken = (window.turnstile && tsWidgetId !== null) ? turnstile.getResponse(tsWidgetId) : '';
         const res = await apiCall('apiLogin', $('loginUsername').value.trim(), $('loginPassword').value, cfToken);
         if (res.mfaRequired) {
+          $('loginErrorBox').classList.add('hidden');
           PENDING_MFA_TOKEN = res.mfaToken;
           $('loginCredsStep').classList.add('hidden');
           $('mfaVerifyStep').classList.remove('hidden');
@@ -683,24 +699,35 @@
     }
 
     async function submitMfaVerification() {
+      const code = $('mfaCodeInput').value.trim();
+      if (code.length !== 6) {
+        $('loginErrorText').textContent = 'Masukkan 6 digit kode Authenticator.';
+        $('loginErrorBox').classList.remove('hidden');
+        return;
+      }
       $('loginErrorBox').classList.add('hidden');
       const btn = $('mfaSubmitBtn');
       btn.disabled = true;
+      btn.textContent = 'Memeriksa kode...';
       try {
-        const res = await apiCall('apiVerifyMfa', PENDING_MFA_TOKEN, $('mfaCodeInput').value.trim());
+        const res = await apiCall('apiVerifyMfa', PENDING_MFA_TOKEN, code);
         completeLogin(res.user, res.token);
       } catch (err) {
         $('loginErrorText').textContent = err.message;
         $('loginErrorBox').classList.remove('hidden');
       } finally {
         btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="key-round" class="w-4 h-4"></i><span>Verifikasi Kode</span>';
+        icons();
       }
     }
 
     function cancelMfaStep() {
       PENDING_MFA_TOKEN = '';
+      $('mfaCodeInput').value = '';
       $('mfaVerifyStep').classList.add('hidden');
       $('loginCredsStep').classList.remove('hidden');
+      $('loginErrorBox').classList.add('hidden');
       tsReset();
     }
 
@@ -708,23 +735,26 @@
       CURRENT_USER = user;
       SESSION_TOKEN = token;
       sessionStorage.setItem('acj_portal_sess', JSON.stringify({ user, token }));
-      $('loggedUserName').textContent = `${user.fullName || user.username} • ${user.dept || 'QA'} (${user.role})`;
+      $('loggedUserName').textContent = `${user.fullName} (${user.role})`;
       $('loginScreen').classList.add('hidden');
       $('mainAppContainer').classList.remove('hidden');
       buildQualityShell();
+      initSignaturePads();
       switchMainModule('claim');
       syncAllSystems(false);
     }
 
     function logoutUser(silent = false) {
-      if (!silent && SESSION_TOKEN) apiCall('apiLogout', SESSION_TOKEN).catch(() => {});
+      if (!silent && SESSION_TOKEN) {
+        apiCall('apiLogout', SESSION_TOKEN).catch(() => {});
+      }
       CURRENT_USER = null;
       SESSION_TOKEN = '';
       sessionStorage.removeItem('acj_portal_sess');
       $('mainAppContainer').classList.add('hidden');
       $('loginScreen').classList.remove('hidden');
       cancelMfaStep();
-      icons();
+      $('loginPassword').value = '';
     }
 
     async function openSecurityModal() {
@@ -732,18 +762,18 @@
       $('securityModalBody').innerHTML = '<p class="text-slate-500">Memuat status keamanan...</p>';
       try {
         const st = await apiCall('apiSecurityStatus');
-        const vt = st.vt;
-        const vtHtml = vt
-          ? `<div class="p-3 rounded-xl border ${vt.malicious > 0 ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-emerald-50 border-emerald-200 text-emerald-800'}">
-               <p class="font-bold">Hasil Scan VirusTotal: ${vt.malicious > 0 ? vt.malicious + ' Terdeteksi' : 'Bersih (0 Malicious)'}</p>
-               <p class="mt-1">Engine: ${vt.harmless || 0} Aman / ${vt.total || 0} Total • Waktu: ${new Date(vt.at).toLocaleString('id-ID')}</p>
-               ${vt.link ? `<a href="${esc(vt.link)}" target="_blank" class="inline-block mt-1.5 underline font-semibold">Lihat Laporan Lengkap VirusTotal &rarr;</a>` : ''}
-             </div>`
-          : `<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600">Belum ada riwayat pemindaian VirusTotal terjadwal.</div>`;
+        const vtHtml = st.vt
+          ? `<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+              <div class="flex justify-between font-bold"><span>Hasil Scan VirusTotal</span><span class="${st.vt.malicious > 0 ? 'text-rose-600' : 'text-emerald-600'}">${st.vt.malicious > 0 ? st.vt.malicious + ' Terdeteksi' : 'Bersih (0 Ancaman)'}</span></div>
+              <p class="text-[11px] text-slate-500">Waktu Scan: ${new Date(st.vt.at).toLocaleString('id-ID')} (${st.vt.harmless}/${st.vt.total} mesin aman)</p>
+              ${st.vt.link ? `<a href="${esc(st.vt.link)}" target="_blank" class="text-[11px] text-blue-700 underline font-semibold inline-block mt-1">Lihat Laporan Lengkap VirusTotal &rarr;</a>` : ''}
+            </div>`
+          : '<div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">Belum ada riwayat pemindaian VirusTotal terjadwal.</div>';
+
         $('securityModalBody').innerHTML = `
-          <div class="flex justify-between p-2.5 rounded-lg bg-slate-50 border"><span>Cloudflare Turnstile (Anti-Bot)</span><strong class="${st.antiBot ? 'text-emerald-600' : 'text-amber-600'}">${st.antiBot ? 'AKTIF' : 'OPSIONAL'}</strong></div>
-          <div class="flex justify-between p-2.5 rounded-lg bg-slate-50 border"><span>Enkripsi Password</span><strong class="text-emerald-600">SHA-256 + SALT</strong></div>
-          <div class="flex justify-between p-2.5 rounded-lg bg-slate-50 border"><span>Proteksi MFA Admin/Auditor</span><strong class="${st.mfaAdmin ? 'text-emerald-600' : 'text-blue-600'}">${st.mfaAdmin ? 'WAJIB 2FA' : 'OPSIONAL 2FA'}</strong></div>
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border"><span>Cloudflare Turnstile Anti-Bot</span><span class="font-bold ${st.antiBot ? 'text-emerald-600' : 'text-amber-600'}">${st.antiBot ? 'Aktif' : 'Belum Dikonfigurasi'}</span></div>
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border"><span>Enkripsi Password</span><span class="font-bold text-emerald-600">SHA-256 + Salt</span></div>
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border"><span>MFA 2FA Wajib Admin/Auditor</span><span class="font-bold ${st.mfaAdmin ? 'text-emerald-600' : 'text-slate-600'}">${st.mfaAdmin ? 'Wajib (Aktif)' : 'Opsional'}</span></div>
           ${vtHtml}
         `;
       } catch (e) {
@@ -752,7 +782,10 @@
     }
     function closeSecurityModal() { $('securityModal').classList.add('hidden'); }
 
-    /* --- NAVIGASI MODUL UTAMA --- */
+    function canEditQuality() {
+      return CURRENT_USER && (CURRENT_USER.role === 'Admin' || CURRENT_USER.role === 'AUDITOR');
+    }
+
     function switchMainModule(mod) {
       ACTIVE_MODULE = mod;
       ['claim', 'ng', 'insp', 'ptp'].forEach(m => {
@@ -762,1042 +795,1172 @@
       if (mod === 'ptp') {
         $('qualityModulesWrapper').classList.add('hidden');
         $('ptpModuleWrapper').classList.remove('hidden');
-        renderDashboard();
+        resizeAllCanvases();
+        renderPtpDashboard();
+        renderLogRegisterTable();
       } else {
         $('ptpModuleWrapper').classList.add('hidden');
         $('qualityModulesWrapper').classList.remove('hidden');
         ['claim', 'ng', 'insp'].forEach(m => {
-          const el = $('qmod-' + m);
-          if (el) el.classList.toggle('hidden', m !== mod);
+          const sec = $('qsec-' + m);
+          if (sec) sec.classList.toggle('hidden', m !== mod);
         });
         renderQualityModule(mod);
       }
-      icons();
     }
 
-    async function syncAllSystems(notify = true) {
-      const ico = $('syncIcon');
-      if (ico) ico.classList.add('animate-spin');
+    async function syncAllSystems(showToast = true) {
+      const icon = $('syncIcon');
+      if (icon) icon.classList.add('animate-spin');
       try {
-        const [qRes, ptpRes] = await Promise.all([
+        const [qRes, pRes] = await Promise.all([
           apiCall('apiGetAllData'),
           apiCall('getInitialPtpMetadata', todayStr())
         ]);
-        if (qRes) {
-          QUALITY_DATA = {
-            claims: qRes.claims || [],
-            ngRecords: qRes.ngRecords || [],
-            inspections: qRes.inspections || [],
-            customerList: qRes.customerList || []
-          };
-          popQualityFilters();
-          if (ACTIVE_MODULE !== 'ptp') renderQualityModule(ACTIVE_MODULE);
+        QUALITY_DATA = {
+          claims: qRes.claims || [],
+          ngRecords: qRes.ngRecords || [],
+          inspections: qRes.inspections || [],
+          customerList: qRes.customerList || []
+        };
+        PTP_LIST = pRes.existingList || [];
+        if (pRes.spreadsheetUrl && $('openSheetsLogBtn')) {
+          $('openSheetsLogBtn').href = pRes.spreadsheetUrl;
+          $('openSheetsLogBtn').classList.remove('hidden');
         }
-        if (ptpRes) {
-          if (ptpRes.nextNoReg && $('modeBadge').textContent.includes('Baru')) $('noReg').value = ptpRes.nextNoReg;
-          ptpLogRecords = ptpRes.existingList || [];
-          renderLogRegisterTable();
-          if (ACTIVE_MODULE === 'ptp') renderDashboard();
-          if (ptpRes.spreadsheetUrl) {
-            $('openSheetsLogBtn').href = ptpRes.spreadsheetUrl;
-            $('openSheetsLogBtn').classList.remove('hidden');
-          }
-        }
+        if ($('noReg') && !$('noReg').value) $('noReg').value = pRes.nextNoReg || '';
         const now = new Date();
         $('lastSyncTime').textContent = `Sync: ${pd(now.getHours())}.${pd(now.getMinutes())}.${pd(now.getSeconds())}`;
-        if (notify) toast('Semua data berhasil disinkronkan!');
-      } catch (e) {
-        toast('Gagal sinkronisasi: ' + e.message, false);
+        renderAllQualityModules();
+        renderPtpDashboard();
+        renderLogRegisterTable();
+        if (showToast) toast('Seluruh data berhasil disinkronkan!');
+      } catch (err) {
+        toast(err.message, false);
       } finally {
-        if (ico) ico.classList.remove('animate-spin');
+        if (icon) icon.classList.remove('animate-spin');
       }
     }
 
     /* ===================================================================== */
-    /* KONFIGURASI & SHELL 3 MODUL QUALITY (CLAIM, NG, INSPECTION)           */
+    /* QUALITY MODULES SHELL — SESUAI WEB SEBELUM PENGGABUNGAN               */
     /* ===================================================================== */
-    const Q_MOD = {
-      claim: {
-        title: 'Monitoring Claim Customer',
-        sub: 'Analisis Pareto 80/20, Top 5 Customer, Tren Kasus & Qty NG, serta Pembanding Tahun Lalu',
-        cols: ['ID Register', 'Tanggal', 'Plant', 'Customer', 'No Claim', 'Kategori', 'Part Name', 'Part No', 'Jenis NG', 'Qty Check', 'Qty NG', '%', 'Kat. NG', 'Status', 'Dokumen', 'Aksi'],
-        keys: ['idRegister', 'tanggalClaim', 'acjPlant', 'namaCustomer', 'noClaim', 'kategoriClaim', 'namaPart', 'partNomor', 'keteranganJenisNG', 'qtyCheck', 'qtyNG', 'prosentase', 'kategoriNG', 'statusClaim']
-      },
-      ng: {
-        title: 'Database NG Internal Produksi',
-        sub: 'Monitoring Defect Internal per Divisi, Operator, Nomor Mesin & Tren Tahunan',
-        cols: ['ID NG', 'Tanggal', 'Nama Part', 'Divisi', 'No Mesin', 'Operator', 'Jenis NG', 'Faktor Penyebab', 'Qty Prod', 'Qty NG', 'Ratio %', 'Aksi'],
-        keys: ['idNG', 'tanggal', 'namaPart', 'divisi', 'noMesin', 'namaOperator', 'jenisNG', 'faktorPenyebab', 'qtyProduksi', 'qtyNG', 'ratioNG']
-      },
-      insp: {
-        title: 'Data Final Inspection',
-        sub: 'Monitoring Hasil Pengecekan OK, NG & Repair Final Inspection per Customer',
-        cols: ['No', 'Tanggal', 'Nama Part', 'Customer', 'Proses', 'Qty OK', 'Qty NG', 'Qty Repair', 'Total Check', 'Operator', 'Keterangan', 'Aksi'],
-        keys: ['no', 'tanggal', 'namaPart', 'customer', 'proses', 'qtyOK', 'qtyNG', 'qtyRepair', 'totalCheck', 'operator', 'keterangan']
-      }
-    };
-
-    const Q_FIELDS = {
-      claim: [
-        { k: 'tanggalClaim', l: 'Tanggal Claim *', t: 'date', req: true },
-        { k: 'acjPlant', l: 'ACJ Plant *', t: 'select', opts: PLANTS, req: true },
-        { k: 'namaCustomer', l: 'Nama Customer *', t: 'text', req: true },
-        { k: 'noClaim', l: 'No. Claim / NCR', t: 'text' },
-        { k: 'kategoriClaim', l: 'Kategori Claim', t: 'select', opts: ['Claim', 'Informasi'] },
-        { k: 'lokasiPenemuan', l: 'Lokasi Penemuan', t: 'select', opts: ['Receiving Inspection', 'In-Process', 'Customer'] },
-        { k: 'namaPart', l: 'Nama Part *', t: 'text', req: true },
-        { k: 'partNomor', l: 'Part Nomor', t: 'text' },
-        { k: 'keteranganJenisNG', l: 'Keterangan Jenis NG *', t: 'text', req: true },
-        { k: 'frekuensiClaim', l: 'Frekuensi Claim', t: 'select', opts: ['Pertama kali', 'Berulang / rutin'] },
-        { k: 'qtyCheck', l: 'Qty Check *', t: 'number', req: true },
-        { k: 'qtyNG', l: 'Qty NG *', t: 'number', req: true },
-        { k: 'kategoriNG', l: 'Kategori NG', t: 'select', opts: ['Dimensi', 'Visual'] },
-        { k: 'penyebabProblem', l: 'Penyebab Problem', t: 'select', opts: ['Internal', 'External'] },
-        { k: 'statusClaim', l: 'Status Claim', t: 'select', opts: ['Monitoring', 'Closed'] },
-        { k: 'officialDocFile', l: 'Official Doc (PDF/JPG/PNG)', t: 'file' },
-        { k: 'picaFile', l: 'Lampiran PICA (PDF/JPG/PNG)', t: 'file' }
-      ],
-      ng: [
-        { k: 'tanggal', l: 'Tanggal *', t: 'date', req: true },
-        { k: 'divisi', l: 'Divisi *', t: 'select', opts: DIVISI, req: true },
-        { k: 'namaPart', l: 'Nama Part *', t: 'text', req: true },
-        { k: 'qtyProduksi', l: 'Qty Produksi *', t: 'number', req: true },
-        { k: 'qtyNG', l: 'Qty NG *', t: 'number', req: true },
-        { k: 'jenisNG', l: 'Jenis NG *', t: 'text', req: true },
-        { k: 'faktorPenyebab', l: 'Faktor Penyebab *', t: 'text', req: true },
-        { k: 'noMesin', l: 'No. Mesin', t: 'text' },
-        { k: 'namaOperator', l: 'Nama Operator', t: 'text' }
-      ],
-      insp: [
-        { k: 'no', l: 'No. Urut', t: 'text' },
-        { k: 'tanggal', l: 'Tanggal *', t: 'date', req: true },
-        { k: 'namaPart', l: 'Nama Part *', t: 'text', req: true },
-        { k: 'customer', l: 'Customer *', t: 'text', req: true },
-        { k: 'proses', l: 'Proses *', t: 'text', req: true },
-        { k: 'qtyOK', l: 'Qty OK *', t: 'number', req: true },
-        { k: 'qtyNG', l: 'Qty NG *', t: 'number', req: true },
-        { k: 'qtyRepair', l: 'Qty Repair *', t: 'number', req: true },
-        { k: 'operator', l: 'Operator *', t: 'text', req: true },
-        { k: 'keterangan', l: 'Keterangan', t: 'text' }
-      ]
-    };
-
-    const Q_STATE = {
-      claim: { page: 1, drill: null, sort: null },
-      ng: { page: 1, drill: null, sort: null },
-      insp: { page: 1, drill: null, sort: null }
-    };
-    const Q_CHARTS = {};
     const Q_CFGS = {};
-    let zoomChartInst = null;
+    const Q_CHARTS = {};
+    const Q_DRILL = { claim: null, ng: null, insp: null };
+    const Q_PAGE_STATE = { claim: 1, ng: 1, insp: 1 };
+    const Q_SORT_STATE = {
+      claim: { col: 'tanggalClaim', dir: 'desc' },
+      ng:    { col: 'tanggal', dir: 'desc' },
+      insp:  { col: 'tanggal', dir: 'desc' }
+    };
 
-    function weekListQ(y, m) {
-      if (!y || !m) return [];
-      const yr = Number(y), mo = Number(m) - 1;
-      const first = new Date(yr, mo, 1), last = new Date(yr, mo + 1, 0);
-      let cur = new Date(first);
-      const day = cur.getDay();
-      cur.setDate(cur.getDate() - (day === 0 ? 6 : day - 1));
-      const out = [];
-      let w = 1;
-      while (cur <= last) {
-        const s = new Date(cur);
-        const e = new Date(cur); e.setDate(e.getDate() + 6);
-        const sIso = `${s.getFullYear()}-${pd(s.getMonth() + 1)}-${pd(s.getDate())}`;
-        const eIso = `${e.getFullYear()}-${pd(e.getMonth() + 1)}-${pd(e.getDate())}`;
-        out.push({ val: `${sIso}|${eIso}`, lbl: `Minggu ${w} (${pd(s.getDate())}/${pd(s.getMonth()+1)} - ${pd(e.getDate())}/${pd(e.getMonth()+1)})` });
-        cur.setDate(cur.getDate() + 7);
-        w++;
-      }
-      return out;
+    function getCalendarWeekOfMonth(isoDate) {
+      const p = String(isoDate || '').split('-').map(Number);
+      if (p.length !== 3 || !p[0] || !p[1] || !p[2]) return 0;
+      const firstDow = new Date(p[0], p[1] - 1, 1).getDay();
+      return Math.ceil((p[2] + firstDow) / 7);
     }
 
-    function canEditQuality() {
-      return CURRENT_USER && (CURRENT_USER.role === 'Admin' || CURRENT_USER.role === 'AUDITOR');
+    function scrollToQualityLog(m) {
+      const box = $('qlog-box-' + m);
+      if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function buildQualityShell() {
-      const wrap = $('qualityModulesWrapper');
-      if (!wrap) return;
-      const showAdd = canEditQuality();
-      wrap.innerHTML = ['claim', 'ng', 'insp'].map(m => {
-        const cfg = Q_MOD[m];
-        const extraFilters = m === 'claim'
-          ? `<select id="qf-cust-claim" onchange="renderQualityModule('claim')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Customer</option></select>
-             <select id="qf-plant-claim" onchange="renderQualityModule('claim')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
-             <select id="qf-cat-claim" onchange="renderQualityModule('claim')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Kategori</option><option value="Claim">Claim</option><option value="Informasi">Informasi</option></select>
-             <select id="qf-cmp-claim" class="rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 font-semibold px-3 py-2 text-xs"><option value="auto">Pembanding PDF: Otomatis (Tahun Lalu)</option></select>`
-          : m === 'ng'
-            ? `<select id="qf-div-ng" onchange="renderQualityModule('ng')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Divisi</option>${DIVISI.map(d => `<option value="${d}">${d}</option>`).join('')}</select>
-               <select id="qf-week-ng" onchange="renderQualityModule('ng')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Minggu</option></select>`
-            : `<select id="qf-cust-insp" onchange="renderQualityModule('insp')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Customer</option></select>
-               <select id="qf-week-insp" onchange="renderQualityModule('insp')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Minggu</option></select>`;
+      const canEdit = canEditQuality();
+      const specs = [
+        {
+          id: 'claim', title: 'Monitoring Claim Customer', sub: 'Analisis Pareto Kategori NG (80/20), Distribusi Kontribusi Defect, Top 5 Customer & Monitoring 90 Hari',
+          grad: 'from-blue-950 via-blue-900 to-indigo-900',
+          kpis: [
+            ['Total Claim', 'qk-claim-tot', 'border-t-4 border-t-blue-700 text-blue-950'],
+            ['Total Qty NG', 'qk-claim-ng', 'border-t-4 border-t-rose-600 text-rose-700'],
+            ['Status Monitoring', 'qk-claim-mon', 'border-t-4 border-t-amber-500 text-amber-700'],
+            ['Status Closed', 'qk-claim-cls', 'border-t-4 border-t-emerald-600 text-emerald-700']
+          ],
+          extraFilters: `
+            <select id="qf-claim-plant" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
+            <select id="qf-claim-cust" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Customer</option></select>
+            <select id="qf-claim-katclaim" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Kategori Claim</option><option value="Claim">Claim</option><option value="Informasi">Informasi</option></select>
+            <select id="qf-claim-lokasi" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Lokasi Penemuan</option><option value="Receiving Inspection">Receiving Inspection</option><option value="In-Process">In-Process</option><option value="Customer">Customer</option></select>
+            <select id="qf-claim-katng" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Kategori NG</option><option value="Dimensi">Dimensi</option><option value="Visual">Visual</option></select>
+            <select id="qf-claim-penyebab" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Penyebab</option><option value="Internal">Internal</option><option value="External">External</option></select>
+            <select id="qf-claim-status" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Status</option><option value="Monitoring">Monitoring</option><option value="Closed">Closed</option></select>
+          `,
+          charts: [
+            ['qc-claim-pareto', 'Pareto Kategori / Jenis NG (80/20)'],
+            ['qc-claim-cust', 'Top 5 Customer Claim (Qty NG)'],
+            ['qc-claim-trend', 'Tren Kasus & Qty NG Claim Bulanan'],
+            ['qc-claim-part', 'Jumlah Claim per Nama Part (Top 8)']
+          ],
+          afterChartsHtml: `
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div class="px-4 py-3 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p class="text-xs font-bold text-slate-800">Tabel Distribusi Pareto (Kontribusi Terhadap Total Defect)</p>
+                  <p class="text-[11px] text-slate-500">Kategori Vital Few (&le; 80% Kumulatif) vs Useful Many (&gt; 80%) • Klik baris untuk filter Log Register</p>
+                </div>
+                <span id="qpareto-claim-summary" class="text-[11px] font-bold text-blue-900 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">0 Total Qty NG</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                  <thead class="bg-slate-100 text-slate-700 font-bold uppercase">
+                    <tr>
+                      <th class="px-3 py-2 text-left">Rank</th>
+                      <th class="px-3 py-2 text-left">Jenis / Kategori NG</th>
+                      <th class="px-3 py-2 text-right">Jumlah Kasus</th>
+                      <th class="px-3 py-2 text-right">Qty NG (Pcs)</th>
+                      <th class="px-3 py-2 text-right">Kontribusi (%)</th>
+                      <th class="px-3 py-2 text-right">Kumulatif (%)</th>
+                      <th class="px-3 py-2 text-center">Klasifikasi 80/20</th>
+                    </tr>
+                  </thead>
+                  <tbody id="qpareto-claim-body" class="divide-y divide-slate-200 bg-white"></tbody>
+                </table>
+              </div>
+            </div>
+          `,
+          headers: [
+            ['idRegister', 'ID Reg'], ['tanggalClaim', 'Tanggal'], ['acjPlant', 'Plant'], ['namaCustomer', 'Customer'],
+            ['namaPart', 'Part & No'], ['keteranganJenisNG', 'Jenis NG'], ['qtyNG', 'Qty NG'], ['statusClaim', 'Status'], ['', 'Dok & Aksi']
+          ]
+        },
+        {
+          id: 'ng', title: 'Database NG Internal', sub: 'Pie Chart Top 5 Part NG Tertinggi, Tren NG 1 Tahun & Pareto Multi-Dimensi (Part, Problem, Operator, Mesin)',
+          grad: 'from-slate-900 via-rose-950 to-slate-900',
+          kpis: [
+            ['Total Kasus NG', 'qk-ng-tot', 'border-t-4 border-t-blue-700 text-blue-950'],
+            ['Total Qty NG', 'qk-ng-qty', 'border-t-4 border-t-rose-600 text-rose-700'],
+            ['Total Qty Produksi', 'qk-ng-prod', 'border-t-4 border-t-slate-600 text-slate-800'],
+            ['Rata-rata Ratio NG', 'qk-ng-rat', 'border-t-4 border-t-amber-500 text-amber-700']
+          ],
+          extraFilters: `
+            <input type="date" id="qf-ng-date" onchange="renderQualityModule('ng')" title="Filter Tanggal Spesifik" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white" />
+            <select id="qf-ng-div" onchange="renderQualityModule('ng')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Divisi</option>${DIVISI.map(d => `<option value="${d}">${d}</option>`).join('')}</select>
+            <select id="qf-ng-part" onchange="renderQualityModule('ng')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Part</option></select>
+          `,
+          charts: [
+            ['qc-ng-top5pie', 'Top 5 Part NG Tertinggi (Klik Irisan → Log Register)'],
+            ['qc-ng-trend', 'Tren NG Satu Tahun (Januari – Desember)'],
+            ['qc-ng-multi', 'Pareto Multi-Dimensi (Part / Problem / Operator / Mesin)', `
+              <select id="qf-ng-pareto-dim" onchange="renderQualityModule('ng')" class="rounded-lg border-slate-300 border px-2 py-1 text-[11px] font-semibold bg-slate-50 text-slate-800">
+                <option value="namaPart">Dimensi: Part NG</option>
+                <option value="jenisNG">Dimensi: Jenis Problem</option>
+                <option value="namaOperator">Dimensi: Operator</option>
+                <option value="noMesin">Dimensi: No. Mesin</option>
+              </select>
+            `],
+            ['qc-ng-div', 'Distribusi Qty NG Per Divisi']
+          ],
+          afterChartsHtml: '',
+          headers: [
+            ['idNG', 'ID NG'], ['tanggal', 'Tanggal'], ['divisi', 'Divisi'], ['namaPart', 'Nama Part'],
+            ['jenisNG', 'Jenis NG'], ['faktorPenyebab', 'Penyebab'], ['qtyNG', 'Qty NG'], ['ratioNG', 'Ratio (%)'], ['', 'Aksi']
+          ]
+        },
+        {
+          id: 'insp', title: 'Data Final Inspection', sub: 'Monitoring Hasil Pengecekan Lot, Filter Mingguan & Kalender, Filter Customer serta Top 5 Part NG',
+          grad: 'from-slate-900 via-emerald-950 to-teal-900',
+          kpis: [
+            ['Total Lot Check', 'qk-insp-lot', 'border-t-4 border-t-blue-700 text-blue-950'],
+            ['Total Qty OK', 'qk-insp-ok', 'border-t-4 border-t-emerald-600 text-emerald-700'],
+            ['Total Qty NG', 'qk-insp-ng', 'border-t-4 border-t-rose-600 text-rose-700'],
+            ['First Pass Yield (FPY)', 'qk-insp-fpy', 'border-t-4 border-t-amber-500 text-amber-700']
+          ],
+          extraFilters: `
+            <input type="date" id="qf-insp-date" onchange="renderQualityModule('insp')" title="Filter Tanggal Spesifik" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white" />
+            <select id="qf-insp-cust" onchange="renderQualityModule('insp')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Customer</option></select>
+            <select id="qf-insp-part" onchange="renderQualityModule('insp')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Part</option></select>
+          `,
+          charts: [
+            ['qc-insp-top5pie', 'Top 5 Part NG Tertinggi (Klik Irisan → Log Register)'],
+            ['qc-insp-trend', 'Tren Hasil Inspection Bulanan (OK vs NG)'],
+            ['qc-insp-cust', 'Top Customer NG Inspection'],
+            ['qc-insp-comp', 'Komposisi Hasil Pengecekan (OK / NG / Repair)']
+          ],
+          afterChartsHtml: '',
+          headers: [
+            ['no', 'No'], ['tanggal', 'Tanggal'], ['customer', 'Customer'], ['namaPart', 'Nama Part'],
+            ['proses', 'Proses'], ['qtyOK', 'OK'], ['qtyNG', 'NG'], ['qtyRepair', 'Repair'], ['operator', 'Operator'], ['', 'Aksi']
+          ]
+        }
+      ];
 
-        const chartsHtml = m === 'claim'
-          ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-               <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Pareto Kategori NG (80/20)</h3><button type="button" onclick="zoomChart('qc-claim-pareto','Pareto Kategori NG (80/20)')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-claim-pareto"></canvas></div><div id="qc-claim-pareto-tbl" class="mt-3 overflow-x-auto"></div></div>
-               <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Top 5 Customer (Qty NG)</h3><button type="button" onclick="zoomChart('qc-claim-cust','Top 5 Customer (Qty NG)')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-claim-cust"></canvas></div></div>
-               <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Tren Kasus &amp; Qty NG Bulanan</h3><button type="button" onclick="zoomChart('qc-claim-trend','Tren Kasus & Qty NG Bulanan')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-claim-trend"></canvas></div></div>
-               <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Jumlah Claim per Nama Part</h3><button type="button" onclick="zoomChart('qc-claim-part','Jumlah Claim per Nama Part')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-claim-part"></canvas></div></div>
-             </div>`
-          : m === 'ng'
-            ? `<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Top 5 Part NG Tertinggi</h3><button type="button" onclick="zoomChart('qc-ng-pie','Top 5 Part NG Tertinggi')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-ng-pie"></canvas></div></div>
-                 <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Tren NG Satu Tahun (per Divisi)</h3><button type="button" onclick="zoomChart('qc-ng-trend','Tren NG Satu Tahun')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-ng-trend"></canvas></div></div>
-                 <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-                   <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
-                     <h3 class="text-xs font-bold text-slate-800">Pareto Multi-Dimensi NG</h3>
-                     <div class="flex items-center gap-2">
-                       <select id="qf-dim-ng" onchange="renderQualityModule('ng')" class="rounded-lg border border-slate-300 px-2.5 py-1 text-xs bg-slate-50 font-semibold">
-                         <option value="part">By Part NG</option>
-                         <option value="jenis">By Jenis Problem</option>
-                         <option value="op">By Operator</option>
-                         <option value="mesin">By No Mesin</option>
-                       </select>
-                       <button type="button" onclick="zoomChart('qc-ng-pareto','Pareto Multi-Dimensi NG')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
-                     </div>
-                   </div>
-                   <div class="h-64"><canvas id="qc-ng-pareto"></canvas></div>
-                 </div>
-               </div>`
-            : `<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Top 5 Part NG Tertinggi (Inspection)</h3><button type="button" onclick="zoomChart('qc-insp-pie','Top 5 Part NG Tertinggi (Inspection)')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-insp-pie"></canvas></div></div>
-                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800">Pareto Part NG Inspection (80/20)</h3><button type="button" onclick="zoomChart('qc-insp-pareto','Pareto Part NG Inspection (80/20)')" class="text-slate-400 hover:text-blue-900 p-1 rounded" title="Perbesar Grafik"><i data-lucide="maximize-2" class="w-4 h-4"></i></button></div><div class="h-60"><canvas id="qc-insp-pareto"></canvas></div></div>
-               </div>`;
-
-        return `
-        <section id="qmod-${m}" class="${m === 'claim' ? '' : 'hidden'} space-y-5">
-          <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
+      $('qualityModulesWrapper').innerHTML = specs.map(sp => `
+        <section id="qsec-${sp.id}" class="${sp.id === 'claim' ? '' : 'hidden'} space-y-5">
+          <div class="bg-gradient-to-r ${sp.grad} rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Management System</span>
-              <h2 class="text-2xl font-extrabold mt-0.5">${cfg.title}</h2>
-              <p class="text-xs text-slate-300 mt-1">${cfg.sub}</p>
+              <h2 class="text-2xl font-extrabold mt-0.5">${sp.title}</h2>
+              <p class="text-xs text-slate-200 mt-1">${sp.sub}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              ${showAdd ? `<button type="button" onclick="openQualityForm('${m}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>` : ''}
-              <button type="button" onclick="exportQualityExcel('${m}')" class="bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-300"></i> Export Excel</button>
-              <button type="button" onclick="execReport()" class="bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-amber-300"></i> Laporan Eksekutif PDF</button>
+              ${canEdit ? `<button type="button" onclick="openQualityForm('${sp.id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>` : ''}
+              <button type="button" onclick="exportQualityExcel('${sp.id}')" class="bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-300"></i> Export Excel</button>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center gap-2.5">
-            <select id="qf-yr-${m}" onchange="onYearMonthChange('${m}')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white font-semibold"><option value="">Semua Tahun</option></select>
-            <select id="qf-mo-${m}" onchange="onYearMonthChange('${m}')" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"><option value="">Semua Bulan</option>${MONTHS.map((nm, idx) => `<option value="${pd(idx+1)}">${nm}</option>`).join('')}</select>
-            ${extraFilters}
-            <button type="button" onclick="resetQualityFilters('${m}')" class="ml-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs">Reset Filter</button>
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2">
+            <select id="qf-${sp.id}-year" onchange="renderQualityModule('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs font-semibold bg-white"></select>
+            <select id="qf-${sp.id}-month" onchange="onQMonthChange('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Bulan</option>${MONTHS.map((m, idx) => `<option value="${pd(idx + 1)}">${m}</option>`).join('')}</select>
+            <select id="qf-${sp.id}-week" onchange="renderQualityModule('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white">
+              <option value="">Semua Minggu</option>
+              <option value="1">Minggu 1</option><option value="2">Minggu 2</option><option value="3">Minggu 3</option><option value="4">Minggu 4</option><option value="5">Minggu 5</option>
+            </select>
+            ${sp.extraFilters}
+            <input type="text" id="qf-${sp.id}-search" oninput="renderQualityTable('${sp.id}')" placeholder="Cari part, jenis NG, ID..." class="flex-1 min-w-[150px] rounded-lg border-slate-300 border px-3 py-1.5 text-xs" />
+            <button type="button" onclick="resetQualityFilters('${sp.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Reset</button>
+            <span id="qdrill-${sp.id}" class="hidden inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-[11px] font-bold"></span>
           </div>
 
-          <div id="qkpi-${m}" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-          ${chartsHtml}
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            ${sp.kpis.map(k => `<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm ${k[2]}"><p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">${k[0]}</p><p id="${k[1]}" class="text-2xl font-extrabold mt-1">0</p></div>`).join('')}
+          </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-blue-950">Log Register ${cfg.title}</h3>
-                <span id="qdrill-${m}" class="hidden bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold px-2.5 py-0.5 rounded-full items-center gap-1"></span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            ${sp.charts.map(c => `
+              <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <p class="text-xs font-bold text-slate-800">${c[1]}</p>
+                  <div class="flex items-center gap-1.5">
+                    ${c[2] || ''}
+                    <button type="button" onclick="openChartZoom('${c[0]}','${esc(c[1])}')" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-900 transition" title="Perbesar Grafik (Zoom)"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+                <div class="h-60 relative"><canvas id="${c[0]}"></canvas></div>
               </div>
-              <input type="text" id="qsearch-${m}" oninput="Q_STATE['${m}'].page=1;renderQualityTable('${m}')" placeholder="Cari data di tabel..." class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs w-full sm:w-64" />
+            `).join('')}
+          </div>
+
+          ${sp.afterChartsHtml}
+
+          <div id="qlog-box-${sp.id}" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <p class="text-xs font-bold text-slate-800">Log Register ${sp.title} (<span id="qcnt-${sp.id}">0</span> data)</p>
+              <span class="text-[11px] text-slate-500">Klik judul kolom untuk sortir A-Z / Z-A</span>
             </div>
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-slate-200 text-xs">
                 <thead class="bg-slate-100 text-slate-700 font-bold uppercase">
-                  <tr>${cfg.cols.map((c, idx) => idx < cfg.keys.length
-                    ? `<th onclick="toggleQualitySort('${m}','${cfg.keys[idx]}')" class="px-3 py-2.5 text-left cursor-pointer hover:bg-slate-200 select-none whitespace-nowrap">${c} <span id="qsort-${m}-${cfg.keys[idx]}" class="text-[10px] text-slate-400">${idx===1?'&#9660; Terbaru':'&#8597;'}</span></th>`
-                    : `<th class="px-3 py-2.5 text-center">${c}</th>`).join('')}</tr>
+                  <tr>
+                    ${sp.headers.map(h => h[0]
+                      ? `<th onclick="toggleQSort('${sp.id}','${h[0]}')" class="px-3 py-2.5 text-left cursor-pointer hover:bg-slate-200 select-none">${h[1]} <span id="qsort-${sp.id}-${h[0]}" class="text-[10px] text-slate-400">&#8597;</span></th>`
+                      : `<th class="px-3 py-2.5 text-center">${h[1]}</th>`).join('')}
+                  </tr>
                 </thead>
-                <tbody id="qtb-${m}" class="divide-y divide-slate-200 bg-white"></tbody>
+                <tbody id="qtb-${sp.id}" class="divide-y divide-slate-200 bg-white"></tbody>
               </table>
             </div>
-            <div id="qpg-${m}" class="flex items-center justify-between text-xs text-slate-500 pt-1"></div>
+            <div id="qpg-${sp.id}" class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs"></div>
           </div>
-        </section>`;
-      }).join('');
+        </section>
+      `).join('');
+      icons();
     }
 
-    function setQDrill(m, label, fn) {
-      Q_STATE[m].drill = { label, fn };
-      Q_STATE[m].page = 1;
-      const b = $('qdrill-' + m);
-      if (b) {
-        b.innerHTML = `${esc(label)} <button type="button" onclick="clearQDrill('${m}')" class="ml-1 text-rose-700 font-extrabold">&times;</button>`;
-        b.classList.remove('hidden');
-        b.classList.add('inline-flex');
-      }
-      renderQualityTable(m);
-      const tbl = $('qtb-' + m);
-      if (tbl) tbl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function clearQDrill(m) {
-      Q_STATE[m].drill = null;
-      Q_STATE[m].page = 1;
-      const b = $('qdrill-' + m);
-      if (b) { b.classList.add('hidden'); b.classList.remove('inline-flex'); }
-      renderQualityTable(m);
-    }
-
-    function popQualityFilters() {
-      const yrsC = [...new Set(QUALITY_DATA.claims.map(r => (r.tanggalClaim || '').slice(0, 4)).filter(Boolean))].sort().reverse();
-      const yrsN = [...new Set(QUALITY_DATA.ngRecords.map(r => (r.tanggal || '').slice(0, 4)).filter(Boolean))].sort().reverse();
-      const yrsI = [...new Set(QUALITY_DATA.inspections.map(r => (r.tanggal || '').slice(0, 4)).filter(Boolean))].sort().reverse();
-
-      const fillY = (id, list) => {
-        const el = $(id); if (!el) return;
-        const cur = el.value;
-        el.innerHTML = '<option value="">Semua Tahun</option>' + list.map(y => `<option value="${y}">${y}</option>`).join('');
-        if (list.includes(cur)) el.value = cur;
-      };
-      fillY('qf-yr-claim', yrsC);
-      fillY('qf-yr-ng', yrsN);
-      fillY('qf-yr-insp', yrsI);
-
-      const cmpEl = $('qf-cmp-claim');
-      if (cmpEl) {
-        cmpEl.innerHTML = '<option value="auto">Pembanding PDF: Otomatis (Tahun Lalu)</option>' + yrsC.map(y => `<option value="${y}">Bandingkan dgn ${y}</option>`).join('');
-      }
-      const custC = [...new Set(QUALITY_DATA.claims.map(r => r.namaCustomer).filter(Boolean))].sort();
-      const custI = [...new Set(QUALITY_DATA.inspections.map(r => r.customer).filter(Boolean))].sort();
-      if ($('qf-cust-claim')) $('qf-cust-claim').innerHTML = '<option value="">Semua Customer</option>' + custC.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-      if ($('qf-cust-insp')) $('qf-cust-insp').innerHTML = '<option value="">Semua Customer</option>' + custI.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    }
-
-    function onYearMonthChange(m) {
-      if (m === 'ng' || m === 'insp') {
-        const y = $('qf-yr-' + m).value, mo = $('qf-mo-' + m).value;
-        const wk = $('qf-week-' + m);
-        const list = weekListQ(y, mo);
-        wk.innerHTML = '<option value="">Semua Minggu</option>' + list.map(w => `<option value="${w.val}">${w.lbl}</option>`).join('');
-      }
-      Q_STATE[m].page = 1;
+    function onQMonthChange(m) {
+      const wk = $(`qf-${m}-week`);
+      if (wk && !$(`qf-${m}-month`)?.value) wk.value = '';
       renderQualityModule(m);
     }
 
     function resetQualityFilters(m) {
-      $('qf-yr-' + m).value = '';
-      $('qf-mo-' + m).value = '';
-      if ($('qf-cust-' + m)) $('qf-cust-' + m).value = '';
-      if ($('qf-plant-' + m)) $('qf-plant-' + m).value = '';
-      if ($('qf-cat-' + m)) $('qf-cat-' + m).value = '';
-      if ($('qf-div-' + m)) $('qf-div-' + m).value = '';
-      if ($('qf-week-' + m)) $('qf-week-' + m).innerHTML = '<option value="">Semua Minggu</option>';
-      Q_STATE[m].sort = null;
+      ['year', 'month', 'week', 'date', 'plant', 'cust', 'katclaim', 'lokasi', 'katng', 'penyebab', 'status', 'div', 'part', 'search'].forEach(k => {
+        const el = $(`qf-${m}-${k}`);
+        if (el) el.value = '';
+      });
       clearQDrill(m);
       renderQualityModule(m);
     }
 
-    function getFilteredQualityRows(m) {
-      const y = $('qf-yr-' + m)?.value || '';
-      const mo = $('qf-mo-' + m)?.value || '';
-      const ym = y && mo ? `${y}-${mo}` : '';
-      if (m === 'claim') {
-        const cu = $('qf-cust-claim')?.value || '';
-        const pl = $('qf-plant-claim')?.value || '';
-        const ca = $('qf-cat-claim')?.value || '';
-        return QUALITY_DATA.claims.filter(r =>
-          (!y || (r.tanggalClaim || '').startsWith(y)) &&
-          (!ym || (r.tanggalClaim || '').startsWith(ym)) &&
-          (!cu || r.namaCustomer === cu) &&
-          (!pl || r.acjPlant === pl) &&
-          (!ca || r.kategoriClaim === ca)
-        );
+    function setQDrill(m, field, val, label, autoScroll = false) {
+      Q_DRILL[m] = { field, val };
+      const b = $('qdrill-' + m);
+      if (b) {
+        b.innerHTML = `Filter Grafik: ${esc(label)} <button type="button" onclick="clearQDrill('${m}')" class="ml-1 text-rose-700 font-extrabold">&times;</button>`;
+        b.classList.remove('hidden');
       }
-      if (m === 'ng') {
-        const dv = $('qf-div-ng')?.value || '';
-        const wk = $('qf-week-ng')?.value || '';
-        const [ws, we] = wk ? wk.split('|') : ['', ''];
-        return QUALITY_DATA.ngRecords.filter(r =>
-          (!y || (r.tanggal || '').startsWith(y)) &&
-          (!ym || (r.tanggal || '').startsWith(ym)) &&
-          (!dv || r.divisi === dv) &&
-          (!wk || (r.tanggal >= ws && r.tanggal <= we))
-        );
-      }
-      const cu = $('qf-cust-insp')?.value || '';
-      const wk = $('qf-week-insp')?.value || '';
-      const [ws, we] = wk ? wk.split('|') : ['', ''];
-      return QUALITY_DATA.inspections.filter(r =>
-        (!y || (r.tanggal || '').startsWith(y)) &&
-        (!ym || (r.tanggal || '').startsWith(ym)) &&
-        (!cu || r.customer === cu) &&
-        (!wk || (r.tanggal >= ws && r.tanggal <= we))
-      );
+      Q_PAGE_STATE[m] = 1;
+      renderQualityTable(m);
+      if (autoScroll) scrollToQualityLog(m);
+    }
+
+    function clearQDrill(m) {
+      Q_DRILL[m] = null;
+      const b = $('qdrill-' + m);
+      if (b) b.classList.add('hidden');
+      renderQualityTable(m);
+    }
+
+    function popQualityFilters() {
+      const years = new Set([String(new Date().getFullYear())]);
+      QUALITY_DATA.claims.forEach(r => r.tanggalClaim && years.add(r.tanggalClaim.slice(0, 4)));
+      QUALITY_DATA.ngRecords.forEach(r => r.tanggal && years.add(r.tanggal.slice(0, 4)));
+      QUALITY_DATA.inspections.forEach(r => r.tanggal && years.add(r.tanggal.slice(0, 4)));
+      const sortedYears = [...years].sort().reverse();
+
+      ['claim', 'ng', 'insp'].forEach(m => {
+        const el = $(`qf-${m}-year`);
+        if (el) {
+          const cur = el.value;
+          el.innerHTML = `<option value="">Semua Tahun</option>` + sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+          el.value = cur && sortedYears.includes(cur) ? cur : '';
+        }
+      });
+
+      const fillSel = (id, items, defLabel) => {
+        const el = $(id);
+        if (!el) return;
+        const cur = el.value;
+        el.innerHTML = `<option value="">${defLabel}</option>` + [...new Set(items.filter(Boolean))].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+        el.value = cur;
+      };
+      fillSel('qf-claim-cust', QUALITY_DATA.claims.map(r => r.namaCustomer), 'Semua Customer');
+      fillSel('qf-ng-part', QUALITY_DATA.ngRecords.map(r => r.namaPart), 'Semua Part');
+      fillSel('qf-insp-cust', QUALITY_DATA.inspections.map(r => r.customer), 'Semua Customer');
+      fillSel('qf-insp-part', QUALITY_DATA.inspections.map(r => r.namaPart), 'Semua Part');
     }
 
     function drawQChart(id, cfg) {
-      const cv = $(id); if (!cv) return;
       Q_CFGS[id] = cfg;
+      const cv = $(id);
+      if (!cv || !window.Chart) return;
       if (Q_CHARTS[id]) Q_CHARTS[id].destroy();
       Q_CHARTS[id] = new Chart(cv, cfg);
     }
 
-    function zoomChart(id, title) {
-      const cfg = Q_CFGS[id];
-      if (!cfg) return toast('Grafik belum tersedia untuk diperbesar.', false);
+    let ZOOM_CHART_INST = null;
+    function openChartZoom(chartId, title) {
+      const baseCfg = Q_CFGS[chartId];
+      if (!baseCfg) return toast('Grafik belum tersedia.', false);
       $('chartZoomTitle').textContent = title || 'Detail Grafik';
       $('chartZoomModal').classList.remove('hidden');
-      if (zoomChartInst) zoomChartInst.destroy();
-      const cloned = {
-        type: cfg.type,
-        data: JSON.parse(JSON.stringify(cfg.data)),
-        options: Object.assign({}, cfg.options || {}, { maintainAspectRatio: false, responsive: true })
+      if (ZOOM_CHART_INST) ZOOM_CHART_INST.destroy();
+      const clonedCfg = {
+        type: baseCfg.type,
+        data: baseCfg.data,
+        options: Object.assign({}, baseCfg.options || {}, { responsive: true, maintainAspectRatio: false })
       };
-      zoomChartInst = new Chart($('chartZoomCanvas'), cloned);
+      ZOOM_CHART_INST = new Chart($('chartZoomCanvas'), clonedCfg);
     }
 
     function closeChartZoom() {
       $('chartZoomModal').classList.add('hidden');
-      if (zoomChartInst) { zoomChartInst.destroy(); zoomChartInst = null; }
+      if (ZOOM_CHART_INST) {
+        ZOOM_CHART_INST.destroy();
+        ZOOM_CHART_INST = null;
+      }
+    }
+
+    function getFilteredQualityRows(m) {
+      const yr = $(`qf-${m}-year`)?.value || '';
+      const mo = $(`qf-${m}-month`)?.value || '';
+      const wk = Number($(`qf-${m}-week`)?.value || 0);
+      if (m === 'claim') {
+        const pl = $('qf-claim-plant')?.value || '';
+        const cu = $('qf-claim-cust')?.value || '';
+        const kc = $('qf-claim-katclaim')?.value || '';
+        const lk = $('qf-claim-lokasi')?.value || '';
+        const kn = $('qf-claim-katng')?.value || '';
+        const py = $('qf-claim-penyebab')?.value || '';
+        const st = $('qf-claim-status')?.value || '';
+        return QUALITY_DATA.claims.filter(r =>
+          (!yr || r.tanggalClaim.startsWith(yr)) &&
+          (!mo || r.tanggalClaim.slice(5, 7) === mo) &&
+          (!wk || getCalendarWeekOfMonth(r.tanggalClaim) === wk) &&
+          (!pl || r.acjPlant === pl) &&
+          (!cu || r.namaCustomer === cu) &&
+          (!kc || r.kategoriClaim === kc) &&
+          (!lk || r.lokasiPenemuan === lk) &&
+          (!kn || r.kategoriNG === kn) &&
+          (!py || r.penyebabProblem === py) &&
+          (!st || r.statusClaim === st)
+        );
+      }
+      if (m === 'ng') {
+        const dt = $('qf-ng-date')?.value || '';
+        const dv = $('qf-ng-div')?.value || '';
+        const pt = $('qf-ng-part')?.value || '';
+        return QUALITY_DATA.ngRecords.filter(r =>
+          (!dt || r.tanggal === dt) &&
+          (!yr || r.tanggal.startsWith(yr)) &&
+          (!mo || r.tanggal.slice(5, 7) === mo) &&
+          (!wk || getCalendarWeekOfMonth(r.tanggal) === wk) &&
+          (!dv || r.divisi === dv) &&
+          (!pt || r.namaPart === pt)
+        );
+      }
+      const dt = $('qf-insp-date')?.value || '';
+      const cu = $('qf-insp-cust')?.value || '';
+      const pt = $('qf-insp-part')?.value || '';
+      return QUALITY_DATA.inspections.filter(r =>
+        (!dt || r.tanggal === dt) &&
+        (!yr || r.tanggal.startsWith(yr)) &&
+        (!mo || r.tanggal.slice(5, 7) === mo) &&
+        (!wk || getCalendarWeekOfMonth(r.tanggal) === wk) &&
+        (!cu || r.customer === cu) &&
+        (!pt || r.namaPart === pt)
+      );
+    }
+
+    function groupSum(rows, keyFn, valFn) {
+      const map = {};
+      rows.forEach(r => {
+        const k = keyFn(r) || 'Lainnya';
+        map[k] = (map[k] || 0) + valFn(r);
+      });
+      return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    }
+
+    function buildParetoConfig(entries, barColor, onClickCb) {
+      const top = entries.slice(0, 8);
+      const total = top.reduce((s, x) => s + x[1], 0);
+      let acc = 0;
+      const cumPct = top.map(x => {
+        acc += x[1];
+        return total > 0 ? Math.round((acc / total) * 100) : 0;
+      });
+      return {
+        type: 'bar',
+        data: {
+          labels: top.map(x => x[0]),
+          datasets: [
+            { label: 'Qty NG', data: top.map(x => x[1]), backgroundColor: barColor, yAxisID: 'y', order: 2 },
+            { label: 'Kumulatif (%)', data: cumPct, type: 'line', borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.25, yAxisID: 'y1', order: 1 },
+            { label: 'Batas 80%', data: top.map(() => 80), type: 'line', borderColor: '#64748b', borderDash: [5, 5], pointRadius: 0, borderWidth: 1.5, yAxisID: 'y1', order: 0 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: onClickCb,
+          scales: {
+            y: { beginAtZero: true },
+            y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
+          }
+        }
+      };
+    }
+
+    function renderAllQualityModules() {
+      popQualityFilters();
+      ['claim', 'ng', 'insp'].forEach(renderQualityModule);
     }
 
     function renderQualityModule(m) {
       const rows = getFilteredQualityRows(m);
       if (m === 'claim') {
-        const totKasus = rows.length;
-        const totNG = rows.reduce((s, r) => s + num(r.qtyNG), 0);
-        const totChk = rows.reduce((s, r) => s + num(r.qtyCheck), 0);
-        const openCnt = rows.filter(r => r.statusClaim !== 'Closed').length;
-        $('qkpi-claim').innerHTML = `
-          <div class="bg-blue-950 text-white rounded-xl p-4"><p class="text-[11px] uppercase text-blue-200">Total Kasus Claim</p><p class="text-2xl font-extrabold mt-1">${fmt(totKasus)}</p></div>
-          <div class="bg-rose-50 border border-rose-200 rounded-xl p-4"><p class="text-[11px] uppercase text-rose-800 font-semibold">Total Qty NG</p><p class="text-2xl font-extrabold text-rose-900 mt-1">${fmt(totNG)} pcs</p></div>
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4"><p class="text-[11px] uppercase text-amber-800 font-semibold">Monitoring (Open)</p><p class="text-2xl font-extrabold text-amber-900 mt-1">${fmt(openCnt)}</p></div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4"><p class="text-[11px] uppercase text-slate-600 font-semibold">Defect Rate</p><p class="text-2xl font-extrabold text-slate-900 mt-1">${totChk > 0 ? (totNG / totChk * 100).toFixed(2) : '0.00'}%</p></div>`;
+        const totalNgAll = rows.reduce((s, r) => s + r.qtyNG, 0);
+        $('qk-claim-tot').textContent = fmt(rows.length);
+        $('qk-claim-ng').textContent = fmt(totalNgAll);
+        $('qk-claim-mon').textContent = fmt(rows.filter(r => r.statusClaim === 'Monitoring').length);
+        $('qk-claim-cls').textContent = fmt(rows.filter(r => r.statusClaim === 'Closed').length);
 
-        // 1. Pareto Kategori NG
-        const byCat = {};
-        rows.forEach(r => { const k = r.keteranganJenisNG || r.kategoriNG || 'Lainnya'; byCat[k] = (byCat[k] || 0) + num(r.qtyNG); });
-        const parEntries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 10);
-        const parTot = parEntries.reduce((s, e) => s + e[1], 0);
-        let run = 0;
-        const cum = parEntries.map(e => { run += e[1]; return parTot > 0 ? Math.round(run / parTot * 100) : 0; });
-        drawQChart('qc-claim-pareto', {
-          data: {
-            labels: parEntries.map(e => e[0]),
-            datasets: [
-              { type: 'bar', label: 'Qty NG', data: parEntries.map(e => e[1]), backgroundColor: '#1e3a8a', borderRadius: 6, yAxisID: 'y' },
-              { type: 'line', label: 'Kumulatif %', data: cum, borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.25, yAxisID: 'y1' }
-            ]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = parEntries[el[0].index][0]; setQDrill('claim', `Jenis NG: ${lbl}`, r => (r.keteranganJenisNG || r.kategoriNG) === lbl); } },
-            scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } } }
-          }
+        // 1. Pareto Kategori / Jenis NG (80/20) + Tabel Distribusi Pareto
+        const ngDetailMap = {};
+        rows.forEach(r => {
+          const k = r.keteranganJenisNG || 'Lainnya';
+          if (!ngDetailMap[k]) ngDetailMap[k] = { cases: 0, qty: 0 };
+          ngDetailMap[k].cases++;
+          ngDetailMap[k].qty += r.qtyNG;
         });
-        $('qc-claim-pareto-tbl').innerHTML = parEntries.length ? `<table class="min-w-full text-[11px] border border-slate-200 rounded"><thead class="bg-slate-50 font-bold"><tr><th class="px-2 py-1 text-left">Jenis NG</th><th class="px-2 py-1 text-right">Qty</th><th class="px-2 py-1 text-right">%</th><th class="px-2 py-1 text-right">Kum %</th></tr></thead><tbody>${parEntries.map((e, idx) => `<tr class="border-t"><td class="px-2 py-1">${esc(e[0])}</td><td class="px-2 py-1 text-right font-semibold">${fmt(e[1])}</td><td class="px-2 py-1 text-right">${parTot > 0 ? (e[1]/parTot*100).toFixed(1) : 0}%</td><td class="px-2 py-1 text-right font-bold text-amber-700">${cum[idx]}%</td></tr>`).join('')}</tbody></table>` : '';
+        const paretoSorted = Object.entries(ngDetailMap).sort((a, b) => b[1].qty - a[1].qty);
+        const paretoEntries = paretoSorted.map(x => [x[0], x[1].qty]);
 
-        // 2. Top 5 Customer
-        const byCust = {};
-        rows.forEach(r => { const k = r.namaCustomer || 'Unknown'; byCust[k] = (byCust[k] || 0) + num(r.qtyNG); });
-        const topC = Object.entries(byCust).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        drawQChart('qc-claim-pareto', buildParetoConfig(paretoEntries, '#ef4444', (_, el) => {
+          if (el.length && paretoEntries[el[0].index]) {
+            setQDrill('claim', 'keteranganJenisNG', paretoEntries[el[0].index][0], paretoEntries[el[0].index][0], true);
+          }
+        }));
+
+        if ($('qpareto-claim-summary')) $('qpareto-claim-summary').textContent = `${fmt(totalNgAll)} Total Qty NG`;
+        if ($('qpareto-claim-body')) {
+          let runQty = 0;
+          $('qpareto-claim-body').innerHTML = paretoSorted.length
+            ? paretoSorted.map((entry, idx) => {
+                const [label, info] = entry;
+                const prevCum = totalNgAll > 0 ? (runQty / totalNgAll) * 100 : 0;
+                runQty += info.qty;
+                const pct = totalNgAll > 0 ? (info.qty / totalNgAll) * 100 : 0;
+                const cum = totalNgAll > 0 ? (runQty / totalNgAll) * 100 : 0;
+                const isVital = idx === 0 || prevCum < 80;
+                return `
+                  <tr onclick="setQDrill('claim','keteranganJenisNG','${esc(label)}','${esc(label)}',true)" class="hover:bg-amber-50/60 cursor-pointer">
+                    <td class="px-3 py-2 font-bold text-slate-600">#${idx + 1}</td>
+                    <td class="px-3 py-2 font-bold text-blue-950">${esc(label)}</td>
+                    <td class="px-3 py-2 text-right">${fmt(info.cases)}</td>
+                    <td class="px-3 py-2 text-right font-bold text-rose-700">${fmt(info.qty)}</td>
+                    <td class="px-3 py-2 text-right font-semibold">${pct.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-right font-bold text-slate-800">${cum.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isVital ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-600'}">${isVital ? 'Vital Few (80%)' : 'Useful Many'}</span></td>
+                  </tr>`;
+              }).join('')
+            : '<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Belum ada data defect untuk distribusi Pareto.</td></tr>';
+        }
+
+        // 2. Top 5 Customer Claim
+        const top5Cust = groupSum(rows, r => r.namaCustomer, r => r.qtyNG).slice(0, 5);
         drawQChart('qc-claim-cust', {
           type: 'bar',
-          data: { labels: topC.map(e => e[0]), datasets: [{ label: 'Qty NG', data: topC.map(e => e[1]), backgroundColor: COLORS, borderRadius: 6 }] },
+          data: { labels: top5Cust.map(x => x[0]), datasets: [{ label: 'Qty NG (Pcs)', data: top5Cust.map(x => x[1]), backgroundColor: ['#1e3a8a', '#2563eb', '#f59e0b', '#10b981', '#8b5cf6'] }] },
           options: {
-            indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-            onClick: (_, el) => { if (el.length) { const lbl = topC[el[0].index][0]; setQDrill('claim', `Customer: ${lbl}`, r => r.namaCustomer === lbl); } }
+            responsive: true, maintainAspectRatio: false,
+            onClick: (_, el) => { if (el.length) setQDrill('claim', 'namaCustomer', top5Cust[el[0].index][0], top5Cust[el[0].index][0], true); }
           }
         });
 
-        // 3. Tren Kasus & Qty NG
-        const mKasus = new Array(12).fill(0), mQty = new Array(12).fill(0);
-        rows.forEach(r => { const mIdx = parseInt((r.tanggalClaim || '').slice(5, 7), 10) - 1; if (mIdx >= 0 && mIdx < 12) { mKasus[mIdx]++; mQty[mIdx] += num(r.qtyNG); } });
+        // 3. Tren Kasus & Qty NG Bulanan
+        const byMo = MONTHS.map((_, i) => rows.filter(r => r.tanggalClaim.slice(5, 7) === pd(i + 1)));
         drawQChart('qc-claim-trend', {
+          type: 'bar',
           data: {
             labels: MONTHS,
             datasets: [
-              { type: 'bar', label: 'Qty NG', data: mQty, backgroundColor: 'rgba(30,58,138,0.8)', borderRadius: 5, yAxisID: 'y' },
-              { type: 'line', label: 'Jumlah Kasus', data: mKasus, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.3, yAxisID: 'y1' }
+              { label: 'Jumlah Kasus', data: byMo.map(a => a.length), backgroundColor: '#1e3a8a', yAxisID: 'y' },
+              { label: 'Qty NG', data: byMo.map(a => a.reduce((s, x) => s + x.qtyNG, 0)), type: 'line', borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.25, yAxisID: 'y1' }
             ]
           },
           options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } } } }
         });
 
         // 4. Jumlah Claim per Nama Part
-        const byPart = {};
-        rows.forEach(r => { const k = r.namaPart || 'Unknown'; byPart[k] = byPart[k] || { c: 0, i: 0 }; if (r.kategoriClaim === 'Informasi') byPart[k].i++; else byPart[k].c++; });
-        const topP = Object.entries(byPart).sort((a, b) => (b[1].c + b[1].i) - (a[1].c + a[1].i)).slice(0, 8);
+        const byPartCount = groupSum(rows, r => r.namaPart, () => 1).slice(0, 8);
         drawQChart('qc-claim-part', {
           type: 'bar',
-          data: {
-            labels: topP.map(e => e[0]),
-            datasets: [
-              { label: 'Claim', data: topP.map(e => e[1].c), backgroundColor: '#ef4444', borderRadius: 4 },
-              { label: 'Informasi', data: topP.map(e => e[1].i), backgroundColor: '#3b82f6', borderRadius: 4 }
-            ]
-          },
+          data: { labels: byPartCount.map(x => x[0]), datasets: [{ label: 'Jumlah Kasus Claim', data: byPartCount.map(x => x[1]), backgroundColor: '#0284c7' }] },
           options: {
+            indexAxis: 'y',
             responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = topP[el[0].index][0]; setQDrill('claim', `Part: ${lbl}`, r => r.namaPart === lbl); } },
-            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+            onClick: (_, el) => { if (el.length) setQDrill('claim', 'namaPart', byPartCount[el[0].index][0], byPartCount[el[0].index][0], true); }
           }
         });
       } else if (m === 'ng') {
-        const totNG = rows.reduce((s, r) => s + num(r.qtyNG), 0);
-        const totProd = rows.reduce((s, r) => s + num(r.qtyProduksi), 0);
-        $('qkpi-ng').innerHTML = `
-          <div class="bg-blue-950 text-white rounded-xl p-4"><p class="text-[11px] uppercase text-blue-200">Total Kasus NG</p><p class="text-2xl font-extrabold mt-1">${fmt(rows.length)}</p></div>
-          <div class="bg-rose-50 border border-rose-200 rounded-xl p-4"><p class="text-[11px] uppercase text-rose-800 font-semibold">Total Qty NG</p><p class="text-2xl font-extrabold text-rose-900 mt-1">${fmt(totNG)} pcs</p></div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4"><p class="text-[11px] uppercase text-slate-600 font-semibold">Total Qty Produksi</p><p class="text-2xl font-extrabold text-slate-900 mt-1">${fmt(totProd)} pcs</p></div>
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4"><p class="text-[11px] uppercase text-amber-800 font-semibold">Ratio NG</p><p class="text-2xl font-extrabold text-amber-900 mt-1">${totProd > 0 ? (totNG/totProd*100).toFixed(2) : '0.00'}%</p></div>`;
+        const totNg = rows.reduce((s, r) => s + r.qtyNG, 0);
+        const totProd = rows.reduce((s, r) => s + r.qtyProduksi, 0);
+        $('qk-ng-tot').textContent = fmt(rows.length);
+        $('qk-ng-qty').textContent = fmt(totNg);
+        $('qk-ng-prod').textContent = fmt(totProd);
+        $('qk-ng-rat').textContent = (totProd > 0 ? (totNg / totProd * 100).toFixed(2) : '0.00') + '%';
 
-        // Pie Top 5 Part NG
-        const byPart = {};
-        rows.forEach(r => { const k = r.namaPart || 'Unknown'; byPart[k] = (byPart[k] || 0) + num(r.qtyNG); });
-        const top5 = Object.entries(byPart).sort((a, b) => b[1] - a[1]).slice(0, 5);
-        drawQChart('qc-ng-pie', {
+        // 1. Pie Chart Top 5 Part NG Tertinggi (klik langsung nyambung ke log register)
+        const top5Part = groupSum(rows, r => r.namaPart, r => r.qtyNG).slice(0, 5);
+        drawQChart('qc-ng-top5pie', {
           type: 'pie',
-          data: { labels: top5.map(e => e[0]), datasets: [{ data: top5.map(e => e[1]), backgroundColor: COLORS }] },
+          data: { labels: top5Part.map(x => x[0]), datasets: [{ data: top5Part.map(x => x[1]), backgroundColor: COLORS }] },
           options: {
             responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = top5[el[0].index][0]; setQDrill('ng', `Part NG: ${lbl}`, r => r.namaPart === lbl); } }
+            onClick: (_, el) => {
+              if (el.length && top5Part[el[0].index]) {
+                setQDrill('ng', 'namaPart', top5Part[el[0].index][0], top5Part[el[0].index][0], true);
+              }
+            }
           }
         });
 
-        // Tren NG 1 Tahun per Divisi
-        const ds = DIVISI.map((dv, idx) => {
-          const arr = new Array(12).fill(0);
-          rows.filter(r => r.divisi === dv).forEach(r => { const mi = parseInt((r.tanggal || '').slice(5, 7), 10) - 1; if (mi >= 0 && mi < 12) arr[mi] += num(r.qtyNG); });
-          return { label: dv, data: arr, backgroundColor: COLORS[idx % COLORS.length], borderRadius: 3 };
-        });
+        // 2. Tren NG Satu Tahun (Januari - Desember)
+        const byMo = MONTHS.map((_, i) => rows.filter(r => r.tanggal.slice(5, 7) === pd(i + 1)).reduce((s, x) => s + x.qtyNG, 0));
         drawQChart('qc-ng-trend', {
-          type: 'bar',
-          data: { labels: MONTHS, datasets: ds },
-          options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+          type: 'line',
+          data: { labels: MONTHS, datasets: [{ label: 'Qty NG (Pcs)', data: byMo, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)', fill: true, tension: 0.3 }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
 
-        // Pareto Multi-Dimensi
-        const dim = $('qf-dim-ng')?.value || 'part';
-        const fieldMap = { part: 'namaPart', jenis: 'jenisNG', op: 'namaOperator', mesin: 'noMesin' };
-        const fk = fieldMap[dim] || 'namaPart';
-        const byDim = {};
-        rows.forEach(r => { const k = r[fk] || '-'; byDim[k] = (byDim[k] || 0) + num(r.qtyNG); });
-        const entries = Object.entries(byDim).sort((a, b) => b[1] - a[1]).slice(0, 12);
-        const totD = entries.reduce((s, e) => s + e[1], 0);
-        let runD = 0;
-        const cumD = entries.map(e => { runD += e[1]; return totD > 0 ? Math.round(runD / totD * 100) : 0; });
-        drawQChart('qc-ng-pareto', {
-          data: {
-            labels: entries.map(e => e[0]),
-            datasets: [
-              { type: 'bar', label: 'Qty NG', data: entries.map(e => e[1]), backgroundColor: '#1e3a8a', borderRadius: 5, yAxisID: 'y' },
-              { type: 'line', label: 'Kumulatif %', data: cumD, borderColor: '#f59e0b', tension: 0.25, yAxisID: 'y1' }
-            ]
-          },
+        // 3. Pareto Multi-Dimensi (Part NG / Jenis Problem / Operator / No Mesin)
+        const dimField = $('qf-ng-pareto-dim')?.value || 'namaPart';
+        const dimSorted = groupSum(rows, r => r[dimField], r => r.qtyNG);
+        drawQChart('qc-ng-multi', buildParetoConfig(dimSorted, '#1e3a8a', (_, el) => {
+          if (el.length && dimSorted[el[0].index]) {
+            setQDrill('ng', dimField, dimSorted[el[0].index][0], dimSorted[el[0].index][0], true);
+          }
+        }));
+
+        // 4. Distribusi Qty NG per Divisi
+        const byDiv = groupSum(rows, r => r.divisi, r => r.qtyNG);
+        drawQChart('qc-ng-div', {
+          type: 'bar',
+          data: { labels: byDiv.map(x => x[0]), datasets: [{ label: 'Qty NG', data: byDiv.map(x => x[1]), backgroundColor: '#f59e0b' }] },
           options: {
             responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = entries[el[0].index][0]; setQDrill('ng', `${dim.toUpperCase()}: ${lbl}`, r => (r[fk] || '-') === lbl); } },
-            scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } } }
+            onClick: (_, el) => { if (el.length) setQDrill('ng', 'divisi', byDiv[el[0].index][0], byDiv[el[0].index][0], true); }
           }
         });
       } else {
-        const totOK = rows.reduce((s, r) => s + num(r.qtyOK), 0);
-        const totNG = rows.reduce((s, r) => s + num(r.qtyNG), 0);
-        const totRep = rows.reduce((s, r) => s + num(r.qtyRepair), 0);
-        const totChk = rows.reduce((s, r) => s + num(r.totalCheck), 0);
-        $('qkpi-insp').innerHTML = `
-          <div class="bg-blue-950 text-white rounded-xl p-4"><p class="text-[11px] uppercase text-blue-200">Total Check</p><p class="text-2xl font-extrabold mt-1">${fmt(totChk)} pcs</p></div>
-          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4"><p class="text-[11px] uppercase text-emerald-800 font-semibold">Total Qty OK</p><p class="text-2xl font-extrabold text-emerald-900 mt-1">${fmt(totOK)} pcs</p></div>
-          <div class="bg-rose-50 border border-rose-200 rounded-xl p-4"><p class="text-[11px] uppercase text-rose-800 font-semibold">Total Qty NG</p><p class="text-2xl font-extrabold text-rose-900 mt-1">${fmt(totNG)} pcs</p></div>
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4"><p class="text-[11px] uppercase text-amber-800 font-semibold">Total Repair</p><p class="text-2xl font-extrabold text-amber-900 mt-1">${fmt(totRep)} pcs</p></div>`;
+        const ok = rows.reduce((s, r) => s + r.qtyOK, 0);
+        const ng = rows.reduce((s, r) => s + r.qtyNG, 0);
+        const rep = rows.reduce((s, r) => s + r.qtyRepair, 0);
+        const tot = ok + ng + rep;
+        $('qk-insp-lot').textContent = fmt(rows.length);
+        $('qk-insp-ok').textContent = fmt(ok);
+        $('qk-insp-ng').textContent = fmt(ng);
+        $('qk-insp-fpy').textContent = (tot > 0 ? (ok / tot * 100).toFixed(2) : '100.00') + '%';
 
-        const byPart = {};
-        rows.forEach(r => { const k = r.namaPart || 'Unknown'; byPart[k] = (byPart[k] || 0) + num(r.qtyNG); });
-        const sortedP = Object.entries(byPart).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
-        const top5 = sortedP.slice(0, 5);
-        drawQChart('qc-insp-pie', {
+        // 1. Pie Chart Top 5 Part NG Tertinggi (klik langsung nyambung ke log register)
+        const top5InspPart = groupSum(rows, r => r.namaPart, r => r.qtyNG).filter(x => x[1] > 0).slice(0, 5);
+        drawQChart('qc-insp-top5pie', {
           type: 'pie',
-          data: { labels: top5.map(e => e[0]), datasets: [{ data: top5.map(e => e[1]), backgroundColor: COLORS }] },
+          data: { labels: top5InspPart.map(x => x[0]), datasets: [{ data: top5InspPart.map(x => x[1]), backgroundColor: COLORS }] },
           options: {
             responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = top5[el[0].index][0]; setQDrill('insp', `Part NG: ${lbl}`, r => r.namaPart === lbl); } }
+            onClick: (_, el) => {
+              if (el.length && top5InspPart[el[0].index]) {
+                setQDrill('insp', 'namaPart', top5InspPart[el[0].index][0], top5InspPart[el[0].index][0], true);
+              }
+            }
           }
         });
 
-        const par = sortedP.slice(0, 10);
-        const totP = par.reduce((s, e) => s + e[1], 0);
-        let runP = 0;
-        const cumP = par.map(e => { runP += e[1]; return totP > 0 ? Math.round(runP / totP * 100) : 0; });
-        drawQChart('qc-insp-pareto', {
+        // 2. Tren Hasil Inspection Bulanan (OK vs NG)
+        const byMo = MONTHS.map((_, i) => rows.filter(r => r.tanggal.slice(5, 7) === pd(i + 1)));
+        drawQChart('qc-insp-trend', {
+          type: 'bar',
           data: {
-            labels: par.map(e => e[0]),
+            labels: MONTHS,
             datasets: [
-              { type: 'bar', label: 'Qty NG', data: par.map(e => e[1]), backgroundColor: '#1e3a8a', borderRadius: 5, yAxisID: 'y' },
-              { type: 'line', label: 'Kumulatif %', data: cumP, borderColor: '#f59e0b', tension: 0.25, yAxisID: 'y1' }
+              { label: 'Qty OK', data: byMo.map(a => a.reduce((s, x) => s + x.qtyOK, 0)), backgroundColor: '#10b981' },
+              { label: 'Qty NG', data: byMo.map(a => a.reduce((s, x) => s + x.qtyNG, 0)), backgroundColor: '#ef4444' }
             ]
           },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 3. Top Customer NG Inspection
+        const byCust = groupSum(rows, r => r.customer, r => r.qtyNG).slice(0, 8);
+        drawQChart('qc-insp-cust', {
+          type: 'bar',
+          data: { labels: byCust.map(x => x[0]), datasets: [{ label: 'Qty NG', data: byCust.map(x => x[1]), backgroundColor: '#1e3a8a' }] },
           options: {
             responsive: true, maintainAspectRatio: false,
-            onClick: (_, el) => { if (el.length) { const lbl = par[el[0].index][0]; setQDrill('insp', `Part NG: ${lbl}`, r => r.namaPart === lbl); } },
-            scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } } }
+            onClick: (_, el) => { if (el.length) setQDrill('insp', 'customer', byCust[el[0].index][0], byCust[el[0].index][0], true); }
           }
         });
+
+        // 4. Komposisi Hasil Pengecekan
+        drawQChart('qc-insp-comp', {
+          type: 'doughnut',
+          data: { labels: ['OK', 'NG', 'Repair'], datasets: [{ data: [ok, ng, rep], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
       }
+      Q_PAGE_STATE[m] = 1;
       renderQualityTable(m);
     }
 
-    function toggleQualitySort(m, key) {
-      const cur = Q_STATE[m].sort;
-      if (!cur || cur.key !== key) Q_STATE[m].sort = { key, dir: 'asc' };
-      else if (cur.dir === 'asc') Q_STATE[m].sort = { key, dir: 'desc' };
-      else Q_STATE[m].sort = null;
-      Q_STATE[m].page = 1;
+    function toggleQSort(m, col) {
+      const st = Q_SORT_STATE[m];
+      if (st.col === col) st.dir = st.dir === 'asc' ? 'desc' : 'asc';
+      else { st.col = col; st.dir = 'asc'; }
       renderQualityTable(m);
     }
 
     function renderQualityTable(m) {
-      let rows = getFilteredQualityRows(m).slice();
-      if (Q_STATE[m].drill) rows = rows.filter(Q_STATE[m].drill.fn);
-      const q = ($('qsearch-' + m)?.value || '').toLowerCase().trim();
-      if (q) rows = rows.filter(r => Object.values(r).some(v => String(v || '').toLowerCase().includes(q)));
+      let rows = getFilteredQualityRows(m);
+      const q = ($(`qf-${m}-search`)?.value || '').toLowerCase().trim();
+      if (q) rows = rows.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+      if (Q_DRILL[m]) rows = rows.filter(r => r[Q_DRILL[m].field] === Q_DRILL[m].val);
 
-      const dKey = m === 'claim' ? 'tanggalClaim' : 'tanggal';
-      const st = Q_STATE[m].sort;
-      Q_MOD[m].keys.forEach(k => {
-        const ind = $(`qsort-${m}-${k}`);
-        if (!ind) return;
-        if (st && st.key === k) {
-          ind.innerHTML = st.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A';
-          ind.className = 'text-[10px] text-amber-600 font-bold';
-        } else if (!st && k === dKey) {
-          ind.innerHTML = '&#9660; Terbaru';
-          ind.className = 'text-[10px] text-amber-600';
-        } else {
-          ind.innerHTML = '&#8597;';
-          ind.className = 'text-[10px] text-slate-400';
-        }
+      const st = Q_SORT_STATE[m];
+      rows = [...rows].sort((a, b) => {
+        const va = a[st.col] ?? '', vb = b[st.col] ?? '';
+        const cmp = (typeof va === 'number' && typeof vb === 'number')
+          ? va - vb
+          : String(va).localeCompare(String(vb), 'id', { numeric: true });
+        return st.dir === 'asc' ? cmp : -cmp;
       });
 
-      if (st) {
-        rows.sort((a, b) => {
-          const va = a[st.key], vb = b[st.key];
-          const na = typeof va === 'number' ? va : (/^\d+(\.\d+)?$/.test(String(va || '').trim()) ? Number(va) : NaN);
-          const nb = typeof vb === 'number' ? vb : (/^\d+(\.\d+)?$/.test(String(vb || '').trim()) ? Number(vb) : NaN);
-          const cmp = (!isNaN(na) && !isNaN(nb)) ? (na - nb) : String(va || '').localeCompare(String(vb || ''), 'id', { numeric: true, sensitivity: 'base' });
-          return st.dir === 'asc' ? cmp : -cmp;
-        });
-      } else {
-        rows.sort((a, b) => String(b[dKey] || '').localeCompare(String(a[dKey] || '')));
+      document.querySelectorAll(`[id^="qsort-${m}-"]`).forEach(el => { el.innerHTML = '&#8597;'; el.className = 'text-[10px] text-slate-400'; });
+      const activeSortEl = $(`qsort-${m}-${st.col}`);
+      if (activeSortEl) {
+        activeSortEl.innerHTML = st.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A';
+        activeSortEl.className = 'text-[10px] text-amber-600 font-bold';
       }
 
-      const PAGE = 15, total = rows.length, maxP = Math.max(1, Math.ceil(total / PAGE));
-      if (Q_STATE[m].page > maxP) Q_STATE[m].page = maxP;
-      const p = Q_STATE[m].page, start = (p - 1) * PAGE;
+      if ($('qcnt-' + m)) $('qcnt-' + m).textContent = rows.length;
+      const PAGE = 15, totalPages = Math.max(1, Math.ceil(rows.length / PAGE));
+      if (Q_PAGE_STATE[m] > totalPages) Q_PAGE_STATE[m] = totalPages;
+      const start = (Q_PAGE_STATE[m] - 1) * PAGE;
       const slice = rows.slice(start, start + PAGE);
       const canEdit = canEditQuality();
 
-      $('qtb-' + m).innerHTML = slice.length ? slice.map(r => {
-        const id = m === 'claim' ? r.idRegister : m === 'ng' ? r.idNG : r.uid;
-        const cells = Q_MOD[m].keys.map(k => {
-          let val = r[k];
-          if (k === 'statusClaim') {
-            const cls = val === 'Closed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-            return `<td class="px-3 py-2"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${cls}">${esc(val)}</span></td>`;
-          }
-          if (['qtyCheck', 'qtyNG', 'qtyProduksi', 'qtyOK', 'qtyRepair', 'totalCheck'].includes(k)) val = fmt(val);
-          return `<td class="px-3 py-2 whitespace-nowrap">${esc(val ?? '-')}</td>`;
-        }).join('');
-        const docCell = m === 'claim'
-          ? `<td class="px-3 py-2 whitespace-nowrap space-x-1">
-               ${r.officialDoc ? `<button type="button" onclick="openPrivateFile('${esc(r.officialDoc)}')" class="text-blue-700 underline font-semibold">Doc</button>` : ''}
-               ${r.pica ? `<button type="button" onclick="openPrivateFile('${esc(r.pica)}')" class="text-emerald-700 underline font-semibold">PICA</button>` : ''}
-               ${!r.officialDoc && !r.pica ? '-' : ''}
-             </td>`
-          : '';
-        const actCell = `<td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
-          ${canEdit
-            ? `<button type="button" onclick="openQualityForm('${m}','${esc(id)}')" class="bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold px-2 py-1 rounded">Edit</button>
-               <button type="button" onclick="deleteQualityRow('${m}','${esc(id)}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded">Hapus</button>`
-            : '<span class="text-slate-400">Read-Only</span>'}
-        </td>`;
-        return `<tr class="hover:bg-slate-50">${cells}${docCell}${actCell}</tr>`;
-      }).join('') : `<tr><td colspan="${Q_MOD[m].cols.length}" class="px-4 py-8 text-center text-slate-400">Tidak ada data yang cocok.</td></tr>`;
+      if (!slice.length) {
+        $('qtb-' + m).innerHTML = '<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">Tidak ada data yang sesuai filter.</td></tr>';
+      } else if (m === 'claim') {
+        $('qtb-claim').innerHTML = slice.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="px-3 py-2 font-bold text-blue-950 whitespace-nowrap">${esc(r.idRegister)}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${esc(r.tanggalClaim)}</td>
+            <td class="px-3 py-2">${esc(r.acjPlant)}</td>
+            <td class="px-3 py-2 font-semibold">${esc(r.namaCustomer)}</td>
+            <td class="px-3 py-2"><div class="font-semibold">${esc(r.namaPart)}</div><div class="text-[11px] text-slate-500">${esc(r.partNomor)}</div></td>
+            <td class="px-3 py-2">${esc(r.keteranganJenisNG)}</td>
+            <td class="px-3 py-2 font-bold text-rose-700">${fmt(r.qtyNG)} <span class="text-[10px] font-normal text-slate-500">(${r.prosentase}%)</span></td>
+            <td class="px-3 py-2"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${r.statusClaim === 'Closed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(r.statusClaim)}</span></td>
+            <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
+              ${r.officialDoc ? `<button type="button" onclick="openPrivateFile('${esc(r.officialDoc)}')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold">Doc</button>` : ''}
+              ${r.pica ? `<button type="button" onclick="openPrivateFile('${esc(r.pica)}')" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold">PICA</button>` : ''}
+              ${canEdit ? `<button type="button" onclick="openQualityForm('claim','${esc(r.idRegister)}')" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold">Edit</button><button type="button" onclick="deleteQualityRow('claim','${esc(r.idRegister)}')" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold">Hapus</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      } else if (m === 'ng') {
+        $('qtb-ng').innerHTML = slice.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="px-3 py-2 font-bold text-blue-950 whitespace-nowrap">${esc(r.idNG)}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${esc(r.tanggal)}</td>
+            <td class="px-3 py-2 font-semibold">${esc(r.divisi)}</td>
+            <td class="px-3 py-2 font-semibold">${esc(r.namaPart)}</td>
+            <td class="px-3 py-2">${esc(r.jenisNG)}</td>
+            <td class="px-3 py-2 text-slate-600">${esc(r.faktorPenyebab)}</td>
+            <td class="px-3 py-2 font-bold text-rose-700">${fmt(r.qtyNG)} <span class="text-[10px] font-normal text-slate-500">/ ${fmt(r.qtyProduksi)}</span></td>
+            <td class="px-3 py-2 font-semibold">${r.ratioNG}%</td>
+            <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
+              ${canEdit ? `<button type="button" onclick="openQualityForm('ng','${esc(r.idNG)}')" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold">Edit</button><button type="button" onclick="deleteQualityRow('ng','${esc(r.idNG)}')" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold">Hapus</button>` : '-'}
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        $('qtb-insp').innerHTML = slice.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="px-3 py-2 font-bold text-blue-950">${esc(r.no)}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${esc(r.tanggal)}</td>
+            <td class="px-3 py-2 font-semibold">${esc(r.customer)}</td>
+            <td class="px-3 py-2 font-semibold">${esc(r.namaPart)}</td>
+            <td class="px-3 py-2">${esc(r.proses)}</td>
+            <td class="px-3 py-2 font-bold text-emerald-700">${fmt(r.qtyOK)}</td>
+            <td class="px-3 py-2 font-bold text-rose-700">${fmt(r.qtyNG)}</td>
+            <td class="px-3 py-2 font-bold text-amber-700">${fmt(r.qtyRepair)}</td>
+            <td class="px-3 py-2">${esc(r.operator)}</td>
+            <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
+              ${canEdit ? `<button type="button" onclick="openQualityForm('insp','${esc(r.uid)}')" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold">Edit</button><button type="button" onclick="deleteQualityRow('insp','${esc(r.uid)}')" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold">Hapus</button>` : '-'}
+            </td>
+          </tr>
+        `).join('');
+      }
 
       $('qpg-' + m).innerHTML = `
-        <span>Menampilkan ${total ? start + 1 : 0}–${Math.min(start + PAGE, total)} dari <b>${fmt(total)}</b> data</span>
-        <div class="flex items-center gap-1.5">
-          <button type="button" ${p <= 1 ? 'disabled' : ''} onclick="Q_STATE['${m}'].page--;renderQualityTable('${m}')" class="px-2.5 py-1 rounded border bg-white disabled:opacity-40">&larr; Prev</button>
-          <span>Hal ${p}/${maxP}</span>
-          <button type="button" ${p >= maxP ? 'disabled' : ''} onclick="Q_STATE['${m}'].page++;renderQualityTable('${m}')" class="px-2.5 py-1 rounded border bg-white disabled:opacity-40">Next &rarr;</button>
-        </div>`;
-    }
-
-    let EDITING_Q = { mod: '', id: '' };
-    function openQualityForm(m, id = '') {
-      EDITING_Q = { mod: m, id };
-      const list = m === 'claim' ? QUALITY_DATA.claims : m === 'ng' ? QUALITY_DATA.ngRecords : QUALITY_DATA.inspections;
-      const rec = id ? list.find(r => (m === 'claim' ? r.idRegister : m === 'ng' ? r.idNG : r.uid) === id) : null;
-      $('qualityModalTitle').textContent = `${rec ? 'Edit' : 'Input Baru'} — ${Q_MOD[m].title}`;
-      $('qualityModalFields').innerHTML = Q_FIELDS[m].map(f => {
-        const val = rec ? (rec[f.k] ?? '') : (f.t === 'date' ? todayStr() : '');
-        if (f.t === 'select') {
-          return `<div><label class="block text-xs font-semibold text-slate-700 mb-1">${f.l}</label><select name="${f.k}" ${f.req ? 'required' : ''} class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white">${f.opts.map(o => `<option value="${esc(o)}" ${String(val) === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`;
-        }
-        if (f.t === 'file') {
-          return `<div><label class="block text-xs font-semibold text-slate-700 mb-1">${f.l}</label><input type="file" name="${f.k}" accept=".pdf,.jpg,.jpeg,.png" class="w-full text-xs border border-slate-300 rounded-xl p-1.5" /></div>`;
-        }
-        return `<div><label class="block text-xs font-semibold text-slate-700 mb-1">${f.l}</label><input type="${f.t}" name="${f.k}" value="${esc(val)}" ${f.req ? 'required' : ''} class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs" /></div>`;
-      }).join('');
-      $('qualityModal').classList.remove('hidden');
-    }
-    function closeQualityModal() { $('qualityModal').classList.add('hidden'); }
-
-    async function submitQualityForm(e) {
-      e.preventDefault();
-      const { mod, id } = EDITING_Q;
-      const fd = new FormData($('qualityModalForm'));
-      const payload = { id };
-      for (const [k, v] of fd.entries()) {
-        if (v instanceof File) {
-          if (v.size > 0) {
-            if (k === 'officialDocFile') { payload.officialDocBase64 = await readB64(v); payload.officialDocName = v.name; }
-            if (k === 'picaFile') { payload.picaBase64 = await readB64(v); payload.picaName = v.name; }
-          }
-        } else {
-          payload[k] = v;
-        }
-      }
-      const btn = $('qualityModalSaveBtn');
-      btn.disabled = true; btn.textContent = 'Menyimpan...';
-      try {
-        const res = await apiCall('apiSave', mod, payload);
-        toast(res.message || 'Data tersimpan!');
-        closeQualityModal();
-        await syncAllSystems(false);
-      } catch (err) {
-        toast(err.message, false);
-      } finally {
-        btn.disabled = false; btn.textContent = 'Simpan Data';
-      }
-    }
-
-    async function deleteQualityRow(m, id) {
-      if (!confirm('Hapus data ini secara permanen dari Google Sheet?')) return;
-      try {
-        const res = await apiCall('apiDelete', m, id);
-        toast(res.message || 'Data dihapus.');
-        await syncAllSystems(false);
-      } catch (err) {
-        toast(err.message, false);
-      }
+        <span class="text-slate-500">Halaman ${Q_PAGE_STATE[m]} dari ${totalPages}</span>
+        <div class="space-x-1">
+          <button type="button" ${Q_PAGE_STATE[m] <= 1 ? 'disabled' : ''} onclick="Q_PAGE_STATE['${m}']--;renderQualityTable('${m}')" class="px-2.5 py-1 rounded border bg-white disabled:opacity-40">Prev</button>
+          <button type="button" ${Q_PAGE_STATE[m] >= totalPages ? 'disabled' : ''} onclick="Q_PAGE_STATE['${m}']++;renderQualityTable('${m}')" class="px-2.5 py-1 rounded border bg-white disabled:opacity-40">Next</button>
+        </div>
+      `;
     }
 
     async function openPrivateFile(url) {
-      toast('Membuka dokumen...');
+      toast('Mengunduh dokumen terenkripsi...');
       try {
-        const f = await apiCall('apiGetFile', url);
-        const bin = atob(f.data);
+        const res = await apiCall('apiGetFile', url);
+        const bin = atob(res.data);
         const arr = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        const blobUrl = URL.createObjectURL(new Blob([arr], { type: f.mime }));
+        const blobUrl = URL.createObjectURL(new Blob([arr], { type: res.mime }));
         window.open(blobUrl, '_blank');
-      } catch (err) {
-        toast(err.message, false);
+      } catch (e) {
+        toast(e.message, false);
       }
+    }
+
+    let Q_EDIT_CTX = { mod: '', id: '' };
+    function openQualityForm(mod, id = '') {
+      Q_EDIT_CTX = { mod, id };
+      let item = null;
+      if (id) {
+        if (mod === 'claim') item = QUALITY_DATA.claims.find(x => x.idRegister === id);
+        if (mod === 'ng') item = QUALITY_DATA.ngRecords.find(x => x.idNG === id);
+        if (mod === 'insp') item = QUALITY_DATA.inspections.find(x => x.uid === id);
+      }
+      $('qualityModalTitle').textContent = (item ? 'Edit Data ' : 'Input Data Baru ') + (mod === 'claim' ? 'Claim Customer' : mod === 'ng' ? 'Database NG' : 'Data Inspection');
+
+      const inp = (name, label, type = 'text', val = '', req = false) =>
+        `<div><label class="block text-xs font-semibold text-slate-700 mb-1">${label}${req ? ' *' : ''}</label><input type="${type}" name="${name}" value="${esc(val)}" ${req ? 'required' : ''} class="w-full rounded-lg border-slate-300 border px-3 py-2 text-xs" /></div>`;
+      const sel = (name, label, opts, val = '') =>
+        `<div><label class="block text-xs font-semibold text-slate-700 mb-1">${label}</label><select name="${name}" class="w-full rounded-lg border-slate-300 border px-3 py-2 text-xs bg-white">${opts.map(o => `<option value="${esc(o)}" ${o === val ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`;
+
+      if (mod === 'claim') {
+        $('qualityModalFields').innerHTML =
+          inp('tanggalClaim', 'Tanggal Claim', 'date', item ? item.tanggalClaim : todayStr(), true) +
+          sel('acjPlant', 'ACJ Plant', PLANTS, item ? item.acjPlant : 'Sangiang') +
+          inp('namaCustomer', 'Nama Customer', 'text', item ? item.namaCustomer : '', true) +
+          inp('noClaim', 'No Claim', 'text', item ? item.noClaim : '') +
+          sel('kategoriClaim', 'Kategori Claim', ['Claim', 'Informasi'], item ? item.kategoriClaim : 'Claim') +
+          sel('lokasiPenemuan', 'Lokasi Penemuan', ['Receiving Inspection', 'In-Process', 'Customer'], item ? item.lokasiPenemuan : 'Customer') +
+          inp('namaPart', 'Nama Part', 'text', item ? item.namaPart : '', true) +
+          inp('partNomor', 'Part Nomor', 'text', item ? item.partNomor : '') +
+          inp('keteranganJenisNG', 'Keterangan Jenis NG', 'text', item ? item.keteranganJenisNG : '', true) +
+          sel('frekuensiClaim', 'Frekuensi Claim', ['Pertama kali', 'Berulang / rutin'], item ? item.frekuensiClaim : 'Pertama kali') +
+          inp('qtyCheck', 'Qty Check', 'number', item ? item.qtyCheck : 0) +
+          inp('qtyNG', 'Qty NG', 'number', item ? item.qtyNG : 0, true) +
+          sel('kategoriNG', 'Kategori NG', ['Dimensi', 'Visual'], item ? item.kategoriNG : 'Dimensi') +
+          sel('penyebabProblem', 'Penyebab Problem', ['Internal', 'External'], item ? item.penyebabProblem : 'Internal') +
+          sel('statusClaim', 'Status Claim', ['Monitoring', 'Closed'], item ? item.statusClaim : 'Monitoring') +
+          `<div><label class="block text-xs font-semibold text-slate-700 mb-1">Official Doc (PDF/JPG/PNG)</label><input type="file" id="qfFileOfficial" accept=".pdf,.jpg,.jpeg,.png" class="w-full text-xs" /></div>` +
+          `<div><label class="block text-xs font-semibold text-slate-700 mb-1">PICA Doc (PDF/JPG/PNG)</label><input type="file" id="qfFilePica" accept=".pdf,.jpg,.jpeg,.png" class="w-full text-xs" /></div>`;
+      } else if (mod === 'ng') {
+        $('qualityModalFields').innerHTML =
+          inp('tanggal', 'Tanggal', 'date', item ? item.tanggal : todayStr(), true) +
+          sel('divisi', 'Divisi', DIVISI, item ? item.divisi : 'CNC') +
+          inp('namaPart', 'Nama Part', 'text', item ? item.namaPart : '', true) +
+          inp('jenisNG', 'Jenis NG', 'text', item ? item.jenisNG : '', true) +
+          inp('faktorPenyebab', 'Faktor Penyebab', 'text', item ? item.faktorPenyebab : '', true) +
+          inp('qtyProduksi', 'Qty Produksi', 'number', item ? item.qtyProduksi : 0) +
+          inp('qtyNG', 'Qty NG', 'number', item ? item.qtyNG : 0, true) +
+          inp('noMesin', 'No Mesin', 'text', item ? item.noMesin : '') +
+          inp('namaOperator', 'Nama Operator', 'text', item ? item.namaOperator : '');
+      } else {
+        $('qualityModalFields').innerHTML =
+          inp('no', 'No Lot / Urut', 'text', item ? item.no : '') +
+          inp('tanggal', 'Tanggal', 'date', item ? item.tanggal : todayStr(), true) +
+          inp('customer', 'Customer', 'text', item ? item.customer : '', true) +
+          inp('namaPart', 'Nama Part', 'text', item ? item.namaPart : '', true) +
+          inp('proses', 'Proses', 'text', item ? item.proses : 'Final Inspection', true) +
+          inp('qtyOK', 'Qty OK', 'number', item ? item.qtyOK : 0, true) +
+          inp('qtyNG', 'Qty NG', 'number', item ? item.qtyNG : 0, true) +
+          inp('qtyRepair', 'Qty Repair', 'number', item ? item.qtyRepair : 0) +
+          inp('operator', 'Operator', 'text', item ? item.operator : '', true) +
+          inp('keterangan', 'Keterangan', 'text', item ? item.keterangan : '');
+      }
+      $('qualityModal').classList.remove('hidden');
+    }
+
+    function closeQualityModal() { $('qualityModal').classList.add('hidden'); }
+
+    function applyOptimisticQualitySave(mod, payload, tempId) {
+      if (mod === 'claim') {
+        const qc = num(payload.qtyCheck), qn = num(payload.qtyNG);
+        const idx = payload.id ? QUALITY_DATA.claims.findIndex(x => x.idRegister === payload.id) : -1;
+        const old = idx >= 0 ? QUALITY_DATA.claims[idx] : {};
+        const rec = Object.assign({}, old, {
+          idRegister: payload.id || tempId,
+          tanggalClaim: payload.tanggalClaim,
+          acjPlant: payload.acjPlant,
+          namaCustomer: payload.namaCustomer,
+          noClaim: payload.noClaim || '',
+          kategoriClaim: payload.kategoriClaim || 'Claim',
+          lokasiPenemuan: payload.lokasiPenemuan || 'Customer',
+          namaPart: payload.namaPart,
+          partNomor: payload.partNomor || '',
+          keteranganJenisNG: payload.keteranganJenisNG,
+          frekuensiClaim: payload.frekuensiClaim || 'Pertama kali',
+          qtyCheck: qc,
+          qtyNG: qn,
+          prosentase: qc > 0 ? Math.round((qn / qc) * 10000) / 100 : 0,
+          kategoriNG: payload.kategoriNG || 'Dimensi',
+          penyebabProblem: payload.penyebabProblem || 'Internal',
+          finishMonitoring: add90(payload.tanggalClaim),
+          statusClaim: payload.statusClaim || 'Monitoring'
+        });
+        if (idx >= 0) QUALITY_DATA.claims[idx] = rec;
+        else QUALITY_DATA.claims.unshift(rec);
+      } else if (mod === 'ng') {
+        const qn = num(payload.qtyNG), qp = num(payload.qtyProduksi);
+        const idx = payload.id ? QUALITY_DATA.ngRecords.findIndex(x => x.idNG === payload.id) : -1;
+        const old = idx >= 0 ? QUALITY_DATA.ngRecords[idx] : {};
+        const rec = Object.assign({}, old, {
+          idNG: payload.id || tempId,
+          tanggal: payload.tanggal,
+          namaPart: payload.namaPart,
+          qtyNG: qn,
+          jenisNG: payload.jenisNG,
+          faktorPenyebab: payload.faktorPenyebab,
+          divisi: payload.divisi,
+          noMesin: payload.noMesin || '',
+          namaOperator: payload.namaOperator || '',
+          qtyProduksi: qp,
+          ratioNG: qp > 0 ? Math.round((qn / qp) * 10000) / 100 : 0
+        });
+        if (idx >= 0) QUALITY_DATA.ngRecords[idx] = rec;
+        else QUALITY_DATA.ngRecords.unshift(rec);
+      } else {
+        const a = num(payload.qtyOK), b = num(payload.qtyNG), c = num(payload.qtyRepair);
+        const idx = payload.id ? QUALITY_DATA.inspections.findIndex(x => x.uid === payload.id) : -1;
+        const old = idx >= 0 ? QUALITY_DATA.inspections[idx] : {};
+        const rec = Object.assign({}, old, {
+          uid: payload.id || tempId,
+          no: payload.no || old.no || 'NEW',
+          tanggal: payload.tanggal,
+          namaPart: payload.namaPart,
+          customer: payload.customer,
+          proses: payload.proses,
+          qtyOK: a,
+          qtyNG: b,
+          qtyRepair: c,
+          totalCheck: a + b + c,
+          operator: payload.operator,
+          keterangan: payload.keterangan || ''
+        });
+        if (idx >= 0) QUALITY_DATA.inspections[idx] = rec;
+        else QUALITY_DATA.inspections.unshift(rec);
+      }
+      popQualityFilters();
+      renderQualityModule(mod);
+    }
+
+    async function submitQualityForm(e) {
+      e.preventDefault();
+      const mod = Q_EDIT_CTX.mod;
+      const fd = new FormData($('qualityModalForm'));
+      const payload = { id: Q_EDIT_CTX.id };
+      fd.forEach((v, k) => { payload[k] = v; });
+
+      if (mod === 'claim') {
+        const fOff = $('qfFileOfficial')?.files[0];
+        const fPic = $('qfFilePica')?.files[0];
+        if (fOff) { payload.officialDocBase64 = await readB64(fOff); payload.officialDocName = fOff.name; }
+        if (fPic) { payload.picaBase64 = await readB64(fPic); payload.picaName = fPic.name; }
+      }
+
+      const tempId = payload.id || ('TMP-' + Date.now());
+      applyOptimisticQualitySave(mod, payload, tempId);
+      closeQualityModal();
+      toast('Tampilan diperbarui, menyinkronkan ke server...');
+      setBgSaving(1);
+
+      apiCall('apiSave', mod, payload)
+        .then(res => {
+          if (res && res.id && !payload.id) {
+            if (mod === 'claim') {
+              const r = QUALITY_DATA.claims.find(x => x.idRegister === tempId);
+              if (r) r.idRegister = res.id;
+            } else if (mod === 'ng') {
+              const r = QUALITY_DATA.ngRecords.find(x => x.idNG === tempId);
+              if (r) r.idNG = res.id;
+            } else {
+              const r = QUALITY_DATA.inspections.find(x => x.uid === tempId);
+              if (r) r.uid = res.id;
+            }
+            renderQualityTable(mod);
+          }
+          toast(res.message || 'Tersimpan permanen ke server!');
+        })
+        .catch(err => {
+          toast('Gagal menyimpan: ' + err.message, false);
+          syncAllSystems(false);
+        })
+        .finally(() => setBgSaving(-1));
+    }
+
+    function deleteQualityRow(mod, id) {
+      if (mod === 'claim') QUALITY_DATA.claims = QUALITY_DATA.claims.filter(x => x.idRegister !== id);
+      else if (mod === 'ng') QUALITY_DATA.ngRecords = QUALITY_DATA.ngRecords.filter(x => x.idNG !== id);
+      else QUALITY_DATA.inspections = QUALITY_DATA.inspections.filter(x => x.uid !== id);
+      renderQualityModule(mod);
+      toast('Data dihapus dari tampilan, menyinkronkan...');
+      setBgSaving(1);
+
+      apiCall('apiDelete', mod, id)
+        .then(res => toast(res.message || 'Data terhapus permanen.'))
+        .catch(err => {
+          toast('Gagal menghapus: ' + err.message, false);
+          syncAllSystems(false);
+        })
+        .finally(() => setBgSaving(-1));
     }
 
     function exportQualityExcel(m) {
       const rows = getFilteredQualityRows(m);
       if (!rows.length) return toast('Tidak ada data untuk diexport.', false);
-      const ws = XLSX.utils.json_to_sheet(rows);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, m.toUpperCase());
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), m.toUpperCase());
       XLSX.writeFile(wb, `ACJ_${m.toUpperCase()}_${todayStr()}.xlsx`);
     }
 
-    /* ===================================================================== */
-    /* LAPORAN EKSEKUTIF PDF (LANDSCAPE - RAMAH TINTA + 4 MODUL LENGKAP)     */
-    /* ===================================================================== */
-    async function execReport() {
-      const btn = event && event.currentTarget;
-      const origHtml = btn ? btn.innerHTML : '';
-      if (btn) { btn.disabled = true; btn.innerHTML = '<span>Menyiapkan PDF...</span>'; }
-      try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const W = doc.internal.pageSize.getWidth();
-        const H = doc.internal.pageSize.getHeight();
-        const M = 10;
-        const NAVY = [30, 58, 138];
-        const AMBER = [245, 158, 11];
-        const LIGHT_BG = [248, 250, 252];
-        const SOFT_BLUE = [239, 246, 255];
+    /* --- LAPORAN EKSEKUTIF PDF (LANDSCAPE RAMAH TINTA + PEMBANDING OTOMATIS TAHUN LALU) --- */
+    function execReport() {
+      if (!window.jspdf) return toast('Library PDF belum siap.', false);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const selYear = $('qf-claim-year')?.value || $('qf-ng-year')?.value || $('qf-insp-year')?.value || String(new Date().getFullYear());
+      const prevYear = String(Number(selYear) - 1);
 
-        const curYr = $('qf-yr-claim')?.value || String(new Date().getFullYear());
-        const cmpSel = $('qf-cmp-claim')?.value || 'auto';
-        const prevYr = cmpSel === 'auto' ? String(Number(curYr) - 1) : cmpSel;
-        const cCur = QUALITY_DATA.claims.filter(r => (r.tanggalClaim || '').startsWith(curYr));
-        const cPrev = QUALITY_DATA.claims.filter(r => (r.tanggalClaim || '').startsWith(prevYr));
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text('LAPORAN EKSEKUTIF QUALITY & E-PTP — PT. ADHI CHANDRA JAYA', 14, 14);
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')} | Oleh: ${CURRENT_USER ? CURRENT_USER.fullName : 'System'} | Pembanding Otomatis: Tahun ${prevYear} vs Tahun ${selYear}`, 14, 19.5);
 
-        const drawHeader = (title, sub) => {
-          doc.setDrawColor(...NAVY);
-          doc.setLineWidth(0.6);
-          doc.line(M, 18, W - M, 18);
-          doc.setDrawColor(...AMBER);
-          doc.setLineWidth(1.2);
-          doc.line(M, 19.2, M + 45, 19.2);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(12);
-          doc.setTextColor(...NAVY);
-          doc.text('PT. ADHI CHANDRA JAYA — ' + title, M, 11);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8.5);
-          doc.setTextColor(71, 85, 105);
-          doc.text(sub + '  |  Dicetak: ' + new Date().toLocaleString('id-ID'), M, 15.8);
-        };
+      const clCur = QUALITY_DATA.claims.filter(r => r.tanggalClaim.startsWith(selYear));
+      const clPrev = QUALITY_DATA.claims.filter(r => r.tanggalClaim.startsWith(prevYear));
+      const ngCur = QUALITY_DATA.ngRecords.filter(r => r.tanggal.startsWith(selYear));
+      const ngPrev = QUALITY_DATA.ngRecords.filter(r => r.tanggal.startsWith(prevYear));
+      const inCur = QUALITY_DATA.inspections.filter(r => r.tanggal.startsWith(selYear));
+      const inPrev = QUALITY_DATA.inspections.filter(r => r.tanggal.startsWith(prevYear));
 
-        const renderTempChart = async (cfg, wPx = 760, hPx = 300) => {
-          const cv = document.createElement('canvas');
-          cv.width = wPx; cv.height = hPx;
-          cfg.options = Object.assign({}, cfg.options || {}, { animation: false, responsive: false });
-          const ch = new Chart(cv, cfg);
-          const url = cv.toDataURL('image/png', 1.0);
-          ch.destroy();
-          return url;
-        };
+      const tblStyle = {
+        theme: 'grid',
+        styles: { fontSize: 8, textColor: [20, 20, 20], lineColor: [180, 180, 180], lineWidth: 0.2 },
+        headStyles: { fillColor: [240, 244, 248], textColor: [15, 23, 42], fontStyle: 'bold' }
+      };
 
-        // HALAMAN 1: CLAIM CUSTOMER + PEMBANDING TAHUN LALU
-        drawHeader('LAPORAN EKSEKUTIF QUALITY & E-PTP', `Bagian 1: Analisis Claim Customer (${curYr} vs Pembanding ${prevYr})`);
-        const totCurNG = cCur.reduce((s, r) => s + num(r.qtyNG), 0);
-        const totPrevNG = cPrev.reduce((s, r) => s + num(r.qtyNG), 0);
-        doc.autoTable({
-          startY: 23,
-          margin: { left: M, right: M },
-          head: [['Indikator Claim Customer', `Tahun ${prevYr}`, `Tahun ${curYr}`, 'Selisih']],
-          body: [
-            ['Jumlah Kasus Claim / Informasi', fmt(cPrev.length), fmt(cCur.length), fmt(cCur.length - cPrev.length)],
-            ['Total Qty NG (Pcs)', fmt(totPrevNG), fmt(totCurNG), fmt(totCurNG - totPrevNG)],
-            ['Kasus Monitoring (Open)', fmt(cPrev.filter(r => r.statusClaim !== 'Closed').length), fmt(cCur.filter(r => r.statusClaim !== 'Closed').length), '-'],
-            ['Kasus Closed', fmt(cPrev.filter(r => r.statusClaim === 'Closed').length), fmt(cCur.filter(r => r.statusClaim === 'Closed').length), '-']
-          ],
-          styles: { fontSize: 8, cellPadding: 2, lineColor: [203, 213, 225], lineWidth: 0.2 },
-          headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: LIGHT_BG }
-        });
+      doc.autoTable(Object.assign({}, tblStyle, {
+        startY: 23,
+        head: [['Ringkasan Kinerja Quality', `Tahun Lalu (${prevYear})`, `Tahun Berjalan (${selYear})`, 'Selisih Qty NG', 'Status Open / Monitoring']],
+        body: (() => {
+          const dCl = clCur.reduce((s, r) => s + r.qtyNG, 0) - clPrev.reduce((s, r) => s + r.qtyNG, 0);
+          const dNg = ngCur.reduce((s, r) => s + r.qtyNG, 0) - ngPrev.reduce((s, r) => s + r.qtyNG, 0);
+          const dIn = inCur.reduce((s, r) => s + r.qtyNG, 0) - inPrev.reduce((s, r) => s + r.qtyNG, 0);
+          return [
+            ['Claim Customer (Kasus / Qty NG)', `${clPrev.length} / ${fmt(clPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${clCur.length} / ${fmt(clCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${dCl > 0 ? '+' : ''}${fmt(dCl)} Pcs`, `${QUALITY_DATA.claims.filter(r => r.statusClaim !== 'Closed').length} Monitoring`],
+            ['Database NG Internal (Kasus / Qty NG)', `${ngPrev.length} / ${fmt(ngPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${ngCur.length} / ${fmt(ngCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${dNg > 0 ? '+' : ''}${fmt(dNg)} Pcs`, '-'],
+            ['Final Inspection (Lot / Qty NG)', `${inPrev.length} / ${fmt(inPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${inCur.length} / ${fmt(inCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${dIn > 0 ? '+' : ''}${fmt(dIn)} Pcs`, '-'],
+            ['E-PTP AF-PROD-014 (Total Dokumen)', `${PTP_LIST.filter(p => String(p.tanggalTerbit).startsWith(prevYear)).length} Dokumen`, `${PTP_LIST.filter(p => String(p.tanggalTerbit).startsWith(selYear)).length} Dokumen`, '-', `${PTP_LIST.filter(p => !String(p.status).toLowerCase().includes('closed')).length} On Progress`]
+          ];
+        })()
+      }));
 
-        const mCur = new Array(12).fill(0), mPrev = new Array(12).fill(0);
-        cCur.forEach(r => { const i = parseInt((r.tanggalClaim || '').slice(5, 7), 10) - 1; if (i >= 0) mCur[i] += num(r.qtyNG); });
-        cPrev.forEach(r => { const i = parseInt((r.tanggalClaim || '').slice(5, 7), 10) - 1; if (i >= 0) mPrev[i] += num(r.qtyNG); });
-        const imgClaimTrend = await renderTempChart({
-          type: 'bar',
-          data: { labels: MONTHS, datasets: [{ label: `Qty NG ${prevYr}`, data: mPrev, backgroundColor: '#94a3b8' }, { label: `Qty NG ${curYr}`, data: mCur, backgroundColor: '#1e3a8a' }] }
-        });
-        doc.addImage(imgClaimTrend, 'PNG', M, doc.lastAutoTable.finalY + 4, (W - 2 * M) * 0.58, 56);
+      const topNgParts = groupSum(ngCur.length ? ngCur : QUALITY_DATA.ngRecords, r => r.namaPart, r => r.qtyNG).slice(0, 8);
+      doc.autoTable(Object.assign({}, tblStyle, {
+        startY: doc.lastAutoTable.finalY + 6,
+        head: [['Top Part NG Internal Tertinggi', 'Total Qty NG (Pcs)', 'Porsi (%)']],
+        body: (() => {
+          const totAllNg = topNgParts.reduce((s, x) => s + x[1], 0) || 1;
+          return topNgParts.map(x => [x[0], fmt(x[1]), ((x[1] / totAllNg) * 100).toFixed(1) + '%']);
+        })()
+      }));
 
-        const byCust = {};
-        cCur.forEach(r => { const k = r.namaCustomer || '-'; byCust[k] = (byCust[k] || 0) + num(r.qtyNG); });
-        const topCust = Object.entries(byCust).sort((a, b) => b[1] - a[1]).slice(0, 5);
-        const imgClaimCust = await renderTempChart({
-          type: 'bar',
-          data: { labels: topCust.map(e => e[0]), datasets: [{ label: `Top 5 Customer ${curYr}`, data: topCust.map(e => e[1]), backgroundColor: COLORS }] },
-          options: { indexAxis: 'y', plugins: { legend: { display: false } } }
-        }, 560, 300);
-        doc.addImage(imgClaimCust, 'PNG', M + (W - 2 * M) * 0.60, doc.lastAutoTable.finalY + 4, (W - 2 * M) * 0.40, 56);
+      doc.autoTable(Object.assign({}, tblStyle, {
+        startY: doc.lastAutoTable.finalY + 6,
+        head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Part Name', 'Part No.', 'Problem', 'Status']],
+        body: PTP_LIST.slice(0, 18).map(p => [p.noReg, p.tanggalTerbit, p.auditee, p.partName, p.partNo, p.problem, p.status])
+      }));
 
-        // HALAMAN 2: LOG REGISTER CLAIM
-        doc.addPage();
-        drawHeader('LOG REGISTER CLAIM CUSTOMER', `Tahun ${curYr} (${cCur.length} Kasus)`);
-        doc.autoTable({
-          startY: 22,
-          margin: { left: M, right: M },
-          head: [['No', 'Tanggal', 'Plant', 'Customer', 'No Claim', 'Nama Part', 'Jenis NG', 'Qty NG', 'Status']],
-          body: cCur.slice(0, 40).map((r, i) => [i + 1, r.tanggalClaim, r.acjPlant, r.namaCustomer, r.noClaim || '-', r.namaPart, r.keteranganJenisNG, fmt(r.qtyNG), r.statusClaim]),
-          styles: { fontSize: 7.5, cellPadding: 1.8, lineColor: [203, 213, 225], lineWidth: 0.2 },
-          headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: LIGHT_BG }
-        });
-
-        // HALAMAN 3: DATABASE NG + TOP 3 PART TERPISAH TANPA KOLOM PART BERULANG
-        doc.addPage();
-        const ngRows = getFilteredQualityRows('ng');
-        drawHeader('DATABASE NG INTERNAL PRODUKSI', `Total Kasus: ${ngRows.length} | Total Qty NG: ${fmt(ngRows.reduce((s, r) => s + num(r.qtyNG), 0))} pcs`);
-        const byNgPart = {};
-        ngRows.forEach(r => { const k = r.namaPart || 'Unknown'; byNgPart[k] = (byNgPart[k] || 0) + num(r.qtyNG); });
-        const top3Ng = Object.entries(byNgPart).sort((a, b) => b[1] - a[1]).slice(0, 3);
-        let curY = 23;
-        top3Ng.forEach(([partNm, totP], idx) => {
-          const subRows = ngRows.filter(r => (r.namaPart || 'Unknown') === partNm).slice(0, 12);
-          if (curY > H - 45) { doc.addPage(); drawHeader('DATABASE NG INTERNAL (LANJUTAN)', 'Log Part NG Tertinggi'); curY = 23; }
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...NAVY);
-          doc.text(`#${idx + 1}  ${partNm}  —  Total NG: ${fmt(totP)} pcs (${subRows.length} log ditampilkan)`, M, curY);
-          doc.autoTable({
-            startY: curY + 2,
-            margin: { left: M, right: M },
-            head: [['Tanggal', 'Divisi', 'No Mesin', 'Operator', 'Jenis NG', 'Faktor Penyebab', 'Qty NG']],
-            body: subRows.map(r => [r.tanggal, r.divisi, r.noMesin || '-', r.namaOperator || '-', r.jenisNG, r.faktorPenyebab, fmt(r.qtyNG)]),
-            styles: { fontSize: 7.5, cellPadding: 1.7, lineColor: [203, 213, 225], lineWidth: 0.2 },
-            headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' },
-            alternateRowStyles: { fillColor: LIGHT_BG }
-          });
-          curY = doc.lastAutoTable.finalY + 7;
-        });
-
-        // HALAMAN 4: DATA INSPECTION + TOP 3 PART TERPISAH
-        doc.addPage();
-        const inspRows = getFilteredQualityRows('insp');
-        drawHeader('MONITORING DATA FINAL INSPECTION', `Total Check: ${fmt(inspRows.reduce((s, r) => s + num(r.totalCheck), 0))} | Total NG: ${fmt(inspRows.reduce((s, r) => s + num(r.qtyNG), 0))} pcs`);
-        const byInspPart = {};
-        inspRows.forEach(r => { const k = r.namaPart || 'Unknown'; byInspPart[k] = (byInspPart[k] || 0) + num(r.qtyNG); });
-        const top3Insp = Object.entries(byInspPart).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
-        curY = 23;
-        top3Insp.forEach(([partNm, totP], idx) => {
-          const subRows = inspRows.filter(r => (r.namaPart || 'Unknown') === partNm && num(r.qtyNG) > 0).slice(0, 12);
-          if (curY > H - 45) { doc.addPage(); drawHeader('DATA FINAL INSPECTION (LANJUTAN)', 'Log Part NG Tertinggi'); curY = 23; }
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...NAVY);
-          doc.text(`#${idx + 1}  ${partNm}  —  Total NG Inspection: ${fmt(totP)} pcs`, M, curY);
-          doc.autoTable({
-            startY: curY + 2,
-            margin: { left: M, right: M },
-            head: [['Tanggal', 'Customer', 'Proses', 'Qty OK', 'Qty NG', 'Qty Repair', 'Operator', 'Keterangan']],
-            body: subRows.map(r => [r.tanggal, r.customer, r.proses, fmt(r.qtyOK), fmt(r.qtyNG), fmt(r.qtyRepair), r.operator, r.keterangan || '-']),
-            styles: { fontSize: 7.5, cellPadding: 1.7, lineColor: [203, 213, 225], lineWidth: 0.2 },
-            headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' },
-            alternateRowStyles: { fillColor: LIGHT_BG }
-          });
-          curY = doc.lastAutoTable.finalY + 7;
-        });
-
-        // HALAMAN 5: MONITORING & LOG REGISTER E-PTP (AF-PROD-014)
-        doc.addPage();
-        const ptpClosed = ptpLogRecords.filter(r => (r.status || '').toLowerCase().includes('closed')).length;
-        const ptpOpen = ptpLogRecords.length - ptpClosed;
-        drawHeader('MONITORING & LOG REGISTER E-PTP (AF-PROD-014)', `Total PTP: ${ptpLogRecords.length} | On Progress: ${ptpOpen} | Closed: ${ptpClosed}`);
-        doc.autoTable({
-          startY: 22,
-          margin: { left: M, right: M },
-          head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Sumber', 'Part Name', 'Part No.', 'Uraian Problem', 'Status']],
-          body: ptpLogRecords.slice(0, 35).map(r => [r.noReg, r.tanggalTerbit, r.auditee, r.sumber, r.partName, r.partNo, r.problem, r.status]),
-          styles: { fontSize: 7.5, cellPadding: 1.8, lineColor: [203, 213, 225], lineWidth: 0.2 },
-          headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: LIGHT_BG }
-        });
-
-        // HALAMAN PENGESAHAN
-        doc.addPage();
-        drawHeader('LEMBAR PENGESAHAN LAPORAN EKSEKUTIF', 'PT. Adhi Chandra Jaya — Quality Management System');
-        doc.autoTable({
-          startY: 32,
-          margin: { left: 30, right: 30 },
-          head: [['Dibuat Oleh (QA Admin / Auditor)', 'Diperiksa Oleh (QA Head)', 'Disetujui Oleh (Top Management / TMJ)']],
-          body: [['\n\n\n\n( _______________________ )', '\n\n\n\n( _______________________ )', '\n\n\n\n( _______________________ )']],
-          styles: { fontSize: 9, halign: 'center', lineColor: [148, 163, 184], lineWidth: 0.3 },
-          headStyles: { fillColor: SOFT_BLUE, textColor: NAVY, fontStyle: 'bold' }
-        });
-
-        doc.save(`Laporan_Eksekutif_ACJ_${todayStr()}.pdf`);
-        toast('Laporan Eksekutif PDF berhasil diunduh!');
-      } catch (err) {
-        toast('Gagal mencetak PDF: ' + err.message, false);
-      } finally {
-        if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
-      }
+      doc.save(`Executive_Report_ACJ_${todayStr()}.pdf`);
     }
 
     /* ===================================================================== */
-    /* LOGIKA MODUL E-PTP (AF-PROD-014, SIGNATURE PAD, DASHBOARD & SORT)     */
+    /* MODUL E-PTP (AF-PROD-014) — OPTIMISTIC SAVE & PDF 1 HALAMAN RESMI     */
     /* ===================================================================== */
-    const sigPads = {};
-    let base64FotoPart = '';
-    let refExisting = [];
-    let refNewFiles = [];
-    let ptpLogRecords = [];
-    let editingPtpOriginalNoReg = '';
-    let lastPtpListTab = 5;
-    let ptpSortState = null;
-    const dashPtpSortState = { open: null, closed: null };
-    const ptpCharts = {};
+    const SIG_PADS = {};
+    let PTP_LIST = [], PTP_REF_ATTACHMENTS = [], PTP_REF_NEW = [];
+    let PTP_FORM_BACKUP = null, PTP_ORIGINAL_NOREG = '';
+    let PTP_LOG_SORT = { col: 'noReg', dir: 'desc' };
+    let DASH_PTP_SORT = { open: { col: 'noReg', dir: 'desc' }, closed: { col: 'noReg', dir: 'desc' } };
 
     function initSignaturePads() {
       ['sigAuditor', 'sigAuditeeProd', 'sigAuditeeInsp', 'sigApproved', 'sigVerifAuditor', 'sigTmj'].forEach(id => {
         const cv = $(id);
-        if (cv && window.SignaturePad) {
-          sigPads[id] = new SignaturePad(cv, { penColor: '#0f172a', minWidth: 0.8, maxWidth: 2.0 });
+        if (cv && window.SignaturePad && !SIG_PADS[id]) {
+          SIG_PADS[id] = new SignaturePad(cv, { penColor: '#0f172a', minWidth: 0.8, maxWidth: 2.2 });
         }
       });
       resizeAllCanvases();
     }
 
     function resizeAllCanvases() {
-      Object.keys(sigPads).forEach(id => {
+      Object.keys(SIG_PADS).forEach(id => {
         const cv = $(id);
-        if (!cv || cv.offsetParent === null) return;
+        if (!cv || cv.offsetWidth === 0) return;
+        const data = SIG_PADS[id].toData();
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        const data = sigPads[id].toData();
         cv.width = cv.offsetWidth * ratio;
         cv.height = cv.offsetHeight * ratio;
         cv.getContext('2d').scale(ratio, ratio);
-        sigPads[id].clear();
-        if (data && data.length) sigPads[id].fromData(data);
+        SIG_PADS[id].clear();
+        if (data && data.length) SIG_PADS[id].fromData(data);
       });
     }
 
-    function clearSig(id) { if (sigPads[id]) sigPads[id].clear(); }
+    function clearSig(id) { if (SIG_PADS[id]) SIG_PADS[id].clear(); }
 
-    function initDefaultActionRows() {
-      ['made', 'sent'].forEach(type => {
-        const c = $(`${type}ActionsContainer`);
-        if (!c) return;
-        c.innerHTML = '';
-        for (let i = 0; i < 3; i++) addActionRow(type);
+    function switchPtpTab(step) {
+      [1, 2, 3, 4, 5].forEach(n => {
+        const el = $('step' + n);
+        if (el) el.classList.toggle('hidden', n !== step);
+        const btn = $('tabBtn' + n);
+        if (btn) btn.classList.toggle('active', n === step);
       });
-    }
-
-    function addActionRow(type, action = '', pic = '', due = '') {
-      const c = $(`${type}ActionsContainer`);
-      if (!c) return;
-      const row = document.createElement('div');
-      row.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 items-center';
-      row.innerHTML = `
-        <input type="text" placeholder="Uraian tindakan perbaikan..." value="${esc(action)}" class="act-desc md:col-span-7 rounded-lg border border-slate-300 px-3 py-2 text-xs" />
-        <input type="text" placeholder="PIC" value="${esc(pic)}" class="act-pic md:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-xs" />
-        <input type="date" value="${esc(due)}" class="act-due md:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-xs" />
-        <button type="button" onclick="this.parentElement.remove()" class="md:col-span-1 text-rose-600 hover:bg-rose-50 rounded-lg py-1.5 text-xs font-bold">&times;</button>`;
-      c.appendChild(row);
-    }
-
-    function collectActionRows(type) {
-      const c = $(`${type}ActionsContainer`);
-      if (!c) return [];
-      return [...c.children].map(row => ({
-        action: row.querySelector('.act-desc')?.value.trim() || '',
-        pic: row.querySelector('.act-pic')?.value.trim() || '',
-        due: row.querySelector('.act-due')?.value || ''
-      })).filter(x => x.action || x.pic || x.due);
-    }
-
-    async function previewImage(input) {
-      const f = input.files && input.files[0];
-      if (!f) return;
-      base64FotoPart = await readB64(f);
-      $('fotoPreviewBox').innerHTML = `<img src="${base64FotoPart}" class="h-full w-full object-cover" />`;
-    }
-
-    function onTanggalTerbitChange() {
-      if (!$('modeBadge').textContent.includes('Baru')) return;
-      apiCall('generateNextNoReg', $('tanggalTerbit').value).then(no => { if (no) $('noReg').value = no; }).catch(() => {});
+      const isEditor = step <= 3;
+      $('ptpOverviewTabs').classList.toggle('hidden', isEditor);
+      $('ptpEditorNav').classList.toggle('hidden', !isEditor);
+      $('actionButtonsBar').classList.toggle('hidden', !isEditor);
+      if (isEditor) setTimeout(resizeAllCanvases, 30);
     }
 
     function openNewPtpForm() {
-      resetFormToNew();
-      $('ptpOverviewTabs').classList.add('hidden');
-      $('ptpEditorNav').classList.remove('hidden');
+      $('ptpForm').reset();
+      PTP_FORM_BACKUP = null;
+      PTP_ORIGINAL_NOREG = '';
+      PTP_REF_ATTACHMENTS = [];
+      PTP_REF_NEW = [];
+      renderRefList();
+      Object.keys(SIG_PADS).forEach(clearSig);
+      $('fotoPreviewBox').innerHTML = '<span class="text-xs text-slate-400">Preview Foto</span>';
+      delete $('fotoPreviewBox').dataset.b64;
+      $('tanggalTerbit').value = todayStr();
+      $('noReg').readOnly = false;
+      $('modeBadge').textContent = 'Mode: Input PTP Baru';
+      $('modeBadge').className = 'bg-amber-500 text-slate-900 font-bold px-2.5 py-1 rounded-full text-[11px]';
+      initDefaultActionRows();
+      onTanggalTerbitChange();
       switchPtpTab(1);
     }
 
     function closePtpEditor() {
-      $('ptpEditorNav').classList.add('hidden');
-      $('ptpOverviewTabs').classList.remove('hidden');
-      switchPtpTab(lastPtpListTab || 5);
+      switchPtpTab(5);
     }
 
-    async function handleRefFiles(input) {
-      const files = [...(input.files || [])];
-      for (const f of files) {
-        if (refExisting.length + refNewFiles.length >= 5) { toast('Maksimal 5 file lampiran.', false); break; }
-        if (f.size > 5 * 1024 * 1024) { toast(`File ${f.name} melebihi 5 MB.`, false); continue; }
-        const data = await readB64(f);
-        refNewFiles.push({ name: f.name, data });
+    function initDefaultActionRows() {
+      $('madeActionsContainer').innerHTML = '';
+      $('sentActionsContainer').innerHTML = '';
+      for (let i = 0; i < 2; i++) {
+        addActionRow('made');
+        addActionRow('sent');
       }
-      input.value = '';
+    }
+
+    function addActionRow(type, val = {}) {
+      const box = $(type === 'made' ? 'madeActionsContainer' : 'sentActionsContainer');
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-200';
+      row.innerHTML = `
+        <input type="text" placeholder="Uraian tindakan perbaikan..." value="${esc(val.action || '')}" class="act-desc md:col-span-7 rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white" />
+        <input type="text" placeholder="PIC" value="${esc(val.pic || '')}" class="act-pic md:col-span-2 rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white" />
+        <input type="date" value="${esc(val.due || '')}" class="act-due md:col-span-2 rounded-lg border-slate-300 border px-2 py-1.5 text-xs bg-white" />
+        <button type="button" onclick="this.parentElement.remove()" class="md:col-span-1 text-rose-600 hover:bg-rose-100 rounded-lg py-1.5 text-xs font-bold">&times;</button>
+      `;
+      box.appendChild(row);
+    }
+
+    function collectActionRows(type) {
+      const box = $(type === 'made' ? 'madeActionsContainer' : 'sentActionsContainer');
+      return [...box.children].map(r => ({
+        action: r.querySelector('.act-desc')?.value.trim() || '',
+        pic: r.querySelector('.act-pic')?.value.trim() || '',
+        due: r.querySelector('.act-due')?.value || ''
+      })).filter(x => x.action || x.pic || x.due);
+    }
+
+    async function previewImage(inp) {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      const b64 = await readB64(f);
+      $('fotoPreviewBox').innerHTML = `<img src="${b64}" class="h-full w-full object-cover" />`;
+      $('fotoPreviewBox').dataset.b64 = b64;
+    }
+
+    async function onTanggalTerbitChange() {
+      if (PTP_ORIGINAL_NOREG) return;
+      try {
+        const res = await apiCall('generateNextNoReg', $('tanggalTerbit').value || todayStr());
+        if (res && typeof res === 'string') $('noReg').value = res;
+        else if (res && res.data) $('noReg').value = res.data;
+      } catch (e) {}
+    }
+
+    async function handleRefFiles(inp) {
+      const files = [...(inp.files || [])];
+      if (PTP_REF_ATTACHMENTS.length + PTP_REF_NEW.length + files.length > 5) {
+        return toast('Maksimal 5 file referensi per PTP.', false);
+      }
+      for (const f of files) {
+        if (f.size > 5 * 1024 * 1024) {
+          toast(`File ${f.name} melebihi 5 MB.`, false);
+          continue;
+        }
+        const b64 = await readB64(f);
+        PTP_REF_NEW.push({ name: f.name, data: b64 });
+      }
+      inp.value = '';
       renderRefList();
     }
 
@@ -1805,83 +1968,257 @@
       const box = $('refFilesList');
       if (!box) return;
       const items = [
-        ...refExisting.map((a, idx) => `<div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 text-xs"><a href="${esc(a.url)}" target="_blank" class="text-blue-900 font-semibold underline truncate">${esc(a.name)}</a><button type="button" onclick="refExisting.splice(${idx},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></div>`),
-        ...refNewFiles.map((f, idx) => `<div class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs"><span class="text-amber-900 font-medium truncate">${esc(f.name)} (Baru)</span><button type="button" onclick="refNewFiles.splice(${idx},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></div>`)
+        ...PTP_REF_ATTACHMENTS.map((a, i) => `<div class="flex items-center justify-between bg-white border rounded-lg px-3 py-1.5 text-xs"><a href="${esc(a.url)}" target="_blank" class="text-blue-800 underline font-medium truncate">${esc(a.name)}</a><button type="button" onclick="PTP_REF_ATTACHMENTS.splice(${i},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></div>`),
+        ...PTP_REF_NEW.map((a, i) => `<div class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs"><span class="font-medium truncate">${esc(a.name)} (Baru)</span><button type="button" onclick="PTP_REF_NEW.splice(${i},1);renderRefList()" class="text-rose-600 font-bold ml-2">&times;</button></div>`)
       ];
       box.innerHTML = items.join('');
     }
 
-    function editPtpFromLog(noReg, tab) {
-      const r = ptpLogRecords.find(x => x.noReg === noReg); if (!r) return;
-      editingPtpOriginalNoReg = r.noReg;
-      $('noReg').value = r.noReg;
-      $('noReg').readOnly = true;
-      $('noReg').classList.add('bg-slate-200', 'cursor-not-allowed');
-      if (r.tanggalTerbit) $('tanggalTerbit').value = r.tanggalTerbit;
-      $('auditee').value = r.auditee !== '-' ? r.auditee : '';
-      $('auditor').value = r.auditor !== '-' ? r.auditor : '';
-      $('lokasi').value = r.lokasi !== '-' ? r.lokasi : '';
-      $('noRefSumber').value = r.noRefSumber !== '-' ? r.noRefSumber : '';
-      $('partName').value = r.partName !== '-' ? r.partName : '';
-      $('partNo').value = r.partNo !== '-' ? r.partNo : '';
-      $('problem').value = r.problem !== '-' ? r.problem : '';
-      $('qtyNg').value = r.qtyNg !== '-' ? r.qtyNg : '';
-      $('hasilSortir').value = r.hasilSortir !== '-' ? r.hasilSortir : '';
-      document.querySelectorAll('input[name="sumber"]').forEach(el => el.checked = (el.value === r.sumber));
-      document.querySelectorAll('input[name="kategori"]').forEach(el => el.checked = (el.value === r.kategori));
-      Object.keys(sigPads).forEach(k => clearSig(k));
-      if (r.dataJson) {
-        try {
-          const d = JSON.parse(r.dataJson);
-          ['acuan','namaTtdAuditor','tglTtdAuditor','madeWhy1','madeWhy2','madeWhy3','madeWhy4','madeWhy5','sentWhy1','sentWhy2','sentWhy3','sentWhy4','sentWhy5','namaAuditeeProd','tglTtdAuditeeProd','namaAuditeeInsp','tglTtdAuditeeInsp','namaApproved','tglTtdApproved','tanggalEvaluasi','komentarVerifikasi','tglVerifAuditor','tglTmj'].forEach(id => { if ($(id)) $(id).value = d[id] || ''; });
-          if (d.statusEvaluasi) document.querySelectorAll('input[name="statusEvaluasi"]').forEach(el => el.checked = (el.value === d.statusEvaluasi));
-          ['made', 'sent'].forEach(type => {
-            const list = d[type + 'Actions'] || [];
-            $(`${type}ActionsContainer`).innerHTML = '';
-            const total = Math.max(list.length, 3);
-            for (let i = 0; i < total; i++) {
-              const it = list[i];
-              addActionRow(type, it ? it.action : '', it ? it.pic : '', it ? it.due : '');
-            }
-          });
-          refExisting = Array.isArray(d.refAttachments) ? d.refAttachments : [];
-          refNewFiles = [];
-          renderRefList();
-        } catch (e) {}
+    function comparePtpItems(a, b, col, dir) {
+      const va = a[col] ?? '', vb = b[col] ?? '';
+      const cmp = (typeof va === 'number' && typeof vb === 'number')
+        ? va - vb
+        : String(va).localeCompare(String(vb), 'id', { numeric: true });
+      return dir === 'asc' ? cmp : -cmp;
+    }
+
+    function togglePtpSort(col) {
+      if (PTP_LOG_SORT.col === col) PTP_LOG_SORT.dir = PTP_LOG_SORT.dir === 'asc' ? 'desc' : 'asc';
+      else { PTP_LOG_SORT.col = col; PTP_LOG_SORT.dir = 'asc'; }
+      renderLogRegisterTable();
+    }
+
+    function toggleDashPtpSort(tbl, col) {
+      const st = DASH_PTP_SORT[tbl];
+      if (st.col === col) st.dir = st.dir === 'asc' ? 'desc' : 'asc';
+      else { st.col = col; st.dir = 'asc'; }
+      renderPtpDashboard();
+    }
+
+    function calcAgeDays(isoDate) {
+      if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return 0;
+      const diff = Date.now() - new Date(isoDate + 'T00:00:00').getTime();
+      return Math.max(0, Math.floor(diff / 86400000));
+    }
+
+    function renderPtpDashboard() {
+      const total = PTP_LIST.length;
+      const closedList = PTP_LIST.filter(p => String(p.status).toLowerCase().includes('closed'));
+      const openList = PTP_LIST.filter(p => !String(p.status).toLowerCase().includes('closed'));
+
+      $('kpiTotal').textContent = total;
+      $('kpiOpen').textContent = openList.length;
+      $('kpiClosed').textContent = closedList.length;
+      $('countOpenBadge').textContent = openList.length;
+      $('countClosedBadge').textContent = closedList.length;
+      $('logTotalBadge').textContent = total;
+
+      const avgAge = openList.length
+        ? Math.round(openList.reduce((s, p) => s + calcAgeDays(p.tanggalTerbit), 0) / openList.length)
+        : 0;
+      $('kpiAvgAge').textContent = `${avgAge} hari`;
+      $('kpiCloseRate').textContent = total ? `${Math.round((closedList.length / total) * 100)}%` : '0%';
+
+      drawQChart('chartStatus', {
+        type: 'doughnut',
+        data: { labels: ['On Progress', 'Closed'], datasets: [{ data: [openList.length, closedList.length], backgroundColor: ['#f59e0b', '#10b981'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      const last6 = [];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        last6.push(`${d.getFullYear()}-${pd(d.getMonth() + 1)}`);
       }
-      $('modeBadge').textContent = `Mode: Edit ${r.noReg}`;
-      $('modeBadge').className = 'bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[11px]';
-      $('ptpOverviewTabs').classList.add('hidden');
-      $('ptpEditorNav').classList.remove('hidden');
-      switchPtpTab(tab || 1);
-      icons();
+      drawQChart('chartMonthly', {
+        type: 'bar',
+        data: {
+          labels: last6.map(ym => MONTHS[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(2, 4)),
+          datasets: [{ label: 'PTP Terbit', data: last6.map(ym => PTP_LIST.filter(p => String(p.tanggalTerbit).startsWith(ym)).length), backgroundColor: '#1e3a8a' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      const audMap = {};
+      PTP_LIST.forEach(p => {
+        const k = p.auditee || 'Lainnya';
+        if (!audMap[k]) audMap[k] = { open: 0, closed: 0 };
+        if (String(p.status).toLowerCase().includes('closed')) audMap[k].closed++;
+        else audMap[k].open++;
+      });
+      const topAud = Object.entries(audMap).sort((a, b) => (b[1].open + b[1].closed) - (a[1].open + a[1].closed)).slice(0, 8);
+      drawQChart('chartAuditee', {
+        type: 'bar',
+        data: {
+          labels: topAud.map(x => x[0]),
+          datasets: [
+            { label: 'Open', data: topAud.map(x => x[1].open), backgroundColor: '#f59e0b' },
+            { label: 'Closed', data: topAud.map(x => x[1].closed), backgroundColor: '#10b981' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+      });
+
+      const openEnriched = openList.map(p => Object.assign({}, p, { age: calcAgeDays(p.tanggalTerbit) }))
+        .sort((a, b) => comparePtpItems(a, b, DASH_PTP_SORT.open.col, DASH_PTP_SORT.open.dir));
+      const closedSorted = [...closedList]
+        .sort((a, b) => comparePtpItems(a, b, DASH_PTP_SORT.closed.col, DASH_PTP_SORT.closed.dir));
+
+      ['open', 'closed'].forEach(tbl => {
+        const st = DASH_PTP_SORT[tbl];
+        document.querySelectorAll(`[id^="dash-${tbl}-sort-"]`).forEach(el => { el.innerHTML = '&#8597;'; el.className = 'text-[10px] text-slate-400'; });
+        const act = $(`dash-${tbl}-sort-${st.col}`);
+        if (act) {
+          act.innerHTML = st.dir === 'desc' && st.col === 'noReg' ? '&#9660; Terbaru' : (st.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A');
+          act.className = 'text-[10px] text-amber-600 font-bold';
+        }
+      });
+
+      $('dashOpenBody').innerHTML = openEnriched.length
+        ? openEnriched.map(p => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-3 py-2 font-bold text-blue-950 whitespace-nowrap">${esc(p.noReg)}</td>
+              <td class="px-3 py-2 whitespace-nowrap">${esc(p.tanggalTerbit)}</td>
+              <td class="px-3 py-2">${esc(p.auditee)}</td>
+              <td class="px-3 py-2 font-semibold">${esc(p.partName)}</td>
+              <td class="px-3 py-2 font-mono text-[11px]">${esc(p.partNo)}</td>
+              <td class="px-3 py-2 text-right font-bold text-amber-800">${p.age} hr</td>
+              <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
+                <button type="button" onclick="editPtpFromLog('${esc(p.noReg)}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-amber-200 text-slate-800 font-bold">Buka</button>
+                ${p.pdfUrl ? `<a href="${esc(p.pdfUrl)}" target="_blank" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold">PDF</a>` : ''}
+              </td>
+            </tr>`).join('')
+        : '<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
+
+      $('dashClosedBody').innerHTML = closedSorted.length
+        ? closedSorted.map(p => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-3 py-2 font-bold text-blue-950 whitespace-nowrap">${esc(p.noReg)}</td>
+              <td class="px-3 py-2 whitespace-nowrap">${esc(p.tanggalTerbit)}</td>
+              <td class="px-3 py-2">${esc(p.auditee)}</td>
+              <td class="px-3 py-2 font-semibold">${esc(p.partName)}</td>
+              <td class="px-3 py-2 font-mono text-[11px]">${esc(p.partNo)}</td>
+              <td class="px-3 py-2 text-right text-slate-600">${esc(p.lastUpdated)}</td>
+              <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
+                <button type="button" onclick="editPtpFromLog('${esc(p.noReg)}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-emerald-200 text-slate-800 font-bold">Buka</button>
+                ${p.pdfUrl ? `<a href="${esc(p.pdfUrl)}" target="_blank" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold">PDF</a>` : ''}
+              </td>
+            </tr>`).join('')
+        : '<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
     }
 
-    function resetFormToNew() {
-      editingPtpOriginalNoReg = '';
+    function renderLogRegisterTable() {
+      const q = ($('logSearchInput')?.value || '').toLowerCase().trim();
+      const stFilter = $('logStatusFilter')?.value || 'ALL';
+      let rows = PTP_LIST.filter(p => {
+        const isClosed = String(p.status).toLowerCase().includes('closed');
+        if (stFilter === 'OPEN' && isClosed) return false;
+        if (stFilter === 'CLOSED' && !isClosed) return false;
+        if (q && !JSON.stringify(p).toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      rows.sort((a, b) => comparePtpItems(a, b, PTP_LOG_SORT.col, PTP_LOG_SORT.dir));
+      document.querySelectorAll('[id^="ptp-sort-"]').forEach(el => { el.innerHTML = '&#8597;'; el.className = 'text-[10px] text-slate-400 ml-0.5'; });
+      const act = $('ptp-sort-' + PTP_LOG_SORT.col);
+      if (act) {
+        act.innerHTML = PTP_LOG_SORT.dir === 'desc' && PTP_LOG_SORT.col === 'noReg' ? '&#9660; Terbaru' : (PTP_LOG_SORT.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A');
+        act.className = 'text-[10px] text-amber-600 font-bold ml-0.5';
+      }
+
+      const canDel = canEditQuality();
+      $('logRegisterTableBody').innerHTML = rows.length
+        ? rows.map(p => {
+            const isClosed = String(p.status).toLowerCase().includes('closed');
+            return `
+              <tr class="hover:bg-slate-50">
+                <td class="px-3 py-2.5 font-bold text-blue-950 whitespace-nowrap">${esc(p.noReg)}</td>
+                <td class="px-3 py-2.5 whitespace-nowrap">${esc(p.tanggalTerbit)}</td>
+                <td class="px-3 py-2.5"><div class="font-semibold">${esc(p.auditee)}</div><div class="text-[11px] text-slate-500">${esc(p.sumber)}</div></td>
+                <td class="px-3 py-2.5"><div class="font-semibold">${esc(p.partName)}</div><div class="text-[11px] text-slate-600 line-clamp-2">${esc(p.problem)}</div></td>
+                <td class="px-3 py-2.5 font-mono text-[11px] whitespace-nowrap">${esc(p.partNo)}</td>
+                <td class="px-3 py-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${isClosed ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(p.status)}</span></td>
+                <td class="px-3 py-2.5 text-slate-500 whitespace-nowrap">${esc(p.lastUpdated)}</td>
+                <td class="px-3 py-2.5 text-center whitespace-nowrap space-x-1">
+                  <button type="button" onclick="editPtpFromLog('${esc(p.noReg)}')" class="px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold">Edit</button>
+                  ${p.pdfUrl ? `<a href="${esc(p.pdfUrl)}" target="_blank" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold">PDF</a>` : ''}
+                  ${canDel ? `<button type="button" onclick="deletePtpRow('${esc(p.noReg)}')" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold">Hapus</button>` : ''}
+                </td>
+              </tr>`;
+          }).join('')
+        : '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">Belum ada data PTP.</td></tr>';
+    }
+
+    function editPtpFromLog(noReg) {
+      const item = PTP_LIST.find(p => p.noReg === noReg);
+      if (!item) return toast('Data PTP tidak ditemukan.', false);
+      let d = {};
+      try { d = item.dataJson ? JSON.parse(item.dataJson) : {}; } catch (e) {}
+      d = Object.assign({}, item, d);
+      PTP_FORM_BACKUP = d;
+      PTP_ORIGINAL_NOREG = item.noReg;
+
       $('ptpForm').reset();
-      base64FotoPart = '';
-      refExisting = [];
-      refNewFiles = [];
+      Object.keys(SIG_PADS).forEach(clearSig);
+      $('noReg').value = item.noReg;
+      $('noReg').readOnly = true;
+      $('modeBadge').textContent = `Mode: Update ${item.noReg}`;
+      $('modeBadge').className = 'bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-full text-[11px]';
+
+      ['tanggalTerbit', 'acuan', 'auditee', 'auditor', 'lokasi', 'noRefSumber', 'partName', 'partNo', 'qtyNg', 'problem', 'hasilSortir',
+       'namaTtdAuditor', 'tglTtdAuditor', 'madeWhy1', 'madeWhy2', 'madeWhy3', 'madeWhy4', 'madeWhy5',
+       'sentWhy1', 'sentWhy2', 'sentWhy3', 'sentWhy4', 'sentWhy5', 'namaAuditeeProd', 'tglTtdAuditeeProd',
+       'namaAuditeeInsp', 'tglTtdAuditeeInsp', 'namaApproved', 'tglTtdApproved', 'tanggalEvaluasi',
+       'komentarVerifikasi', 'tglVerifAuditor', 'tglTmj'].forEach(f => {
+        if ($(f)) $(f).value = d[f] || '';
+      });
+
+      const setRadio = (name, val) => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(r => { r.checked = (r.value === val); });
+      };
+      setRadio('sumber', d.sumber || 'Complaint / Claim Customer');
+      setRadio('kategori', d.kategori || 'NON-AUDIT');
+      setRadio('statusEvaluasi', d.statusEvaluasi || d.status || 'Tidak / Open');
+
+      $('madeActionsContainer').innerHTML = '';
+      (Array.isArray(d.madeActions) && d.madeActions.length ? d.madeActions : [{}, {}]).forEach(a => addActionRow('made', a));
+      $('sentActionsContainer').innerHTML = '';
+      (Array.isArray(d.sentActions) && d.sentActions.length ? d.sentActions : [{}, {}]).forEach(a => addActionRow('sent', a));
+
+      PTP_REF_ATTACHMENTS = Array.isArray(d.refAttachments) ? d.refAttachments : [];
+      PTP_REF_NEW = [];
       renderRefList();
-      $('noReg').readOnly = false;
-      $('noReg').classList.remove('bg-slate-200', 'cursor-not-allowed');
-      $('fotoPreviewBox').innerHTML = '<span class="text-xs text-slate-400">Preview Foto</span>';
-      Object.keys(sigPads).forEach(k => clearSig(k));
-      initDefaultActionRows();
-      $('tanggalTerbit').value = todayStr();
-      $('tglTtdAuditor').value = todayStr();
-      $('modeBadge').textContent = 'Mode: Input PTP Baru';
-      $('modeBadge').className = 'bg-amber-500 text-slate-900 font-bold px-2.5 py-1 rounded-full text-[11px]';
-      onTanggalTerbitChange();
+      switchPtpTab(2);
     }
 
-    function collectPtpPayload() {
-      const getSig = id => (sigPads[id] && !sigPads[id].isEmpty()) ? sigPads[id].toDataURL('image/png') : '';
-      const isNew = $('modeBadge').textContent.includes('Baru');
-      return {
-        isNewRecord: isNew,
-        originalNoReg: isNew ? '' : editingPtpOriginalNoReg,
+    function deletePtpRow(noReg) {
+      PTP_LIST = PTP_LIST.filter(p => p.noReg !== noReg);
+      renderPtpDashboard();
+      renderLogRegisterTable();
+      toast(`PTP ${noReg} dihapus dari tampilan, menyinkronkan...`);
+      setBgSaving(1);
+
+      apiCall('deletePtp', noReg)
+        .then(res => toast(res.message || 'PTP dihapus permanen.'))
+        .catch(e => {
+          toast('Gagal menghapus PTP: ' + e.message, false);
+          syncAllSystems(false);
+        })
+        .finally(() => setBgSaving(-1));
+    }
+
+    function collectPtpFormData() {
+      const getRadio = name => {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : '';
+      };
+      const sigB64 = id => (SIG_PADS[id] && !SIG_PADS[id].isEmpty()) ? SIG_PADS[id].toDataURL('image/png') : '';
+      const base = PTP_FORM_BACKUP ? Object.assign({}, PTP_FORM_BACKUP) : {};
+
+      return Object.assign(base, {
+        isNewRecord: !PTP_ORIGINAL_NOREG,
+        originalNoReg: PTP_ORIGINAL_NOREG || '',
         noReg: $('noReg').value.trim(),
         tanggalTerbit: $('tanggalTerbit').value,
         acuan: $('acuan').value.trim(),
@@ -1889,287 +2226,171 @@
         auditor: $('auditor').value.trim(),
         lokasi: $('lokasi').value.trim(),
         noRefSumber: $('noRefSumber').value.trim(),
-        sumber: document.querySelector('input[name="sumber"]:checked')?.value || '',
-        kategori: document.querySelector('input[name="kategori"]:checked')?.value || '',
+        sumber: getRadio('sumber'),
+        kategori: getRadio('kategori'),
         partName: $('partName').value.trim(),
         partNo: $('partNo').value.trim(),
         qtyNg: $('qtyNg').value.trim(),
         problem: $('problem').value.trim(),
         hasilSortir: $('hasilSortir').value.trim(),
-        fotoPartBase64: base64FotoPart,
+        fotoPartBase64: $('fotoPreviewBox').dataset.b64 || base.fotoPartBase64 || '',
         namaTtdAuditor: $('namaTtdAuditor').value.trim(),
         tglTtdAuditor: $('tglTtdAuditor').value,
-        sigAuditorBase64: getSig('sigAuditor'),
-        madeWhy1: $('madeWhy1').value, madeWhy2: $('madeWhy2').value, madeWhy3: $('madeWhy3').value, madeWhy4: $('madeWhy4').value, madeWhy5: $('madeWhy5').value,
-        sentWhy1: $('sentWhy1').value, sentWhy2: $('sentWhy2').value, sentWhy3: $('sentWhy3').value, sentWhy4: $('sentWhy4').value, sentWhy5: $('sentWhy5').value,
-        namaAuditeeProd: $('namaAuditeeProd').value.trim(), tglTtdAuditeeProd: $('tglTtdAuditeeProd').value, sigAuditeeProdBase64: getSig('sigAuditeeProd'),
-        namaAuditeeInsp: $('namaAuditeeInsp').value.trim(), tglTtdAuditeeInsp: $('tglTtdAuditeeInsp').value, sigAuditeeInspBase64: getSig('sigAuditeeInsp'),
+        sigAuditorBase64: sigB64('sigAuditor') || base.sigAuditorBase64 || '',
+        madeWhy1: $('madeWhy1').value.trim(), madeWhy2: $('madeWhy2').value.trim(), madeWhy3: $('madeWhy3').value.trim(), madeWhy4: $('madeWhy4').value.trim(), madeWhy5: $('madeWhy5').value.trim(),
+        sentWhy1: $('sentWhy1').value.trim(), sentWhy2: $('sentWhy2').value.trim(), sentWhy3: $('sentWhy3').value.trim(), sentWhy4: $('sentWhy4').value.trim(), sentWhy5: $('sentWhy5').value.trim(),
+        namaAuditeeProd: $('namaAuditeeProd').value.trim(), tglTtdAuditeeProd: $('tglTtdAuditeeProd').value,
+        sigAuditeeProdBase64: sigB64('sigAuditeeProd') || base.sigAuditeeProdBase64 || '',
+        namaAuditeeInsp: $('namaAuditeeInsp').value.trim(), tglTtdAuditeeInsp: $('tglTtdAuditeeInsp').value,
+        sigAuditeeInspBase64: sigB64('sigAuditeeInsp') || base.sigAuditeeInspBase64 || '',
         madeActions: collectActionRows('made'),
         sentActions: collectActionRows('sent'),
-        namaApproved: $('namaApproved').value.trim(), tglTtdApproved: $('tglTtdApproved').value, sigApprovedBase64: getSig('sigApproved'),
-        statusEvaluasi: document.querySelector('input[name="statusEvaluasi"]:checked')?.value || 'Tidak / Open',
+        namaApproved: $('namaApproved').value.trim(), tglTtdApproved: $('tglTtdApproved').value,
+        sigApprovedBase64: sigB64('sigApproved') || base.sigApprovedBase64 || '',
+        statusEvaluasi: getRadio('statusEvaluasi'),
         tanggalEvaluasi: $('tanggalEvaluasi').value,
         komentarVerifikasi: $('komentarVerifikasi').value.trim(),
-        tglVerifAuditor: $('tglVerifAuditor').value, sigVerifAuditorBase64: getSig('sigVerifAuditor'),
-        tglTmj: $('tglTmj').value, sigTmjBase64: getSig('sigTmj'),
-        refAttachments: refExisting,
-        refFilesNew: refNewFiles
-      };
-    }
-
-    function showStatusModal(loading, title, msg, actionHtml = '') {
-      $('modalIconContainer').innerHTML = loading
-        ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>'
-        : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
-      $('modalTitle').textContent = title;
-      $('modalMessage').textContent = msg;
-      $('modalActionContainer').innerHTML = actionHtml || (loading ? '' : '<button type="button" onclick="document.getElementById(\'statusModal\').classList.add(\'hidden\')" class="bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>');
-      $('statusModal').classList.remove('hidden');
-      icons();
-    }
-
-    async function executePtpAction(actionType) {
-      const payload = collectPtpPayload();
-      showStatusModal(true, 'Memproses Dokumen PTP...', 'Mohon tunggu sebentar.');
-      try {
-        const res = await apiCall('handlePtpAction', actionType, payload);
-        if (actionType === 'PREVIEW') {
-          $('statusModal').classList.add('hidden');
-          $('previewModalBody').innerHTML = res.previewHtml;
-          $('previewModal').classList.remove('hidden');
-        } else if (actionType === 'SAVE') {
-          showStatusModal(false, 'Data Tersimpan!', res.message);
-          await syncAllSystems(false);
-          closePtpEditor();
-        } else if (actionType === 'PDF') {
-          showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `Dokumen PDF ${res.noReg} tersimpan di Google Drive.`, `<a href="${esc(res.pdfUrl)}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a> <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>`);
-          await syncAllSystems(false);
-          closePtpEditor();
-        }
-      } catch (err) {
-        showStatusModal(false, 'Gagal Memproses', err.message);
-      }
-    }
-
-    async function deletePtpFromLog(noReg) {
-      if (!confirm(`Hapus PTP ${noReg} secara permanen?`)) return;
-      try {
-        const res = await apiCall('deletePtp', noReg);
-        toast(res.message || 'PTP dihapus.');
-        await syncAllSystems(false);
-      } catch (err) {
-        toast(err.message, false);
-      }
-    }
-
-    function switchPtpTab(stepNum) {
-      if (stepNum === 4 || stepNum === 5) {
-        lastPtpListTab = stepNum;
-        if ($('ptpOverviewTabs')) $('ptpOverviewTabs').classList.remove('hidden');
-        if ($('ptpEditorNav')) $('ptpEditorNav').classList.add('hidden');
-      } else {
-        if ($('ptpOverviewTabs')) $('ptpOverviewTabs').classList.add('hidden');
-        if ($('ptpEditorNav')) $('ptpEditorNav').classList.remove('hidden');
-      }
-      [1, 2, 3, 4, 5].forEach(n => {
-        $('step' + n).classList.toggle('hidden', n !== stepNum);
-        $('tabBtn' + n).classList.toggle('active', n === stepNum);
+        tglVerifAuditor: $('tglVerifAuditor').value,
+        sigVerifAuditorBase64: sigB64('sigVerifAuditor') || base.sigVerifAuditorBase64 || '',
+        tglTmj: $('tglTmj').value,
+        sigTmjBase64: sigB64('sigTmj') || base.sigTmjBase64 || '',
+        refAttachments: PTP_REF_ATTACHMENTS,
+        refFilesNew: PTP_REF_NEW
       });
-      $('actionButtonsBar').classList.toggle('hidden', stepNum === 4 || stepNum === 5);
-      if (stepNum === 5) renderDashboard();
-      setTimeout(resizeAllCanvases, 50);
     }
 
-    function togglePtpSort(key) {
-      if (!ptpSortState || ptpSortState.key !== key) ptpSortState = { key, dir: 'asc' };
-      else if (ptpSortState.dir === 'asc') ptpSortState = { key, dir: 'desc' };
-      else ptpSortState = null;
+    function applyOptimisticPtpItem(data, pdfUrl = '') {
+      const lookup = data.originalNoReg || data.noReg;
+      const now = new Date();
+      const stamp = `${pd(now.getDate())}/${pd(now.getMonth() + 1)}/${now.getFullYear()} ${pd(now.getHours())}:${pd(now.getMinutes())}`;
+      const slim = Object.assign({}, data);
+      Object.keys(slim).forEach(k => { if (/Base64$/.test(k) || k === 'refFilesNew') delete slim[k]; });
+
+      const idx = PTP_LIST.findIndex(p => p.noReg === lookup);
+      const existingPdf = idx >= 0 ? PTP_LIST[idx].pdfUrl : '';
+      const item = {
+        noReg: data.noReg,
+        tanggalTerbit: data.tanggalTerbit || todayStr(),
+        auditee: data.auditee || '-',
+        auditor: data.auditor || '-',
+        lokasi: data.lokasi || '-',
+        sumber: data.sumber || '-',
+        noRefSumber: data.noRefSumber || '-',
+        kategori: data.kategori || '-',
+        partName: data.partName || '-',
+        partNo: data.partNo || '-',
+        problem: data.problem || '-',
+        qtyNg: data.qtyNg || '-',
+        hasilSortir: data.hasilSortir || '-',
+        status: data.statusEvaluasi || 'Tidak / Open',
+        pdfUrl: pdfUrl || existingPdf || '',
+        lastUpdated: stamp,
+        dataJson: JSON.stringify(slim)
+      };
+
+      if (idx >= 0) PTP_LIST[idx] = item;
+      else PTP_LIST.unshift(item);
+
+      renderPtpDashboard();
       renderLogRegisterTable();
     }
 
-    function renderLogRegisterTable() {
-      const closedCount = ptpLogRecords.filter(r => (r.status || '').toLowerCase().includes('closed')).length;
-      const openCount = ptpLogRecords.length - closedCount;
-      $('logTotalBadge').textContent = ptpLogRecords.length;
-      $('countOpenBadge').textContent = openCount;
-      $('countClosedBadge').textContent = closedCount;
-
-      const q = ($('logSearchInput')?.value || '').toLowerCase().trim();
-      const stFilter = $('logStatusFilter')?.value || 'ALL';
-      let rows = ptpLogRecords.filter(r => {
-        const isClosed = (r.status || '').toLowerCase().includes('closed');
-        if (stFilter === 'OPEN' && isClosed) return false;
-        if (stFilter === 'CLOSED' && !isClosed) return false;
-        if (!q) return true;
-        return [r.noReg, r.auditee, r.sumber, r.partName, r.partNo, r.problem].some(v => String(v || '').toLowerCase().includes(q));
-      });
-
-      ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'partNo', 'status', 'lastUpdated'].forEach(k => {
-        const ind = $('ptp-sort-' + k);
-        if (!ind) return;
-        if (ptpSortState && ptpSortState.key === k) {
-          ind.innerHTML = ptpSortState.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A';
-          ind.className = 'text-[10px] text-amber-600 font-bold ml-0.5';
-        } else if (!ptpSortState && k === 'noReg') {
-          ind.innerHTML = '&#9660; Terbaru';
-          ind.className = 'text-[10px] text-amber-600 ml-0.5';
-        } else {
-          ind.innerHTML = '&#8597;';
-          ind.className = 'text-[10px] text-slate-400 ml-0.5';
+    async function executePtpAction(type) {
+      const data = collectPtpFormData();
+      if (type === 'PREVIEW') {
+        $('statusModal').classList.remove('hidden');
+        $('modalTitle').textContent = 'Menyiapkan Preview...';
+        $('modalMessage').textContent = 'Merender formulir AF-PROD-014...';
+        $('modalActionContainer').innerHTML = '';
+        try {
+          const res = await apiCall('handlePtpAction', 'PREVIEW', data);
+          $('statusModal').classList.add('hidden');
+          $('previewModalBody').innerHTML = res.previewHtml;
+          $('previewModal').classList.remove('hidden');
+        } catch (e) {
+          $('statusModal').classList.add('hidden');
+          toast(e.message, false);
         }
-      });
-
-      if (ptpSortState) {
-        rows.sort((a, b) => {
-          const cmp = String(a[ptpSortState.key] || '').localeCompare(String(b[ptpSortState.key] || ''), 'id', { numeric: true, sensitivity: 'base' });
-          return ptpSortState.dir === 'asc' ? cmp : -cmp;
-        });
-      } else {
-        rows.sort((a, b) => String(b.noReg || '').localeCompare(String(a.noReg || ''), 'id', { numeric: true }));
+        return;
       }
 
-      const canDel = canEditQuality();
-      $('logRegisterTableBody').innerHTML = rows.length ? rows.map(r => {
-        const isClosed = (r.status || '').toLowerCase().includes('closed');
-        const badge = isClosed
-          ? '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[11px]">Ya / Closed</span>'
-          : '<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[11px]">On Progress</span>';
-        return `<tr class="hover:bg-slate-50">
-          <td class="px-3 py-2.5 font-bold text-blue-950 whitespace-nowrap">${esc(r.noReg)}</td>
-          <td class="px-3 py-2.5 whitespace-nowrap">${esc(r.tanggalTerbit)}</td>
-          <td class="px-3 py-2.5"><b>${esc(r.auditee)}</b><br/><span class="text-[11px] text-slate-400">${esc(r.sumber)}</span></td>
-          <td class="px-3 py-2.5"><b>${esc(r.partName)}</b><br/><span class="text-[11px] text-slate-500 line-clamp-1">${esc(r.problem)}</span></td>
-          <td class="px-3 py-2.5 font-mono whitespace-nowrap">${esc(r.partNo)}</td>
-          <td class="px-3 py-2.5 text-center whitespace-nowrap">${badge}</td>
-          <td class="px-3 py-2.5 text-[11px] text-slate-500 whitespace-nowrap">${esc(r.lastUpdated)}</td>
-          <td class="px-3 py-2.5 text-center whitespace-nowrap space-x-1">
-            <button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold px-2 py-1 rounded">Edit</button>
-            ${r.pdfUrl ? `<a href="${esc(r.pdfUrl)}" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold px-2 py-1 rounded inline-block">PDF</a>` : ''}
-            ${canDel ? `<button type="button" onclick="deletePtpFromLog('${esc(r.noReg)}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-2 py-1 rounded">Hapus</button>` : ''}
-          </td>
-        </tr>`;
-      }).join('') : '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">Belum ada data PTP.</td></tr>';
-    }
-
-    function toggleDashPtpSort(bucket, key) {
-      const cur = dashPtpSortState[bucket];
-      if (!cur || cur.key !== key) dashPtpSortState[bucket] = { key, dir: 'asc' };
-      else if (cur.dir === 'asc') dashPtpSortState[bucket] = { key, dir: 'desc' };
-      else dashPtpSortState[bucket] = null;
-      renderDashboard();
-    }
-
-    function renderDashboard() {
-      const closed = ptpLogRecords.filter(r => (r.status || '').toLowerCase().includes('closed'));
-      const open = ptpLogRecords.filter(r => !(r.status || '').toLowerCase().includes('closed'));
-      const nowMs = Date.now();
-      const calcAge = d => { const t = new Date(d + 'T00:00:00').getTime(); return isNaN(t) ? 0 : Math.max(0, Math.floor((nowMs - t) / 86400000)); };
-      const avgAge = open.length ? Math.round(open.reduce((s, r) => s + calcAge(r.tanggalTerbit), 0) / open.length) : 0;
-      const rate = ptpLogRecords.length ? Math.round(closed.length / ptpLogRecords.length * 100) : 0;
-
-      $('kpiTotal').textContent = ptpLogRecords.length;
-      $('kpiOpen').textContent = open.length;
-      $('kpiClosed').textContent = closed.length;
-      $('kpiAvgAge').textContent = `${avgAge} hari`;
-      $('kpiCloseRate').textContent = `${rate}%`;
-
-      const drawPtpChart = (id, cfg) => {
-        const cv = $(id); if (!cv) return;
-        if (ptpCharts[id]) ptpCharts[id].destroy();
-        ptpCharts[id] = new Chart(cv, cfg);
-      };
-
-      drawPtpChart('chartStatus', {
-        type: 'doughnut',
-        data: { labels: ['On Progress', 'Closed'], datasets: [{ data: [open.length, closed.length], backgroundColor: ['#f59e0b', '#10b981'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-
-      const mLabels = [], mOpen = [], mClosed = [];
-      const curD = new Date();
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(curD.getFullYear(), curD.getMonth() - i, 1);
-        const ym = `${d.getFullYear()}-${pd(d.getMonth() + 1)}`;
-        mLabels.push(`${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`);
-        mOpen.push(open.filter(r => (r.tanggalTerbit || '').startsWith(ym)).length);
-        mClosed.push(closed.filter(r => (r.tanggalTerbit || '').startsWith(ym)).length);
+      if (!data.auditee || !data.auditor) {
+        return toast('Auditee dan Auditor wajib diisi pada Tahap 1.', false);
       }
-      drawPtpChart('chartMonthly', {
-        type: 'bar',
-        data: { labels: mLabels, datasets: [{ label: 'Open', data: mOpen, backgroundColor: '#f59e0b' }, { label: 'Closed', data: mClosed, backgroundColor: '#10b981' }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
-      });
 
-      const byAud = {};
-      ptpLogRecords.forEach(r => {
-        const k = r.auditee || '-';
-        byAud[k] = byAud[k] || { o: 0, c: 0 };
-        if ((r.status || '').toLowerCase().includes('closed')) byAud[k].c++; else byAud[k].o++;
-      });
-      const topAud = Object.entries(byAud).sort((a, b) => (b[1].o + b[1].c) - (a[1].o + a[1].c)).slice(0, 8);
-      drawPtpChart('chartAuditee', {
-        type: 'bar',
-        data: { labels: topAud.map(e => e[0]), datasets: [{ label: 'Open', data: topAud.map(e => e[1].o), backgroundColor: '#f59e0b' }, { label: 'Closed', data: topAud.map(e => e[1].c), backgroundColor: '#10b981' }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } } }
-      });
+      if (type === 'SAVE') {
+        const tempNoReg = data.noReg;
+        applyOptimisticPtpItem(data);
+        closePtpEditor();
+        toast(`PTP ${tempNoReg} diperbarui di layar, menyimpan ke server...`);
+        setBgSaving(1);
 
-      const renderBucket = (bucket, list, bodyId, keys) => {
-        const st = dashPtpSortState[bucket];
-        keys.forEach(k => {
-          const ind = $(`dash-${bucket}-sort-${k}`);
-          if (!ind) return;
-          if (st && st.key === k) {
-            ind.innerHTML = st.dir === 'asc' ? '&#9650; A-Z' : '&#9660; Z-A';
-            ind.className = 'text-[10px] text-amber-600 font-bold';
-          } else if (!st && k === 'noReg') {
-            ind.innerHTML = '&#9660; Terbaru';
-            ind.className = 'text-[10px] text-amber-600';
-          } else {
-            ind.innerHTML = '&#8597;';
-            ind.className = 'text-[10px] text-slate-400';
-          }
-        });
-        const sorted = list.map(r => Object.assign({}, r, { age: calcAge(r.tanggalTerbit) }));
-        if (st) {
-          sorted.sort((a, b) => {
-            const cmp = st.key === 'age'
-              ? (a.age - b.age)
-              : String(a[st.key] || '').localeCompare(String(b[st.key] || ''), 'id', { numeric: true, sensitivity: 'base' });
-            return st.dir === 'asc' ? cmp : -cmp;
-          });
-        } else {
-          sorted.sort((a, b) => String(b.noReg || '').localeCompare(String(a.noReg || ''), 'id', { numeric: true }));
-        }
-        $(bodyId).innerHTML = sorted.length ? sorted.map(r => `<tr class="hover:bg-slate-50">
-          <td class="px-3 py-2 font-bold text-blue-950 whitespace-nowrap">${esc(r.noReg)}</td>
-          <td class="px-3 py-2 whitespace-nowrap">${esc(r.tanggalTerbit)}</td>
-          <td class="px-3 py-2">${esc(r.auditee)}</td>
-          <td class="px-3 py-2 font-semibold">${esc(r.partName)}</td>
-          <td class="px-3 py-2 font-mono whitespace-nowrap">${esc(r.partNo)}</td>
-          <td class="px-3 py-2 text-right font-bold whitespace-nowrap">${bucket === 'open' ? `${r.age} hr` : esc(r.lastUpdated)}</td>
-          <td class="px-3 py-2 text-center whitespace-nowrap space-x-1">
-            <button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 2)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-2 py-1 rounded">Buka</button>
-            ${r.pdfUrl ? `<a href="${esc(r.pdfUrl)}" target="_blank" class="bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold px-2 py-1 rounded inline-block">PDF</a>` : ''}
-          </td>
-        </tr>`).join('') : `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Belum ada PTP ${bucket === 'open' ? 'On Progress' : 'Closed'}.</td></tr>`;
-      };
+        apiCall('handlePtpAction', 'SAVE', data)
+          .then(res => {
+            if (res && res.noReg && res.noReg !== tempNoReg) {
+              const i = PTP_LIST.findIndex(p => p.noReg === tempNoReg);
+              if (i >= 0) {
+                PTP_LIST[i].noReg = res.noReg;
+                renderPtpDashboard();
+                renderLogRegisterTable();
+              }
+            }
+            toast(res.message || `PTP ${res.noReg || tempNoReg} tersimpan permanen di server!`);
+          })
+          .catch(err => {
+            toast('Gagal menyimpan ke server: ' + err.message, false);
+            syncAllSystems(false);
+          })
+          .finally(() => setBgSaving(-1));
+        return;
+      }
 
-      renderBucket('open', open, 'dashOpenBody', ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'partNo', 'age']);
-      renderBucket('closed', closed, 'dashClosedBody', ['noReg', 'tanggalTerbit', 'auditee', 'partName', 'partNo', 'lastUpdated']);
+      $('statusModal').classList.remove('hidden');
+      $('modalTitle').textContent = 'Menyimpan & Membuat PDF 1 Halaman Resmi...';
+      $('modalMessage').textContent = 'Menyimpan arsip ke Google Drive & membuka dokumen PDF.';
+      $('modalActionContainer').innerHTML = '';
+
+      try {
+        const res = await apiCall('handlePtpAction', 'PDF', data);
+        $('statusModal').classList.add('hidden');
+        if (res.noReg) data.noReg = res.noReg;
+        if (res.refAttachments) data.refAttachments = res.refAttachments;
+        applyOptimisticPtpItem(data, res.pdfUrl || '');
+        closePtpEditor();
+        toast(`PTP ${data.noReg} tersimpan & PDF 1 halaman siap!`);
+        if (res.pdfUrl) window.open(res.pdfUrl, '_blank');
+      } catch (e) {
+        $('statusModal').classList.add('hidden');
+        toast(e.message, false);
+      }
     }
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartZoom(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeChartZoom();
+        closeQualityModal();
+        closeSecurityModal();
+        $('previewModal').classList.add('hidden');
+      }
+    });
+
     window.addEventListener('resize', resizeAllCanvases);
-    window.addEventListener('load', () => {
+    window.onload = function () {
       icons();
-      initSignaturePads();
-      initDefaultActionRows();
-      const tsPoll = setInterval(() => { if (window.turnstile) { tsInit(); clearInterval(tsPoll); } }, 300);
+      const pollTs = setInterval(() => {
+        if (window.turnstile) {
+          tsInit();
+          clearInterval(pollTs);
+        }
+      }, 300);
+
       try {
         const saved = JSON.parse(sessionStorage.getItem('acj_portal_sess') || 'null');
-        if (saved && saved.user && saved.token) completeLogin(saved.user, saved.token);
+        if (saved && saved.user && saved.token) {
+          completeLogin(saved.user, saved.token);
+        }
       } catch (e) {}
-    });
+    };
   </script>
 </body>
 </html>
