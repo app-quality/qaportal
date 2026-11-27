@@ -190,6 +190,7 @@
           <button type="button" onclick="execReport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Cetak Laporan Eksekutif PDF (Landscape)">
             <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> Laporan PDF
           </button>
+          <span id="bgSyncBadge" class="hidden bg-amber-500/20 text-amber-200 border border-amber-400/40 px-2.5 py-1 rounded-full text-[11px] font-semibold animate-pulse">Menyimpan...</span>
           <span id="lastSyncTime" class="text-[11px] text-blue-200 hidden sm:inline">Sync: --:--</span>
           <button type="button" onclick="syncAllSystems(true)" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Sinkronkan Semua Data">
             <i id="syncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
@@ -505,7 +506,7 @@
         </div>
 
         <div id="actionButtonsBar" class="hidden mt-8 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-xs text-slate-500">Simpan sementara ke Database atau langsung cetak PDF 1 halaman.</p>
+          <p class="text-xs text-slate-500"><b>Simpan Data</b> memperbarui layar seketika, <b>Simpan &amp; Cetak PDF</b> membuat arsip 1 halaman A4 resmi.</p>
           <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
             <button type="button" onclick="executePtpAction('PREVIEW')" class="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="eye" class="w-4 h-4 text-slate-600"></i><span>Preview Form</span></button>
             <button type="button" onclick="executePtpAction('SAVE')" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan Data</span></button>
@@ -597,10 +598,24 @@
     let CURRENT_USER = null, SESSION_TOKEN = '', PENDING_MFA_TOKEN = '';
     let QUALITY_DATA = { claims: [], ngRecords: [], inspections: [], customerList: [] };
     let ACTIVE_MODULE = 'claim';
+    let PENDING_BG_SAVES = 0;
     const PLANTS = ['Sangiang', 'Cikarang', 'Kalisabi', 'Jatake'];
     const DIVISI = ['Bor', 'CNC', 'Cutting', 'Harden', 'Hexagon', 'Punch', 'Rolling', 'Turret'];
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const COLORS = ['#1e3a8a', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
+
+    function setBgSaving(delta) {
+      PENDING_BG_SAVES = Math.max(0, PENDING_BG_SAVES + delta);
+      const b = $('bgSyncBadge');
+      if (b) b.classList.toggle('hidden', PENDING_BG_SAVES === 0);
+    }
+
+    window.addEventListener('beforeunload', e => {
+      if (PENDING_BG_SAVES > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
 
     function getEndpointUrl() {
       const u = String(window.PORTAL_CONFIG.APPS_SCRIPT_URL || '').trim();
@@ -832,7 +847,7 @@
     }
 
     /* ===================================================================== */
-    /* QUALITY MODULES SHELL, CHARTS, ZOOM, FILTER MINGGUAN & TABEL          */
+    /* QUALITY MODULES SHELL, CHARTS, ZOOM & TABEL                           */
     /* ===================================================================== */
     const Q_CFGS = {};
     const Q_CHARTS = {};
@@ -1508,7 +1523,7 @@
     }
 
     /* ===================================================================== */
-    /* MODUL E-PTP (AF-PROD-014)                                             */
+    /* MODUL E-PTP (AF-PROD-014) — OPTIMISTIC SAVE & PDF 1 HALAMAN RESMI     */
     /* ===================================================================== */
     const SIG_PADS = {};
     let PTP_LIST = [], PTP_REF_ATTACHMENTS = [], PTP_REF_NEW = [];
@@ -1933,6 +1948,42 @@
       });
     }
 
+    function applyOptimisticPtpItem(data, pdfUrl = '') {
+      const lookup = data.originalNoReg || data.noReg;
+      const now = new Date();
+      const stamp = `${pd(now.getDate())}/${pd(now.getMonth() + 1)}/${now.getFullYear()} ${pd(now.getHours())}:${pd(now.getMinutes())}`;
+      const slim = Object.assign({}, data);
+      Object.keys(slim).forEach(k => { if (/Base64$/.test(k) || k === 'refFilesNew') delete slim[k]; });
+
+      const idx = PTP_LIST.findIndex(p => p.noReg === lookup);
+      const existingPdf = idx >= 0 ? PTP_LIST[idx].pdfUrl : '';
+      const item = {
+        noReg: data.noReg,
+        tanggalTerbit: data.tanggalTerbit || todayStr(),
+        auditee: data.auditee || '-',
+        auditor: data.auditor || '-',
+        lokasi: data.lokasi || '-',
+        sumber: data.sumber || '-',
+        noRefSumber: data.noRefSumber || '-',
+        kategori: data.kategori || '-',
+        partName: data.partName || '-',
+        partNo: data.partNo || '-',
+        problem: data.problem || '-',
+        qtyNg: data.qtyNg || '-',
+        hasilSortir: data.hasilSortir || '-',
+        status: data.statusEvaluasi || 'Tidak / Open',
+        pdfUrl: pdfUrl || existingPdf || '',
+        lastUpdated: stamp,
+        dataJson: JSON.stringify(slim)
+      };
+
+      if (idx >= 0) PTP_LIST[idx] = item;
+      else PTP_LIST.unshift(item);
+
+      renderPtpDashboard();
+      renderLogRegisterTable();
+    }
+
     async function executePtpAction(type) {
       const data = collectPtpFormData();
       if (type === 'PREVIEW') {
@@ -1956,18 +2007,50 @@
         return toast('Auditee dan Auditor wajib diisi pada Tahap 1.', false);
       }
 
+      // REKOMENDASI TERBAIK 1: Simpan Data = Instan di layar (0 detik jeda) + Sync latar belakang aman
+      if (type === 'SAVE') {
+        const tempNoReg = data.noReg;
+        applyOptimisticPtpItem(data);
+        closePtpEditor();
+        toast(`PTP ${tempNoReg} diperbarui di layar, menyimpan ke server...`);
+        setBgSaving(1);
+
+        apiCall('handlePtpAction', 'SAVE', data)
+          .then(res => {
+            if (res && res.noReg && res.noReg !== tempNoReg) {
+              const i = PTP_LIST.findIndex(p => p.noReg === tempNoReg);
+              if (i >= 0) {
+                PTP_LIST[i].noReg = res.noReg;
+                renderPtpDashboard();
+                renderLogRegisterTable();
+              }
+            }
+            toast(res.message || `PTP ${res.noReg || tempNoReg} tersimpan permanen di server!`);
+          })
+          .catch(err => {
+            toast('Gagal menyimpan ke server: ' + err.message, false);
+            syncAllSystems(false);
+          })
+          .finally(() => setBgSaving(-1));
+        return;
+      }
+
+      // REKOMENDASI TERBAIK 2: Simpan & Cetak PDF = Render 1x jalan di server (~1-2 detik)
+      // sehingga dokumen arsip Google Drive dan hasil cetak A4 1 halaman 100% identik
       $('statusModal').classList.remove('hidden');
-      $('modalTitle').textContent = type === 'PDF' ? 'Menyimpan & Membuat PDF 1 Halaman...' : 'Menyimpan Data PTP...';
-      $('modalMessage').textContent = 'Mohon tunggu sebentar.';
+      $('modalTitle').textContent = 'Menyimpan & Membuat PDF 1 Halaman Resmi...';
+      $('modalMessage').textContent = 'Menyimpan arsip ke Google Drive & membuka dokumen PDF.';
       $('modalActionContainer').innerHTML = '';
 
       try {
-        const res = await apiCall('handlePtpAction', type, data);
+        const res = await apiCall('handlePtpAction', 'PDF', data);
         $('statusModal').classList.add('hidden');
-        toast(res.message || `PTP ${res.noReg} berhasil diproses!`);
-        if (res.pdfUrl) window.open(res.pdfUrl, '_blank');
-        await syncAllSystems(false);
+        if (res.noReg) data.noReg = res.noReg;
+        if (res.refAttachments) data.refAttachments = res.refAttachments;
+        applyOptimisticPtpItem(data, res.pdfUrl || '');
         closePtpEditor();
+        toast(`PTP ${data.noReg} tersimpan & PDF 1 halaman siap!`);
+        if (res.pdfUrl) window.open(res.pdfUrl, '_blank');
       } catch (e) {
         $('statusModal').classList.add('hidden');
         toast(e.message, false);
