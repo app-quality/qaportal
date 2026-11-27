@@ -377,8 +377,8 @@
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left border-collapse text-xs">
               <thead><tr class="bg-blue-950 text-white">
-                <th onclick="togglePtpSort('noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">No. Reg. PTP<span id="ptp-sort-noReg" class="ml-1 text-[10px] text-blue-300">↕</span></th>
-                <th onclick="togglePtpSort('tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Tanggal<span id="ptp-sort-tanggalTerbit" class="ml-1 text-[10px] text-amber-300 font-bold">▼ Terbaru</span></th>
+                <th onclick="togglePtpSort('noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">No. Reg. PTP<span id="ptp-sort-noReg" class="ml-1 text-[10px] text-amber-300 font-bold">▼ Terbaru</span></th>
+                <th onclick="togglePtpSort('tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Tanggal<span id="ptp-sort-tanggalTerbit" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('auditee')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Auditee / Sumber<span id="ptp-sort-auditee" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('partName')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Part &amp; Problem<span id="ptp-sort-partName" class="ml-1 text-[10px] text-blue-300">↕</span></th>
                 <th onclick="togglePtpSort('partNo')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-blue-900 whitespace-nowrap">Part No.<span id="ptp-sort-partNo" class="ml-1 text-[10px] text-blue-300">↕</span></th>
@@ -415,8 +415,8 @@
           <div class="border border-amber-200 rounded-xl overflow-hidden">
             <div class="bg-amber-50 px-4 py-2.5"><h4 class="text-xs font-bold text-amber-800">PTP On Progress (Terbaru di Atas)</h4></div>
             <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600">
-              <th onclick="toggleDashPtpSort('prog','noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">No. Reg.<span id="dash-prog-sort-noReg" class="ml-1 text-[10px] text-slate-400">↕</span></th>
-              <th onclick="toggleDashPtpSort('prog','tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Tanggal<span id="dash-prog-sort-tanggalTerbit" class="ml-1 text-[10px] text-amber-700 font-bold">▼ Terbaru</span></th>
+              <th onclick="toggleDashPtpSort('prog','noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">No. Reg.<span id="dash-prog-sort-noReg" class="ml-1 text-[10px] text-amber-700 font-bold">▼ Terbaru</span></th>
+              <th onclick="toggleDashPtpSort('prog','tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Tanggal<span id="dash-prog-sort-tanggalTerbit" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('prog','auditee')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Auditee<span id="dash-prog-sort-auditee" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('prog','partName')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Part Name<span id="dash-prog-sort-partName" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('prog','partNo')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Part No<span id="dash-prog-sort-partNo" class="ml-1 text-[10px] text-slate-400">↕</span></th>
@@ -427,8 +427,8 @@
           <div class="border border-emerald-200 rounded-xl overflow-hidden">
             <div class="bg-emerald-50 px-4 py-2.5"><h4 class="text-xs font-bold text-emerald-800">PTP Closed (Terbaru di Atas)</h4></div>
             <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600">
-              <th onclick="toggleDashPtpSort('closed','noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">No. Reg.<span id="dash-closed-sort-noReg" class="ml-1 text-[10px] text-slate-400">↕</span></th>
-              <th onclick="toggleDashPtpSort('closed','tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Tanggal<span id="dash-closed-sort-tanggalTerbit" class="ml-1 text-[10px] text-emerald-700 font-bold">▼ Terbaru</span></th>
+              <th onclick="toggleDashPtpSort('closed','noReg')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">No. Reg.<span id="dash-closed-sort-noReg" class="ml-1 text-[10px] text-emerald-700 font-bold">▼ Terbaru</span></th>
+              <th onclick="toggleDashPtpSort('closed','tanggalTerbit')" title="Klik untuk urutkan Terbaru / Terlama" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Tanggal<span id="dash-closed-sort-tanggalTerbit" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('closed','auditee')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Auditee<span id="dash-closed-sort-auditee" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('closed','partName')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Part Name<span id="dash-closed-sort-partName" class="ml-1 text-[10px] text-slate-400">↕</span></th>
               <th onclick="toggleDashPtpSort('closed','partNo')" title="Klik untuk urutkan A-Z / Z-A" class="p-2.5 cursor-pointer select-none hover:bg-slate-100 whitespace-nowrap">Part No<span id="dash-closed-sort-partNo" class="ml-1 text-[10px] text-slate-400">↕</span></th>
@@ -496,7 +496,7 @@
     /* KONFIGURASI BACKEND & CLOUDFLARE TURNSTILE                          */
     /* =================================================================== */
     window.PORTAL_CONFIG = {
-      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzXRt6r0rsJzvRSEyOY_K-VwWwfoUXB-WjcSG2aAde_vGR_Tp3Ml9BmoZnuK5TahqNU/exec',
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzg42z5pU_xO65zM5F2J2P1s29G989K_rW7iD5aN1k4B0X-pD45zS3hT462739A-A0c/exec',
       TURNSTILE_SITEKEY: '0x4AAAAAAF_JNNxBwXPQpQm_'
     };
 
@@ -551,23 +551,23 @@
       const maxS = Math.max(1, ...srcRows.map(([, v]) => v.c + v.p));
       $('dashSumber').innerHTML = srcRows.length ? srcRows.map(([k, v]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${v.p} On Progress &bull; ${v.c} Closed</span></div><div class="flex h-2.5 rounded bg-slate-100 overflow-hidden" style="width:${(v.c+v.p)/maxS*100}%"><div class="bg-emerald-500" style="width:${v.c/(v.c+v.p)*100}%"></div><div class="bg-amber-300 flex-1"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Belum ada data.</p>';
 
-      const byAud = {};
-      prog.forEach(r => { const k = r.auditee && r.auditee !== '-' ? r.auditee : '(tanpa auditee)'; byAud[k] = (byAud[k] || 0) + 1; });
-      const audRows = Object.entries(byAud).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      const maxA = Math.max(1, ...audRows.map(a => a[1]));
-      $('dashAuditee').innerHTML = audRows.length ? audRows.map(([k, n]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${n}</span></div><div class="h-2.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-400" style="width:${n/maxA*100}%"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Tidak ada PTP On Progress.</p>';
+      const parseRegKey = reg => {
+        const m = /^(\d+)\/PTP\/([IVX]+)\/(\d{4})/i.exec(String(reg || '').trim());
+        return m ? { yr: Number(m[3]), seq: Number(m[1]) } : { yr: 0, seq: 0 };
+      };
+      const cmpRegDesc = (a, b) => {
+        const ra = parseRegKey(a.noReg), rb = parseRegKey(b.noReg);
+        if (ra.yr !== rb.yr) return rb.yr - ra.yr;
+        if (ra.seq !== rb.seq) return rb.seq - ra.seq;
+        return String(b.noReg || '').localeCompare(String(a.noReg || ''), 'id', { numeric: true });
+      };
 
       const sortDashRows = (arr, st) => {
-        if (!st) {
-          return arr.slice().sort((a, b) => {
-            const da = String(a.tanggalTerbit || ''), db = String(b.tanggalTerbit || '');
-            if (da !== db) return db.localeCompare(da);
-            return String(b.noReg || '').localeCompare(String(a.noReg || ''), 'id', { numeric: true });
-          });
-        }
+        if (!st) return arr.slice().sort(cmpRegDesc);
         const dir = st.dir === 'asc' ? 1 : -1, k = st.k;
         return arr.slice().sort((a, b) => {
           if (k === 'age') return ((ageOf(a) ?? -1) - (ageOf(b) ?? -1)) * dir;
+          if (k === 'noReg') return cmpRegDesc(b, a) * dir;
           return String(a[k] || '').localeCompare(String(b[k] || ''), 'id', { numeric: true, sensitivity: 'base' }) * dir;
         });
       };
@@ -580,7 +580,7 @@
           if (st && st.k === colKey) {
             ind.textContent = st.dir === 'asc' ? '▲ A-Z' : '▼ Z-A';
             ind.className = `ml-1 text-[10px] ${activeClass} font-bold`;
-          } else if (!st && colKey === 'tanggalTerbit') {
+          } else if (!st && colKey === 'noReg') {
             ind.textContent = '▼ Terbaru';
             ind.className = `ml-1 text-[10px] ${activeClass} font-bold`;
           } else {
@@ -627,12 +627,22 @@
 
     function apiCall(fn, ...args) {
       const token = sessionStorage.getItem('acj_token') || '';
-      return fetch(window.PORTAL_CONFIG.APPS_SCRIPT_URL, {
+      const url = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.APPS_SCRIPT_URL || '').trim();
+      if (!url || !/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) {
+        return Promise.reject(new Error('URL Apps Script (/exec) di PORTAL_CONFIG belum valid.'));
+      }
+      return fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ fn, args, token })
       })
-      .then(r => r.json())
+      .catch(() => {
+        throw new Error('Gagal terhubung ke server (Failed to fetch). Periksa: 1) APPS_SCRIPT_URL di Index.html sesuai link /exec terbaru, 2) Deploy Apps Script diset "Who has access: Anyone", 3) Koneksi internet aktif.');
+      })
+      .then(r => {
+        if (!r.ok) throw new Error('Server merespons status HTTP ' + r.status);
+        return r.json();
+      })
       .then(res => {
         if (res && res.error === 'SESSION_EXPIRED') {
           logoutUser(true);
@@ -1330,29 +1340,25 @@
 
       $('qtb-' + m).innerHTML = rows.slice(st, st + PAGE).map(r => {
         const id = esc(r[c.idk]);
-        const act = adm && r[c.idk]
-          ? `<div class="flex gap-1"><button type="button" onclick="openQualityForm('${m}','${id}')" class="px-2 py-0.5 bg-blue-50 text-blue-800 rounded font-semibold">Edit</button><button type="button" onclick="deleteQualityRow('${m}','${id}')" class="px-2 py-0.5 bg-rose-50 text-rose-700 rounded font-semibold">Hapus</button></div>`
-          : '<span class="text-slate-400 text-[10px]">Read Only</span>';
-        const tds = c.cols.map(col => {
-          const [, k, t] = col, v = r[k];
-          if (t === 'n') return `<td class="p-2.5 text-right font-semibold">${fmt(v)}</td>`;
-          if (t === 'p') return `<td class="p-2.5 text-right">${num(v)}%</td>`;
-          if (t === 'b') return `<td class="p-2.5">${v ? `<button type="button" onclick="openPrivateFile('${esc(v)}')" class="text-blue-700 underline font-semibold">Buka</button>` : '-'}</td>`;
-          if (k === 'statusClaim') return `<td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${v === 'Closed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(v)}</span></td>`;
+        const act = adm
+          ? `<button type="button" onclick="openQualityForm('${m}','${id}')" class="text-blue-700 hover:underline font-bold">Edit</button> <button type="button" onclick="deleteQualityRow('${m}','${id}')" class="text-rose-600 hover:underline font-bold ml-1">Hapus</button>`
+          : '<span class="text-slate-400">Read</span>';
+        const tds = c.cols.map(x => {
+          const k = x[1], t = x[2], v = r[k];
+          if (t === 'n') return `<td class="p-2.5 text-right font-mono">${fmt(v)}</td>`;
+          if (t === 'p') return `<td class="p-2.5 text-right font-bold text-rose-600">${num(v).toFixed(2)}%</td>`;
+          if (t === 'b') return `<td class="p-2.5">${v ? `<button type="button" onclick="openPrivateFile('${esc(v)}')" class="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded font-semibold">Lihat</button>` : '-'}</td>`;
+          if (k === 'statusClaim') return `<td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${v === 'Closed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${esc(v)}</span></td>`;
+          if (k === 'kategoriClaim') return `<td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${v === 'Informasi' ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-700'}">${esc(v || 'Claim')}</span></td>`;
           return `<td class="p-2.5 whitespace-nowrap">${esc(v || '-')}</td>`;
         }).join('');
-        return `<tr class="hover:bg-slate-50"><td class="p-2.5">${act}</td>${tds}</tr>`;
-      }).join('') || `<tr><td colspan="${c.cols.length + 1}" class="p-6 text-center text-slate-400">Belum ada data.</td></tr>`;
+        return `<tr class="hover:bg-slate-50"><td class="p-2.5 whitespace-nowrap">${act}</td>${tds}</tr>`;
+      }).join('') || `<tr><td colspan="${c.cols.length + 1}" class="p-6 text-center text-slate-400">Tidak ada data sesuai filter.</td></tr>`;
 
-      $('qinfo-' + m).textContent = `Menampilkan ${rows.length ? st + 1 : 0}-${Math.min(st + PAGE, rows.length)} dari ${rows.length} data`;
-      $('qpn-' + m).textContent = `${Q_PG[m]} / ${pages}`;
-      $('qprev-' + m).disabled = Q_PG[m] <= 1;
-      $('qnext-' + m).disabled = Q_PG[m] >= pages;
-
+      const s = Q_SRT[m];
       c.cols.forEach(x => {
         const ind = $(`qsort-${m}-${x[1]}`);
         if (!ind) return;
-        const s = Q_SRT[m];
         if (s && s.k === x[1]) {
           ind.textContent = s.dir === 'asc' ? '▲ A-Z' : '▼ Z-A';
           ind.className = 'ml-1 text-[10px] text-amber-300 font-bold';
@@ -1364,6 +1370,11 @@
           ind.className = 'ml-1 text-[10px] text-blue-300';
         }
       });
+
+      $('qinfo-' + m).textContent = rows.length ? `Menampilkan ${st + 1}-${Math.min(st + PAGE, rows.length)} dari ${rows.length} data` : '0 data';
+      $('qpn-' + m).textContent = `${Q_PG[m]} / ${pages}`;
+      $('qprev-' + m).disabled = Q_PG[m] <= 1;
+      $('qnext-' + m).disabled = Q_PG[m] >= pages;
     }
 
     let qEditing = null;
@@ -2074,51 +2085,6 @@
         const res = await apiCall('deletePtp', noReg);
         toast(res.message, 'success'); syncAllSystems(false);
       } catch (e) { toast(e.message, 'error'); }
-    }
-
-    function renderDashboard() {
-      if (!$('dashTotal')) return;
-      const isClosed = r => String(r.status || '').toLowerCase().includes('closed');
-      const closed = ptpLogRecords.filter(isClosed), prog = ptpLogRecords.filter(r => !isClosed(r)), total = ptpLogRecords.length;
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const ageOf = r => { const d = new Date((r.tanggalTerbit || '') + 'T00:00:00'); return isNaN(d) ? null : Math.max(0, Math.floor((today - d) / 86400000)); };
-
-      $('dashTotal').textContent = total; $('dashProgress').textContent = prog.length; $('dashClosed').textContent = closed.length;
-      const ages = prog.map(ageOf).filter(a => a !== null);
-      $('dashAvgAge').textContent = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
-      const pct = total ? Math.round(closed.length / total * 100) : 0;
-      $('dashPct').textContent = pct + '%'; $('dashDonut').setAttribute('stroke-dasharray', (total ? closed.length / total * 100 : 0) + ' 100');
-
-      const months = [];
-      for (let i = 5; i >= 0; i--) { const d = new Date(today.getFullYear(), today.getMonth() - i, 1); months.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }), c: 0, p: 0 }); }
-      ptpLogRecords.forEach(r => { const m = months.find(x => x.key === String(r.tanggalTerbit || '').substring(0, 7)); if (m) { if (isClosed(r)) m.c++; else m.p++; } });
-      const maxM = Math.max(1, ...months.map(m => m.c + m.p));
-      $('dashMonthly').innerHTML = months.map(m => `<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[10px] font-bold mb-1">${m.c + m.p || ''}</span><div class="w-full max-w-[40px] flex flex-col justify-end" style="height:75%"><div class="bg-amber-300 rounded-t" style="height:${m.p/maxM*100}%"></div><div class="bg-emerald-500" style="height:${m.c/maxM*100}%"></div></div><span class="text-[10px] text-slate-500 mt-1">${m.label}</span></div>`).join('');
-
-      const bySrc = {};
-      ptpLogRecords.forEach(r => { const k = r.sumber || '-'; (bySrc[k] = bySrc[k] || { c: 0, p: 0 }); if (isClosed(r)) bySrc[k].c++; else bySrc[k].p++; });
-      const srcRows = Object.entries(bySrc).sort((a, b) => (b[1].c + b[1].p) - (a[1].c + a[1].p));
-      const maxS = Math.max(1, ...srcRows.map(([, v]) => v.c + v.p));
-      $('dashSumber').innerHTML = srcRows.length ? srcRows.map(([k, v]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${v.p} On Progress &bull; ${v.c} Closed</span></div><div class="flex h-2.5 rounded bg-slate-100 overflow-hidden" style="width:${(v.c+v.p)/maxS*100}%"><div class="bg-emerald-500" style="width:${v.c/(v.c+v.p)*100}%"></div><div class="bg-amber-300 flex-1"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Belum ada data.</p>';
-
-      const byAud = {};
-      prog.forEach(r => { const k = r.auditee && r.auditee !== '-' ? r.auditee : '(tanpa auditee)'; byAud[k] = (byAud[k] || 0) + 1; });
-      const audRows = Object.entries(byAud).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      const maxA = Math.max(1, ...audRows.map(a => a[1]));
-      $('dashAuditee').innerHTML = audRows.length ? audRows.map(([k, n]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${n}</span></div><div class="h-2.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-400" style="width:${n/maxA*100}%"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Tidak ada PTP On Progress.</p>';
-
-      const actions = r => `<button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Buka</button>` + (r.pdfUrl ? ` <a href="${esc(r.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '');
-      const progSorted = prog.slice().sort((a, b) => String(a.tanggalTerbit).localeCompare(String(b.tanggalTerbit)));
-      $('dashProgressBody').innerHTML = progSorted.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
-      $('dashClosedBody').innerHTML = closed.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center text-[11px]">${esc(r.lastUpdated)}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
-    }
-
-    function showStatusModal(isLoading, title, desc, extraBtnHtml = '') {
-      $('statusTitle').textContent = title; $('statusDesc').textContent = desc;
-      $('statusIcon').innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>' : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
-      $('statusActions').innerHTML = `${extraBtnHtml}<button type="button" onclick="$('statusModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>`;
-      $('statusActions').classList.toggle('hidden', isLoading);
-      $('statusModal').classList.remove('hidden'); icons();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
