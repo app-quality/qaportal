@@ -203,29 +203,37 @@
     <div id="qualityModulesWrapper" class="max-w-7xl mx-auto px-3 sm:px-5 mt-5 space-y-5"></div>
 
     <!-- AREA MODUL E-PTP (AF-PROD-014) -->
-    <div id="ptpModuleWrapper" class="hidden max-w-5xl mx-auto px-3 sm:px-4 mt-5">
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5">
-          <div class="p-2 bg-blue-100 text-blue-900 rounded-lg"><i data-lucide="folder-search" class="w-5 h-5"></i></div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-sm font-bold text-slate-800">Lanjutkan / Update PTP yang Sudah Ada</h2>
-              <span id="modeBadge" class="bg-amber-500 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Mode: Buat PTP Baru</span>
-            </div>
-            <p class="text-xs text-slate-500">Pilih No. Reg. PTP untuk mengisi investigasi (Tahap 2) atau verifikasi (Tahap 3).</p>
-          </div>
+    <div id="ptpModuleWrapper" class="hidden max-w-7xl mx-auto px-3 sm:px-5 mt-5 pb-8">
+
+      <!-- BANNER -->
+      <div class="rounded-2xl bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900 text-white shadow-lg border border-blue-900/60 px-5 sm:px-7 py-5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p class="text-[10px] sm:text-[11px] font-extrabold tracking-wider text-amber-400 uppercase">ACJ Quality Management System</p>
+          <h2 class="text-xl sm:text-2xl font-extrabold mt-1 leading-tight">Permintaan Tindakan Perbaikan (E-PTP)</h2>
+          <p class="text-[11px] sm:text-xs text-blue-200 mt-1">Formulir Digital AF-PROD-014 &bull; Monitoring, Investigasi 5-Why &amp; Verifikasi Efektivitas</p>
         </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <select id="existingPtpSelect" onchange="loadSelectedPtpFromDropdown()" class="w-full sm:w-56 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-slate-50 outline-none">
-            <option value="">-- Buat PTP Baru --</option>
-          </select>
-          <button type="button" onclick="resetFormToNew()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg whitespace-nowrap">Reset Baru</button>
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button type="button" onclick="resetFormToNew()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>
+          <button type="button" onclick="execReport()" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition"><i data-lucide="file-text" class="w-4 h-4"></i> Laporan Eksekutif PDF</button>
         </div>
       </div>
 
-      <div class="bg-white rounded-t-xl border-b border-slate-200 grid grid-cols-2 sm:grid-cols-5 overflow-hidden shadow-sm">
+      <!-- TAB DAFTAR: Dashboard & Log Register -->
+      <div id="ptpListTabs" class="bg-white rounded-t-xl border border-slate-200 grid grid-cols-2 overflow-hidden shadow-sm">
         <button type="button" id="tabBtn5" onclick="switchPtpTab(5)" class="ptp-subtab active py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard PTP</span></button>
         <button type="button" id="tabBtn4" onclick="switchPtpTab(4)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="list-checks" class="w-4 h-4"></i><span>Log Register (<span id="logTotalBadge">0</span>)</span></button>
+      </div>
+
+      <!-- BAR FORM: Kembali + Mode + Tahap 1-3 -->
+      <div id="ptpFormBar" class="hidden bg-slate-50 rounded-t-xl border border-slate-200 border-b-0 px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchPtpTab(5)" class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Kembali ke Daftar</button>
+          <span id="modeBadge" class="bg-amber-500 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]">Mode: Input PTP Baru</span>
+        </div>
+        <p class="text-[11px] text-slate-500">Lengkapi Tahap 1 s/d 3 sesuai progress investigasi &amp; verifikasi</p>
+        <select id="existingPtpSelect" onchange="loadSelectedPtpFromDropdown()" class="hidden"><option value="">-- Buat PTP Baru --</option></select>
+      </div>
+      <div id="ptpFormTabs" class="hidden bg-white border border-slate-200 border-b-0 grid grid-cols-3 overflow-hidden shadow-sm">
         <button type="button" id="tabBtn1" onclick="switchPtpTab(1)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">1</span><span>Temuan Awal</span></button>
         <button type="button" id="tabBtn2" onclick="switchPtpTab(2)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">2</span><span>Investigasi &amp; Perbaikan</span></button>
         <button type="button" id="tabBtn3" onclick="switchPtpTab(3)" class="ptp-subtab py-3 px-2 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center">3</span><span>Verifikasi &amp; Close</span></button>
@@ -392,33 +400,47 @@
         </div>
 
         <div id="step5" class="space-y-5">
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-[11px] font-semibold text-slate-500">Total PTP</p><p id="dashTotal" class="text-3xl font-extrabold text-blue-950">0</p></div>
-            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4"><p class="text-[11px] font-semibold text-amber-700">On Progress</p><p id="dashProgress" class="text-3xl font-extrabold text-amber-700">0</p></div>
-            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4"><p class="text-[11px] font-semibold text-emerald-700">Closed</p><p id="dashClosed" class="text-3xl font-extrabold text-emerald-700">0</p></div>
-            <div class="rounded-xl border border-blue-200 bg-blue-50 p-4"><p class="text-[11px] font-semibold text-blue-700">Rata-rata umur On Progress</p><p class="text-3xl font-extrabold text-blue-900"><span id="dashAvgAge">0</span> <span class="text-sm font-semibold">hari</span></p></div>
+          <!-- KPI -->
+          <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="rounded-xl bg-blue-950 text-white p-4 border border-blue-950 col-span-2 lg:col-span-1"><p class="text-[10px] font-bold tracking-wider uppercase text-blue-200">Total PTP</p><p id="dashTotal" class="text-3xl font-extrabold mt-1">0</p></div>
+            <div class="rounded-xl bg-amber-50 border border-amber-200 p-4"><p class="text-[10px] font-bold tracking-wider uppercase text-amber-800">On Progress</p><p id="dashProgress" class="text-3xl font-extrabold text-amber-900 mt-1">0</p></div>
+            <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-4"><p class="text-[10px] font-bold tracking-wider uppercase text-emerald-800">Closed</p><p id="dashClosed" class="text-3xl font-extrabold text-emerald-900 mt-1">0</p></div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4"><p class="text-[10px] font-bold tracking-wider uppercase text-slate-600">Rata-rata umur On Progress</p><p class="text-3xl font-extrabold text-slate-900 mt-1"><span id="dashAvgAge">0</span> hari</p></div>
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4"><p class="text-[10px] font-bold tracking-wider uppercase text-slate-600">Tingkat Penyelesaian</p><p id="dashPct" class="text-3xl font-extrabold text-slate-900 mt-1">0%</p></div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center">
-              <h4 class="text-xs font-bold text-slate-700 mb-3 self-start">Tingkat Penyelesaian</h4>
-              <div class="relative w-36 h-36">
-                <svg viewBox="0 0 42 42" class="w-36 h-36 -rotate-90"><circle cx="21" cy="21" r="15.915" fill="none" stroke="#fde68a" stroke-width="6"></circle><circle id="dashDonut" cx="21" cy="21" r="15.915" fill="none" stroke="#10b981" stroke-width="6" stroke-dasharray="0 100"></circle></svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="dashPct" class="text-2xl font-extrabold text-slate-800">0%</span><span class="text-[10px] text-slate-500">Closed</span></div>
-              </div>
+
+          <!-- CHART -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="border border-slate-200 rounded-xl p-4 bg-white">
+              <div class="flex items-center justify-between mb-2"><h4 class="text-xs font-bold text-slate-800">Status PTP</h4><span class="text-[10px] text-slate-400">Open vs Closed</span></div>
+              <div class="relative h-56"><canvas id="dashChStatus"></canvas></div>
             </div>
-            <div class="border border-slate-200 rounded-xl p-4 md:col-span-2"><h4 class="text-xs font-bold text-slate-700 mb-3">PTP Terbit per Bulan (6 bulan terakhir)</h4><div id="dashMonthly" class="flex items-end gap-3 h-40"></div></div>
+            <div class="border border-slate-200 rounded-xl p-4 bg-white">
+              <div class="flex items-center justify-between mb-2"><h4 class="text-xs font-bold text-slate-800">PTP Terbit (6 Bulan Terakhir)</h4><span class="text-[10px] text-slate-400">per bulan</span></div>
+              <div class="relative h-56"><canvas id="dashChMonthly"></canvas></div>
+            </div>
+            <div class="border border-slate-200 rounded-xl p-4 bg-white">
+              <div class="flex items-center justify-between mb-2"><h4 class="text-xs font-bold text-slate-800">Per Auditee (Top 8)</h4><span class="text-[10px] text-slate-400">Open vs Closed</span></div>
+              <div class="relative h-56"><canvas id="dashChAuditee"></canvas></div>
+            </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="border border-slate-200 rounded-xl p-4"><h4 class="text-xs font-bold text-slate-700 mb-3">Berdasarkan Sumber</h4><div id="dashSumber" class="space-y-2.5"></div></div>
-            <div class="border border-slate-200 rounded-xl p-4"><h4 class="text-xs font-bold text-slate-700 mb-3">On Progress per Auditee (Top 5)</h4><div id="dashAuditee" class="space-y-2.5"></div></div>
+
+          <!-- TABEL ON PROGRESS -->
+          <div class="border border-amber-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <div class="bg-amber-50 px-4 py-2.5 flex flex-wrap items-center justify-between gap-1">
+              <h4 class="text-xs font-bold text-slate-900">PTP On Progress (Terbaru di Atas)</h4>
+              <span class="text-[10px] text-rose-800">Klik header kolom untuk sortir A-Z / Z-A</span>
+            </div>
+            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead id="dashProgHead"></thead><tbody id="dashProgressBody" class="divide-y divide-slate-100"></tbody></table></div>
           </div>
-          <div class="border border-amber-200 rounded-xl overflow-hidden">
-            <div class="bg-amber-50 px-4 py-2.5"><h4 class="text-xs font-bold text-amber-800">PTP On Progress (Terlama di Atas)</h4></div>
-            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600"><th class="p-2.5">No. Reg.</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee</th><th class="p-2.5">Part Name</th><th class="p-2.5">Part No</th><th class="p-2.5 text-center">Umur</th><th class="p-2.5 text-center">Aksi</th></tr></thead><tbody id="dashProgressBody" class="divide-y divide-slate-100"></tbody></table></div>
-          </div>
-          <div class="border border-emerald-200 rounded-xl overflow-hidden">
-            <div class="bg-emerald-50 px-4 py-2.5"><h4 class="text-xs font-bold text-emerald-800">PTP Closed (Terbaru di Atas)</h4></div>
-            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600"><th class="p-2.5">No. Reg.</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee</th><th class="p-2.5">Part Name</th><th class="p-2.5">Part No</th><th class="p-2.5 text-center">Tgl Update</th><th class="p-2.5 text-center">Aksi</th></tr></thead><tbody id="dashClosedBody" class="divide-y divide-slate-100"></tbody></table></div>
+
+          <!-- TABEL CLOSED -->
+          <div class="border border-emerald-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <div class="bg-emerald-50 px-4 py-2.5 flex flex-wrap items-center justify-between gap-1">
+              <h4 class="text-xs font-bold text-slate-900">PTP Closed (Terbaru di Atas)</h4>
+              <span class="text-[10px] text-emerald-800">Klik header kolom untuk sortir A-Z / Z-A</span>
+            </div>
+            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead id="dashClosedHead"></thead><tbody id="dashClosedBody" class="divide-y divide-slate-100"></tbody></table></div>
           </div>
         </div>
 
@@ -1748,9 +1770,17 @@
         $('step' + n).classList.toggle('hidden', n !== stepNum);
         $('tabBtn' + n).classList.toggle('active', n === stepNum);
       });
-      $('actionButtonsBar').classList.toggle('hidden', stepNum === 4 || stepNum === 5);
-      if (stepNum === 5) renderDashboard();
+      const isForm = stepNum <= 3;
+      $('ptpListTabs').classList.toggle('hidden', isForm);
+      $('ptpFormBar').classList.toggle('hidden', !isForm);
+      $('ptpFormTabs').classList.toggle('hidden', !isForm);
+      $('actionButtonsBar').classList.toggle('hidden', !isForm);
+      if (stepNum === 5) {
+        renderDashboard();
+        setTimeout(() => Object.values(dashCharts).forEach(c => { try { c.resize(); } catch (e) {} }), 60);
+      }
       setTimeout(resizeAllCanvases, 50);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function initDefaultActionRows() {
@@ -1779,9 +1809,24 @@
       }
     }
 
+    function localNextNoReg(dateStr) {
+      const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+      const d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+      const year = d.getFullYear(); let max = 0;
+      ptpLogRecords.forEach(r => {
+        const m = String(r.noReg || '').trim().match(/^(\d+)\/PTP\/[IVX]+\/(\d{4})$/);
+        if (m && Number(m[2]) === year) max = Math.max(max, Number(m[1]));
+      });
+      return String(max + 1).padStart(3, '0') + '/PTP/' + roman[d.getMonth()] + '/' + year;
+    }
+
     function onTanggalTerbitChange() {
       if (!$('modeBadge').textContent.includes('Baru')) return;
-      apiCall('generateNextNoReg', $('tanggalTerbit').value).then(no => { if (no) $('noReg').value = no; }).catch(() => {});
+      const guess = localNextNoReg($('tanggalTerbit').value);
+      $('noReg').value = guess;                                   // tampil seketika (dihitung dari data lokal)
+      apiCall('generateNextNoReg', $('tanggalTerbit').value)       // verifikasi ke server di latar belakang
+        .then(no => { if (no && no !== guess && $('modeBadge').textContent.includes('Baru') && $('noReg').value === guess) $('noReg').value = no; })
+        .catch(() => {});
     }
 
     function populateExistingDropdown(list) {
@@ -1852,7 +1897,7 @@
       $('fotoPreviewBox').innerHTML = '<span class="text-xs text-slate-400">Preview Foto</span>';
       Object.keys(sigPads).forEach(k => clearSig(k)); initDefaultActionRows();
       $('tanggalTerbit').value = todayStr(); $('tglTtdAuditor').value = todayStr();
-      $('modeBadge').textContent = 'Mode: Buat PTP Baru';
+      $('modeBadge').textContent = 'Mode: Input PTP Baru';
       $('modeBadge').className = 'bg-amber-500 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]';
       onTanggalTerbitChange(); switchPtpTab(1);
     }
@@ -1878,29 +1923,110 @@
       };
     }
 
+    let ptpBusy = false;
+    function setPtpBusy(b) {
+      ptpBusy = b;
+      document.querySelectorAll('#actionButtonsBar button').forEach(btn => {
+        btn.disabled = b; btn.classList.toggle('opacity-60', b); btn.classList.toggle('cursor-not-allowed', b);
+      });
+    }
+
+    const nowId = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+
+    function slimPtpPayload(p) {
+      const o = {};
+      Object.keys(p).forEach(k => { if (/Base64$/.test(k) || k === 'isNewRecord' || k === 'refFilesNew') return; o[k] = p[k]; });
+      return o;
+    }
+
+    // Bentuk record log yang sama persis dengan yang dikirim server (dipakai untuk update tampilan instan)
+    function recordFromPayload(p, pdfUrl) {
+      const v = x => (x != null && String(x).trim()) ? String(x).trim() : '-';
+      return {
+        noReg: p.noReg, tanggalTerbit: p.tanggalTerbit, auditee: v(p.auditee), auditor: v(p.auditor), lokasi: v(p.lokasi),
+        sumber: v(p.sumber), noRefSumber: v(p.noRefSumber), kategori: v(p.kategori), partName: v(p.partName), partNo: v(p.partNo),
+        problem: v(p.problem), qtyNg: v(p.qtyNg), hasilSortir: v(p.hasilSortir), status: p.statusEvaluasi || 'Tidak / Open',
+        pdfUrl: pdfUrl || '', lastUpdated: nowId(), dataJson: JSON.stringify(slimPtpPayload(p))
+      };
+    }
+
+    function upsertPtpRecord(rec, matchKey) {
+      const i = ptpLogRecords.findIndex(r => r.noReg === (matchKey || rec.noReg));
+      if (i >= 0) ptpLogRecords[i] = rec; else ptpLogRecords.unshift(rec);
+      populateExistingDropdown(ptpLogRecords);
+      $('existingPtpSelect').value = editingPtpOriginalNoReg || '';
+      renderLogRegisterTable();           // sekaligus menyegarkan dashboard
+    }
+
+    function ptpEnterUpdateMode(noReg) {
+      editingPtpOriginalNoReg = noReg;
+      $('noReg').value = noReg; $('noReg').readOnly = true; $('noReg').classList.add('bg-slate-200', 'cursor-not-allowed');
+      $('modeBadge').textContent = `Mode: Update ${noReg}`;
+      $('modeBadge').className = 'bg-emerald-400 text-slate-950 font-bold px-2.5 py-0.5 rounded-full text-[11px]';
+      $('existingPtpSelect').value = noReg;
+    }
+
+    function applyPtpServerResult(res, sentNoReg, payload) {
+      if (Array.isArray(res.refAttachments)) refExisting = res.refAttachments;
+      refNewFiles = []; renderRefList();
+      if (res.record) upsertPtpRecord(res.record, sentNoReg);
+      // Form masih menampilkan PTP baru yang barusan disimpan -> ubah ke mode Update agar tidak terbuat dobel
+      if (payload.isNewRecord && $('modeBadge').textContent.includes('Baru') && $('noReg').value.trim() === sentNoReg) {
+        ptpEnterUpdateMode(res.noReg || (res.record && res.record.noReg) || sentNoReg);
+      }
+    }
+
     async function executePtpAction(actionType) {
+      if (ptpBusy) return;
       const payload = collectPtpPayload();
-      if (actionType === 'PREVIEW') payload.refFilesNew = [];
-      const titles = { SAVE: 'Menyimpan Data PTP...', PREVIEW: 'Menyiapkan Print Preview...', PDF: 'Mencetak PDF PTP (1 Halaman)...' };
-      showStatusModal(true, titles[actionType], 'Mohon tunggu sebentar, sedang memproses ke Google Workspace.');
-      try {
-        const res = await apiCall('handlePtpAction', actionType, payload);
-        if (actionType !== 'PREVIEW') {
-          if (Array.isArray(res.refAttachments)) refExisting = res.refAttachments;
-          refNewFiles = []; renderRefList(); syncAllSystems(false);
-        }
-        if (actionType === 'PREVIEW') {
+
+      /* ---- PREVIEW ---- */
+      if (actionType === 'PREVIEW') {
+        payload.refFilesNew = [];
+        showStatusModal(true, 'Menyiapkan Print Preview...', 'Mohon tunggu sebentar.');
+        setPtpBusy(true);
+        try {
+          const res = await apiCall('handlePtpAction', 'PREVIEW', payload);
           $('statusModal').classList.add('hidden');
           $('previewModalBody').innerHTML = res.previewHtml;
           $('previewModal').classList.remove('hidden');
-        } else if (actionType === 'SAVE') {
-          showStatusModal(false, 'Data Tersimpan!', res.message);
-        } else if (actionType === 'PDF') {
-          showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `Dokumen PDF ${res.noReg} tersimpan di Google Drive.`, `<a href="${esc(res.pdfUrl)}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a>`);
-        }
-      } catch (err) {
-        showStatusModal(false, 'Gagal Memproses', err.message);
+        } catch (err) { showStatusModal(false, 'Gagal Memproses', err.message, '', true); }
+        finally { setPtpBusy(false); }
+        return;
       }
+
+      /* ---- SIMPAN: tampilan diperbarui seketika, server menyusul di latar belakang ---- */
+      if (actionType === 'SAVE') {
+        const snapshot = JSON.parse(JSON.stringify(ptpLogRecords));
+        const prev = ptpLogRecords.find(r => r.noReg === payload.noReg);
+        upsertPtpRecord(recordFromPayload(payload, prev ? prev.pdfUrl : ''), payload.noReg);
+        toast('Menyimpan ' + payload.noReg + '...');
+        setPtpBusy(true);
+        try {
+          const res = await apiCall('handlePtpAction', 'SAVE', payload);
+          applyPtpServerResult(res, payload.noReg, payload);
+          toast('✓ ' + (res.message || 'Data PTP tersimpan.'), 'success');
+        } catch (err) {
+          ptpLogRecords = snapshot;                        // batalkan tampilan sementara
+          populateExistingDropdown(ptpLogRecords); renderLogRegisterTable();
+          showStatusModal(false, 'Gagal Menyimpan', err.message + ' Isian form masih ada, silakan coba lagi.', '', true);
+        } finally { setPtpBusy(false); }
+        return;
+      }
+
+      /* ---- CETAK PDF ---- */
+      const t0 = Date.now();
+      showStatusModal(true, 'Mencetak PDF PTP (1 Halaman)...', 'Menyimpan data & membuat PDF di Google Drive. Umumnya hanya beberapa detik.');
+      setPtpBusy(true);
+      try {
+        const res = await apiCall('handlePtpAction', 'PDF', payload);
+        applyPtpServerResult(res, payload.noReg, payload);
+        const secs = ((Date.now() - t0) / 1000).toFixed(1);
+        showStatusModal(false, 'PDF PTP Berhasil Dicetak!', `Dokumen PDF ${res.noReg} tersimpan di Google Drive (${secs} detik).`,
+          `<a href="${esc(res.pdfUrl)}" target="_blank" class="bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Buka PDF</a>`);
+      } catch (err) {
+        showStatusModal(false, 'Gagal Memproses', err.message, '', true);
+      } finally { setPtpBusy(false); }
     }
 
     let ptpSortState = null;
@@ -1968,46 +2094,167 @@
       } catch (e) { toast(e.message, 'error'); }
     }
 
-    function renderDashboard() {
-      if (!$('dashTotal')) return;
-      const isClosed = r => String(r.status || '').toLowerCase().includes('closed');
-      const closed = ptpLogRecords.filter(isClosed), prog = ptpLogRecords.filter(r => !isClosed(r)), total = ptpLogRecords.length;
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const ageOf = r => { const d = new Date((r.tanggalTerbit || '') + 'T00:00:00'); return isNaN(d) ? null : Math.max(0, Math.floor((today - d) / 86400000)); };
+    /* ------------------------------------------------------------------ */
+    /* DASHBOARD E-PTP                                                    */
+    /* ------------------------------------------------------------------ */
+    const dashCharts = {};
+    let dashAudFull = [];
+    const dashSort = { prog: null, closed: null };      // null = urutan default (Terbaru di atas)
+    const DASH_COLS = {
+      prog:   [['noReg', 'No. Reg.'], ['tanggalTerbit', 'Tanggal'], ['auditee', 'Auditee'], ['partName', 'Part Name'], ['partNo', 'Part No'], ['age', 'Umur'], ['_aksi', 'Aksi']],
+      closed: [['noReg', 'No. Reg.'], ['tanggalTerbit', 'Tanggal'], ['auditee', 'Auditee'], ['partName', 'Part Name'], ['partNo', 'Part No'], ['lastUpdated', 'Tgl Update'], ['_aksi', 'Aksi']]
+    };
 
-      $('dashTotal').textContent = total; $('dashProgress').textContent = prog.length; $('dashClosed').textContent = closed.length;
-      const ages = prog.map(ageOf).filter(a => a !== null);
-      $('dashAvgAge').textContent = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
-      const pct = total ? Math.round(closed.length / total * 100) : 0;
-      $('dashPct').textContent = pct + '%'; $('dashDonut').setAttribute('stroke-dasharray', (total ? closed.length / total * 100 : 0) + ' 100');
+    const ptpIsClosed = r => String(r.status || '').toLowerCase().includes('closed');
+    const ptpAge = r => {
+      const d = new Date((r.tanggalTerbit || '') + 'T00:00:00'); if (isNaN(d)) return null;
+      const t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.max(0, Math.floor((t - d) / 86400000));
+    };
+    const regKey = no => { const m = String(no || '').trim().match(/^(\d+)\/PTP\/[IVX]+\/(\d{4})$/); return m ? Number(m[2]) * 100000 + Number(m[1]) : null; };
+    const updKey = s => { const m = String(s || '').match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/); return m ? m[3] + m[2] + m[1] + m[4] + m[5] : ''; };
+    const fmtTgl = iso => { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '-'); };
 
-      const months = [];
-      for (let i = 5; i >= 0; i--) { const d = new Date(today.getFullYear(), today.getMonth() - i, 1); months.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }), c: 0, p: 0 }); }
-      ptpLogRecords.forEach(r => { const m = months.find(x => x.key === String(r.tanggalTerbit || '').substring(0, 7)); if (m) { if (isClosed(r)) m.c++; else m.p++; } });
-      const maxM = Math.max(1, ...months.map(m => m.c + m.p));
-      $('dashMonthly').innerHTML = months.map(m => `<div class="flex-1 flex flex-col items-center justify-end h-full"><span class="text-[10px] font-bold mb-1">${m.c + m.p || ''}</span><div class="w-full max-w-[40px] flex flex-col justify-end" style="height:75%"><div class="bg-amber-300 rounded-t" style="height:${m.p/maxM*100}%"></div><div class="bg-emerald-500" style="height:${m.c/maxM*100}%"></div></div><span class="text-[10px] text-slate-500 mt-1">${m.label}</span></div>`).join('');
-
-      const bySrc = {};
-      ptpLogRecords.forEach(r => { const k = r.sumber || '-'; (bySrc[k] = bySrc[k] || { c: 0, p: 0 }); if (isClosed(r)) bySrc[k].c++; else bySrc[k].p++; });
-      const srcRows = Object.entries(bySrc).sort((a, b) => (b[1].c + b[1].p) - (a[1].c + a[1].p));
-      const maxS = Math.max(1, ...srcRows.map(([, v]) => v.c + v.p));
-      $('dashSumber').innerHTML = srcRows.length ? srcRows.map(([k, v]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${v.p} On Progress &bull; ${v.c} Closed</span></div><div class="flex h-2.5 rounded bg-slate-100 overflow-hidden" style="width:${(v.c+v.p)/maxS*100}%"><div class="bg-emerald-500" style="width:${v.c/(v.c+v.p)*100}%"></div><div class="bg-amber-300 flex-1"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Belum ada data.</p>';
-
-      const byAud = {};
-      prog.forEach(r => { const k = r.auditee && r.auditee !== '-' ? r.auditee : '(tanpa auditee)'; byAud[k] = (byAud[k] || 0) + 1; });
-      const audRows = Object.entries(byAud).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      const maxA = Math.max(1, ...audRows.map(a => a[1]));
-      $('dashAuditee').innerHTML = audRows.length ? audRows.map(([k, n]) => `<div><div class="flex justify-between text-[11px] text-slate-600 mb-0.5"><span class="font-semibold">${esc(k)}</span><span>${n}</span></div><div class="h-2.5 rounded bg-slate-100 overflow-hidden"><div class="h-full bg-amber-400" style="width:${n/maxA*100}%"></div></div></div>`).join('') : '<p class="text-xs text-slate-400">Tidak ada PTP On Progress.</p>';
-
-      const actions = r => `<button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-slate-100 font-semibold px-2 py-1 rounded text-[11px]">Buka</button>` + (r.pdfUrl ? ` <a href="${esc(r.pdfUrl)}" target="_blank" class="bg-blue-50 text-blue-700 font-semibold px-2 py-1 rounded text-[11px]">PDF</a>` : '');
-      const progSorted = prog.slice().sort((a, b) => String(a.tanggalTerbit).localeCompare(String(b.tanggalTerbit)));
-      $('dashProgressBody').innerHTML = progSorted.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
-      $('dashClosedBody').innerHTML = closed.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center text-[11px]">${esc(r.lastUpdated)}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
+    function dashCmp(k) {
+      return (a, b) => {
+        if (k === 'noReg') {
+          const x = regKey(a.noReg), y = regKey(b.noReg);
+          if (x !== null && y !== null) return x - y;
+          return String(a.noReg || '').localeCompare(String(b.noReg || ''), 'id', { numeric: true });
+        }
+        if (k === 'age') return (ptpAge(a) ?? -1) - (ptpAge(b) ?? -1);
+        if (k === 'lastUpdated') return updKey(a.lastUpdated).localeCompare(updKey(b.lastUpdated));
+        return String(a[k] || '').localeCompare(String(b[k] || ''), 'id', { numeric: true, sensitivity: 'base' });
+      };
     }
 
-    function showStatusModal(isLoading, title, desc, extraBtnHtml = '') {
+    function sortDashRows(rows, st) {
+      const out = rows.slice();
+      if (!st) {
+        return out.sort((a, b) => {
+          const da = String(a.tanggalTerbit || ''), db = String(b.tanggalTerbit || '');
+          if (da !== db) return db.localeCompare(da);
+          return dashCmp('noReg')(b, a);
+        });
+      }
+      const cmp = dashCmp(st.k), dir = st.dir === 'asc' ? 1 : -1;
+      return out.sort((a, b) => cmp(a, b) * dir);
+    }
+
+    function dashSortBy(table, k) {
+      const st = dashSort[table];
+      dashSort[table] = !st || st.k !== k ? { k, dir: 'asc' } : st.dir === 'asc' ? { k, dir: 'desc' } : null;
+      renderDashTables();
+    }
+
+    function dashHead(table) {
+      const st = dashSort[table];
+      return '<tr class="bg-slate-50 text-slate-700 border-y border-slate-200">' + DASH_COLS[table].map(([k, label]) => {
+        if (k === '_aksi') return `<th class="px-3 py-2.5 font-bold">${label}</th>`;
+        let ind, cls;
+        if (st && st.k === k) { ind = st.dir === 'asc' ? '▲ A-Z' : '▼ Z-A'; cls = 'text-amber-600 font-bold'; }
+        else if (!st && k === 'noReg') { ind = '▼ Terbaru'; cls = 'text-amber-600 font-bold'; }
+        else { ind = '↕'; cls = 'text-slate-400'; }
+        return `<th onclick="dashSortBy('${table}','${k}')" class="px-3 py-2.5 font-bold cursor-pointer select-none whitespace-nowrap hover:bg-slate-100">${label}<span class="ml-1 text-[10px] ${cls}">${ind}</span></th>`;
+      }).join('') + '</tr>';
+    }
+
+    function renderDashTables() {
+      if (!$('dashProgHead')) return;
+      const prog = ptpLogRecords.filter(r => !ptpIsClosed(r)), closed = ptpLogRecords.filter(ptpIsClosed);
+      $('dashProgHead').innerHTML = dashHead('prog');
+      $('dashClosedHead').innerHTML = dashHead('closed');
+
+      const actions = r => `<button type="button" onclick="editPtpFromLog('${esc(r.noReg)}', 1)" class="bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded text-[11px]">Buka</button>` +
+        (r.pdfUrl ? ` <a href="${esc(r.pdfUrl)}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded text-[11px]">PDF</a>` : '');
+      const empty = (msg) => `<tr><td colspan="7" class="px-3 py-8 text-center text-slate-400 text-xs">${msg}</td></tr>`;
+      const common = r => `<td class="px-3 py-2.5 font-mono font-bold text-blue-900 whitespace-nowrap">${esc(r.noReg)}</td><td class="px-3 py-2.5 whitespace-nowrap">${esc(fmtTgl(r.tanggalTerbit))}</td><td class="px-3 py-2.5">${esc(r.auditee)}</td><td class="px-3 py-2.5 font-semibold">${esc(r.partName)}</td><td class="px-3 py-2.5 font-mono text-slate-700 whitespace-nowrap">${esc(r.partNo || '-')}</td>`;
+
+      $('dashProgressBody').innerHTML = sortDashRows(prog, dashSort.prog).map(r => {
+        const a = ptpAge(r);
+        return `<tr class="hover:bg-slate-50">${common(r)}<td class="px-3 py-2.5 font-bold whitespace-nowrap ${a !== null && a > 30 ? 'text-rose-600' : ''}">${a === null ? '-' : a + ' hr'}</td><td class="px-3 py-2.5 whitespace-nowrap">${actions(r)}</td></tr>`;
+      }).join('') || empty('Tidak ada PTP On Progress.');
+
+      $('dashClosedBody').innerHTML = sortDashRows(closed, dashSort.closed).map(r =>
+        `<tr class="hover:bg-slate-50">${common(r)}<td class="px-3 py-2.5 text-[11px] whitespace-nowrap">${esc(r.lastUpdated)}</td><td class="px-3 py-2.5 whitespace-nowrap">${actions(r)}</td></tr>`
+      ).join('') || empty('Belum ada PTP Closed.');
+    }
+
+    function putDashChart(id, cfg) {
+      if (typeof Chart === 'undefined' || !$(id)) return;
+      const ch = dashCharts[id];
+      if (!ch) { dashCharts[id] = new Chart($(id).getContext('2d'), cfg); return; }
+      ch.data.labels = cfg.data.labels;
+      cfg.data.datasets.forEach((ds, i) => { ch.data.datasets[i].data = ds.data; });
+      ch.update('none');
+    }
+
+    function renderDashCharts(prog, closed) {
+      const AMBER = '#f59e0b', GREEN = '#10b981', NAVY = '#1e3a8a';
+      const baseOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } } };
+      const yInt = { beginAtZero: true, ticks: { precision: 0 } };
+
+      putDashChart('dashChStatus', {
+        type: 'doughnut',
+        data: { labels: ['On Progress', 'Closed'], datasets: [{ data: [prog.length, closed.length], backgroundColor: [AMBER, GREEN], borderColor: '#fff', borderWidth: 2 }] },
+        options: Object.assign({}, baseOpts, { cutout: '60%' })
+      });
+
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const months = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        months.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }), n: 0 });
+      }
+      ptpLogRecords.forEach(r => { const m = months.find(x => x.key === String(r.tanggalTerbit || '').substring(0, 7)); if (m) m.n++; });
+      putDashChart('dashChMonthly', {
+        type: 'bar',
+        data: { labels: months.map(m => m.label), datasets: [{ label: 'PTP Terbit', data: months.map(m => m.n), backgroundColor: NAVY, borderRadius: 4, maxBarThickness: 36 }] },
+        options: Object.assign({}, baseOpts, { scales: { y: yInt } })
+      });
+
+      const byAud = {};
+      ptpLogRecords.forEach(r => {
+        const k = r.auditee && r.auditee !== '-' ? r.auditee : '(tanpa auditee)';
+        (byAud[k] = byAud[k] || { p: 0, c: 0 })[ptpIsClosed(r) ? 'c' : 'p']++;
+      });
+      const rows = Object.entries(byAud).sort((a, b) => (b[1].p + b[1].c) - (a[1].p + a[1].c)).slice(0, 8);
+      dashAudFull = rows.map(([k]) => k);
+      putDashChart('dashChAuditee', {
+        type: 'bar',
+        data: {
+          labels: rows.map(([k]) => k.length > 14 ? k.slice(0, 13) + '…' : k),
+          datasets: [
+            { label: 'Open', data: rows.map(([, v]) => v.p), backgroundColor: AMBER, borderRadius: 3, maxBarThickness: 32 },
+            { label: 'Closed', data: rows.map(([, v]) => v.c), backgroundColor: GREEN, borderRadius: 3, maxBarThickness: 32 }
+          ]
+        },
+        options: Object.assign({}, baseOpts, {
+          scales: { x: { stacked: true }, y: Object.assign({ stacked: true }, yInt) },
+          plugins: { legend: baseOpts.plugins.legend, tooltip: { callbacks: { title: items => dashAudFull[items[0].dataIndex] || '' } } }
+        })
+      });
+    }
+
+    function renderDashboard() {
+      if (!$('dashTotal')) return;
+      const closed = ptpLogRecords.filter(ptpIsClosed), prog = ptpLogRecords.filter(r => !ptpIsClosed(r)), total = ptpLogRecords.length;
+      $('dashTotal').textContent = total;
+      $('dashProgress').textContent = prog.length;
+      $('dashClosed').textContent = closed.length;
+      const ages = prog.map(ptpAge).filter(a => a !== null);
+      $('dashAvgAge').textContent = ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
+      $('dashPct').textContent = (total ? Math.round(closed.length / total * 100) : 0) + '%';
+      renderDashCharts(prog, closed);
+      renderDashTables();
+    }
+
+    function showStatusModal(isLoading, title, desc, extraBtnHtml = '', isError = false) {
       $('statusTitle').textContent = title; $('statusDesc').textContent = desc;
-      $('statusIcon').innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>' : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
+      $('statusIcon').className = 'mx-auto w-12 h-12 rounded-full flex items-center justify-center ' + (isError ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-900');
+      $('statusIcon').innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>'
+        : isError ? '<i data-lucide="alert-circle" class="w-6 h-6 text-rose-600"></i>'
+        : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
       $('statusActions').innerHTML = `${extraBtnHtml}<button type="button" onclick="$('statusModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>`;
       $('statusActions').classList.toggle('hidden', isLoading);
       $('statusModal').classList.remove('hidden'); icons();
