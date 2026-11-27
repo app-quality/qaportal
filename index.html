@@ -113,6 +113,7 @@
                 <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"><i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i></button>
               </div>
             </div>
+            <!-- Widget Cloudflare Turnstile -->
             <div id="ts" class="flex justify-center min-h-[65px]"></div>
             <button type="submit" id="loginSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
               <i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Sistem</span>
@@ -189,7 +190,6 @@
           <button type="button" onclick="execReport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Cetak Laporan Eksekutif PDF (Landscape)">
             <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i> Laporan PDF
           </button>
-          <span id="bgSyncBadge" class="hidden bg-amber-500/20 text-amber-200 border border-amber-400/40 px-2.5 py-1 rounded-full text-[11px] font-semibold animate-pulse">Menyimpan...</span>
           <span id="lastSyncTime" class="text-[11px] text-blue-200 hidden sm:inline">Sync: --:--</span>
           <button type="button" onclick="syncAllSystems(true)" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 transition" title="Sinkronkan Semua Data">
             <i id="syncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
@@ -205,6 +205,7 @@
 
     <!-- AREA MODUL E-PTP (AF-PROD-014) -->
     <div id="ptpModuleWrapper" class="hidden max-w-7xl mx-auto px-3 sm:px-5 mt-5 space-y-5">
+      <!-- Banner Header Seragam Seperti Dashboard Lainnya -->
       <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
         <div>
           <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Management System</span>
@@ -221,11 +222,13 @@
         </div>
       </div>
 
+      <!-- Baris Tab Utama E-PTP -->
       <div id="ptpOverviewTabs" class="bg-white rounded-t-xl border-b border-slate-200 grid grid-cols-2 overflow-hidden shadow-sm">
         <button type="button" id="tabBtn5" onclick="switchPtpTab(5)" class="ptp-subtab active py-3 px-3 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard PTP</span></button>
         <button type="button" id="tabBtn4" onclick="switchPtpTab(4)" class="ptp-subtab py-3 px-3 text-xs sm:text-sm text-slate-600 flex items-center justify-center gap-1.5"><i data-lucide="list-checks" class="w-4 h-4"></i><span>Log Register (<span id="logTotalBadge">0</span>)</span></button>
       </div>
 
+      <!-- Baris Navigasi Form Input / Edit E-PTP -->
       <div id="ptpEditorNav" class="hidden bg-white rounded-t-xl border-b border-slate-200 overflow-hidden shadow-sm">
         <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
@@ -502,7 +505,7 @@
         </div>
 
         <div id="actionButtonsBar" class="hidden mt-8 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-xs text-slate-500"><b>Simpan Data</b> memperbarui layar seketika, <b>Simpan &amp; Cetak PDF</b> membuat arsip 1 halaman A4 resmi.</p>
+          <p class="text-xs text-slate-500">Simpan sementara ke Database atau langsung cetak PDF 1 halaman.</p>
           <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
             <button type="button" onclick="executePtpAction('PREVIEW')" class="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="eye" class="w-4 h-4 text-slate-600"></i><span>Preview Form</span></button>
             <button type="button" onclick="executePtpAction('SAVE')" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan Data</span></button>
@@ -594,24 +597,10 @@
     let CURRENT_USER = null, SESSION_TOKEN = '', PENDING_MFA_TOKEN = '';
     let QUALITY_DATA = { claims: [], ngRecords: [], inspections: [], customerList: [] };
     let ACTIVE_MODULE = 'claim';
-    let PENDING_BG_SAVES = 0;
     const PLANTS = ['Sangiang', 'Cikarang', 'Kalisabi', 'Jatake'];
     const DIVISI = ['Bor', 'CNC', 'Cutting', 'Harden', 'Hexagon', 'Punch', 'Rolling', 'Turret'];
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const COLORS = ['#1e3a8a', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
-
-    function setBgSaving(delta) {
-      PENDING_BG_SAVES = Math.max(0, PENDING_BG_SAVES + delta);
-      const b = $('bgSyncBadge');
-      if (b) b.classList.toggle('hidden', PENDING_BG_SAVES === 0);
-    }
-
-    window.addEventListener('beforeunload', e => {
-      if (PENDING_BG_SAVES > 0) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    });
 
     function getEndpointUrl() {
       const u = String(window.PORTAL_CONFIG.APPS_SCRIPT_URL || '').trim();
@@ -843,7 +832,7 @@
     }
 
     /* ===================================================================== */
-    /* QUALITY MODULES SHELL (DESAIN ASLI LENGKAP DENGAN FILTER MINGGUAN)    */
+    /* QUALITY MODULES SHELL, CHARTS, ZOOM, FILTER MINGGUAN & TABEL          */
     /* ===================================================================== */
     const Q_CFGS = {};
     const Q_CHARTS = {};
@@ -855,24 +844,16 @@
       insp:  { col: 'tanggal', dir: 'desc' }
     };
 
-    function getCalendarWeekOfMonth(isoDate) {
-      const p = String(isoDate || '').split('-').map(Number);
-      if (p.length !== 3 || !p[0] || !p[1] || !p[2]) return 0;
-      const firstDow = new Date(p[0], p[1] - 1, 1).getDay();
-      return Math.ceil((p[2] + firstDow) / 7);
-    }
-
     function buildQualityShell() {
       const canEdit = canEditQuality();
       const specs = [
         {
-          id: 'claim', title: 'Monitoring Claim Customer', sub: 'Dashboard Analisis Keluhan Pelanggan, PICA & Status Monitoring 90 Hari',
-          grad: 'from-blue-950 via-blue-900 to-indigo-900',
+          id: 'claim', title: 'Monitoring Claim Customer', sub: 'Tracking Claim Eksternal, PICA & Status Monitoring 90 Hari',
           kpis: [
-            ['Total Claim', 'qk-claim-tot', 'border-t-4 border-t-blue-700 text-blue-950'],
-            ['Total Qty NG', 'qk-claim-ng', 'border-t-4 border-t-rose-600 text-rose-700'],
-            ['Status Monitoring', 'qk-claim-mon', 'border-t-4 border-t-amber-500 text-amber-700'],
-            ['Status Closed', 'qk-claim-cls', 'border-t-4 border-t-emerald-600 text-emerald-700']
+            ['Total Claim', 'qk-claim-tot', 'bg-blue-950 text-white'],
+            ['Total Qty NG', 'qk-claim-ng', 'bg-rose-50 border-rose-200 text-rose-900'],
+            ['Monitoring (Open)', 'qk-claim-mon', 'bg-amber-50 border-amber-200 text-amber-900'],
+            ['Closed', 'qk-claim-cls', 'bg-emerald-50 border-emerald-200 text-emerald-900']
           ],
           extraFilters: `
             <select id="qf-claim-plant" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Plant</option>${PLANTS.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
@@ -880,10 +861,10 @@
             <select id="qf-claim-status" onchange="renderQualityModule('claim')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Status</option><option value="Monitoring">Monitoring</option><option value="Closed">Closed</option></select>
           `,
           charts: [
-            ['qc-claim-trend', 'Tren Claim Bulanan (Jumlah Kasus & Qty NG)'],
-            ['qc-claim-cust', 'Top Customer Claim (Berdasarkan Qty NG)'],
-            ['qc-claim-pareto', 'Pareto Jenis NG Claim Customer (Qty & Kumulatif %)'],
-            ['qc-claim-plant', 'Distribusi Claim Per ACJ Plant']
+            ['qc-claim-trend', 'Tren Claim Bulanan (Kasus & Qty NG)'],
+            ['qc-claim-cust', 'Top Customer Claim (Qty NG)'],
+            ['qc-claim-pareto', 'Pareto Jenis NG Claim'],
+            ['qc-claim-plant', 'Distribusi Per Plant']
           ],
           headers: [
             ['idRegister', 'ID Reg'], ['tanggalClaim', 'Tanggal'], ['acjPlant', 'Plant'], ['namaCustomer', 'Customer'],
@@ -891,22 +872,21 @@
           ]
         },
         {
-          id: 'ng', title: 'Database NG Internal', sub: 'Monitoring Reject Produksi, Pareto Jenis NG, Faktor Penyebab & Rasio NG',
-          grad: 'from-slate-900 via-rose-950 to-slate-900',
+          id: 'ng', title: 'Database NG Internal', sub: 'Analisis Pareto Reject Produksi, Rasio NG & Kinerja Divisi',
           kpis: [
-            ['Total Kasus NG', 'qk-ng-tot', 'border-t-4 border-t-blue-700 text-blue-950'],
-            ['Total Qty NG', 'qk-ng-qty', 'border-t-4 border-t-rose-600 text-rose-700'],
-            ['Total Qty Produksi', 'qk-ng-prod', 'border-t-4 border-t-slate-600 text-slate-800'],
-            ['Rata-rata Ratio NG', 'qk-ng-rat', 'border-t-4 border-t-amber-500 text-amber-700']
+            ['Total Kasus NG', 'qk-ng-tot', 'bg-blue-950 text-white'],
+            ['Total Qty NG', 'qk-ng-qty', 'bg-rose-50 border-rose-200 text-rose-900'],
+            ['Total Produksi', 'qk-ng-prod', 'bg-slate-50 border-slate-200 text-slate-900'],
+            ['Rata-rata Ratio NG', 'qk-ng-rat', 'bg-amber-50 border-amber-200 text-amber-900']
           ],
           extraFilters: `
             <select id="qf-ng-div" onchange="renderQualityModule('ng')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Divisi</option>${DIVISI.map(d => `<option value="${d}">${d}</option>`).join('')}</select>
             <select id="qf-ng-part" onchange="renderQualityModule('ng')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Part</option></select>
           `,
           charts: [
-            ['qc-ng-trend', 'Tren Qty NG Internal Bulanan'],
-            ['qc-ng-pareto', 'Pareto Jenis NG Internal (Qty & Kumulatif %)'],
-            ['qc-ng-div', 'Distribusi Qty NG Per Divisi'],
+            ['qc-ng-trend', 'Tren Qty NG Bulanan'],
+            ['qc-ng-pareto', 'Pareto Jenis NG Internal'],
+            ['qc-ng-div', 'Qty NG Per Divisi'],
             ['qc-ng-part', 'Top 8 Part NG Tertinggi']
           ],
           headers: [
@@ -915,23 +895,22 @@
           ]
         },
         {
-          id: 'insp', title: 'Data Final Inspection', sub: 'Monitoring Hasil Pengecekan Lot, Qty OK / NG / Repair & First Pass Yield',
-          grad: 'from-slate-900 via-emerald-950 to-teal-900',
+          id: 'insp', title: 'Data Final Inspection', sub: 'Monitoring Hasil Pengecekan Lot, OK / NG / Repair & Yield Rate',
           kpis: [
-            ['Total Lot Check', 'qk-insp-lot', 'border-t-4 border-t-blue-700 text-blue-950'],
-            ['Total Qty OK', 'qk-insp-ok', 'border-t-4 border-t-emerald-600 text-emerald-700'],
-            ['Total Qty NG', 'qk-insp-ng', 'border-t-4 border-t-rose-600 text-rose-700'],
-            ['First Pass Yield (FPY)', 'qk-insp-fpy', 'border-t-4 border-t-amber-500 text-amber-700']
+            ['Total Lot Check', 'qk-insp-lot', 'bg-blue-950 text-white'],
+            ['Total Qty OK', 'qk-insp-ok', 'bg-emerald-50 border-emerald-200 text-emerald-900'],
+            ['Total Qty NG', 'qk-insp-ng', 'bg-rose-50 border-rose-200 text-rose-900'],
+            ['First Pass Yield', 'qk-insp-fpy', 'bg-amber-50 border-amber-200 text-amber-900']
           ],
           extraFilters: `
             <select id="qf-insp-cust" onchange="renderQualityModule('insp')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Customer</option></select>
             <select id="qf-insp-part" onchange="renderQualityModule('insp')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Part</option></select>
           `,
           charts: [
-            ['qc-insp-trend', 'Tren Hasil Inspection Bulanan (OK vs NG)'],
-            ['qc-insp-cust', 'Top Customer NG Inspection'],
+            ['qc-insp-trend', 'Tren Lot Check & NG Bulanan'],
+            ['qc-insp-cust', 'Qty Check & NG Per Customer'],
             ['qc-insp-part', 'Top 8 Part NG Inspection'],
-            ['qc-insp-comp', 'Komposisi Hasil Pengecekan (OK / NG / Repair)']
+            ['qc-insp-comp', 'Komposisi OK vs NG vs Repair']
           ],
           headers: [
             ['no', 'No'], ['tanggal', 'Tanggal'], ['customer', 'Customer'], ['namaPart', 'Nama Part'],
@@ -942,11 +921,11 @@
 
       $('qualityModulesWrapper').innerHTML = specs.map(sp => `
         <section id="qsec-${sp.id}" class="${sp.id === 'claim' ? '' : 'hidden'} space-y-5">
-          <div class="bg-gradient-to-r ${sp.grad} rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md">
+          <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-4 shadow-md border border-slate-800">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">ACJ Quality Management System</span>
               <h2 class="text-2xl font-extrabold mt-0.5">${sp.title}</h2>
-              <p class="text-xs text-slate-200 mt-1">${sp.sub}</p>
+              <p class="text-xs text-slate-300 mt-1">${sp.sub}</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               ${canEdit ? `<button type="button" onclick="openQualityForm('${sp.id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Input Baru</button>` : ''}
@@ -954,21 +933,16 @@
             </div>
           </div>
 
-          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2">
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-2.5">
             <select id="qf-${sp.id}-year" onchange="renderQualityModule('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs font-semibold bg-white"></select>
-            <select id="qf-${sp.id}-month" onchange="onQMonthChange('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Bulan</option>${MONTHS.map((m, idx) => `<option value="${pd(idx + 1)}">${m}</option>`).join('')}</select>
-            <select id="qf-${sp.id}-week" onchange="renderQualityModule('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white">
-              <option value="">Semua Minggu</option>
-              <option value="1">Minggu 1</option><option value="2">Minggu 2</option><option value="3">Minggu 3</option><option value="4">Minggu 4</option><option value="5">Minggu 5</option>
-            </select>
+            <select id="qf-${sp.id}-month" onchange="renderQualityModule('${sp.id}')" class="rounded-lg border-slate-300 border px-2.5 py-1.5 text-xs bg-white"><option value="">Semua Bulan</option>${MONTHS.map((m, idx) => `<option value="${pd(idx + 1)}">${m}</option>`).join('')}</select>
             ${sp.extraFilters}
-            <input type="text" id="qf-${sp.id}-search" oninput="renderQualityTable('${sp.id}')" placeholder="Cari part, jenis NG, ID..." class="flex-1 min-w-[150px] rounded-lg border-slate-300 border px-3 py-1.5 text-xs" />
-            <button type="button" onclick="resetQualityFilters('${sp.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Reset</button>
+            <input type="text" id="qf-${sp.id}-search" oninput="renderQualityTable('${sp.id}')" placeholder="Cari part, jenis NG, ID..." class="flex-1 min-w-[160px] rounded-lg border-slate-300 border px-3 py-1.5 text-xs" />
             <span id="qdrill-${sp.id}" class="hidden inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-[11px] font-bold"></span>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            ${sp.kpis.map(k => `<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm ${k[2]}"><p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">${k[0]}</p><p id="${k[1]}" class="text-2xl font-extrabold mt-1">0</p></div>`).join('')}
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            ${sp.kpis.map(k => `<div class="rounded-xl p-4 border ${k[2]}"><p class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">${k[0]}</p><p id="${k[1]}" class="text-2xl font-extrabold mt-1">0</p></div>`).join('')}
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -978,7 +952,7 @@
                   <p class="text-xs font-bold text-slate-800">${c[1]}</p>
                   <button type="button" onclick="openChartZoom('${c[0]}','${esc(c[1])}')" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-900 transition" title="Perbesar Grafik (Zoom)"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
                 </div>
-                <div class="h-60 relative"><canvas id="${c[0]}"></canvas></div>
+                <div class="h-56 relative"><canvas id="${c[0]}"></canvas></div>
               </div>
             `).join('')}
           </div>
@@ -1005,21 +979,6 @@
         </section>
       `).join('');
       icons();
-    }
-
-    function onQMonthChange(m) {
-      const wk = $(`qf-${m}-week`);
-      if (wk && !$(`qf-${m}-month`)?.value) wk.value = '';
-      renderQualityModule(m);
-    }
-
-    function resetQualityFilters(m) {
-      ['year', 'month', 'week', 'plant', 'cust', 'status', 'div', 'part', 'search'].forEach(k => {
-        const el = $(`qf-${m}-${k}`);
-        if (el) el.value = '';
-      });
-      clearQDrill(m);
-      renderQualityModule(m);
     }
 
     function setQDrill(m, field, val, label) {
@@ -1103,7 +1062,6 @@
     function getFilteredQualityRows(m) {
       const yr = $(`qf-${m}-year`)?.value || '';
       const mo = $(`qf-${m}-month`)?.value || '';
-      const wk = Number($(`qf-${m}-week`)?.value || 0);
       if (m === 'claim') {
         const pl = $('qf-claim-plant')?.value || '';
         const cu = $('qf-claim-cust')?.value || '';
@@ -1111,7 +1069,6 @@
         return QUALITY_DATA.claims.filter(r =>
           (!yr || r.tanggalClaim.startsWith(yr)) &&
           (!mo || r.tanggalClaim.slice(5, 7) === mo) &&
-          (!wk || getCalendarWeekOfMonth(r.tanggalClaim) === wk) &&
           (!pl || r.acjPlant === pl) &&
           (!cu || r.namaCustomer === cu) &&
           (!st || r.statusClaim === st)
@@ -1123,7 +1080,6 @@
         return QUALITY_DATA.ngRecords.filter(r =>
           (!yr || r.tanggal.startsWith(yr)) &&
           (!mo || r.tanggal.slice(5, 7) === mo) &&
-          (!wk || getCalendarWeekOfMonth(r.tanggal) === wk) &&
           (!dv || r.divisi === dv) &&
           (!pt || r.namaPart === pt)
         );
@@ -1133,7 +1089,6 @@
       return QUALITY_DATA.inspections.filter(r =>
         (!yr || r.tanggal.startsWith(yr)) &&
         (!mo || r.tanggal.slice(5, 7) === mo) &&
-        (!wk || getCalendarWeekOfMonth(r.tanggal) === wk) &&
         (!cu || r.customer === cu) &&
         (!pt || r.namaPart === pt)
       );
@@ -1146,35 +1101,6 @@
         map[k] = (map[k] || 0) + valFn(r);
       });
       return Object.entries(map).sort((a, b) => b[1] - a[1]);
-    }
-
-    function buildParetoConfig(entries, barColor, onClickCb) {
-      const top = entries.slice(0, 8);
-      const total = top.reduce((s, x) => s + x[1], 0);
-      let acc = 0;
-      const cumPct = top.map(x => {
-        acc += x[1];
-        return total > 0 ? Math.round((acc / total) * 100) : 0;
-      });
-      return {
-        type: 'bar',
-        data: {
-          labels: top.map(x => x[0]),
-          datasets: [
-            { label: 'Qty NG', data: top.map(x => x[1]), backgroundColor: barColor, yAxisID: 'y', order: 2 },
-            { label: 'Kumulatif (%)', data: cumPct, type: 'line', borderColor: '#f59e0b', backgroundColor: '#f59e0b', tension: 0.25, yAxisID: 'y1', order: 1 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          onClick: onClickCb,
-          scales: {
-            y: { beginAtZero: true },
-            y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => v + '%' } }
-          }
-        }
-      };
     }
 
     function renderAllQualityModules() {
@@ -1213,10 +1139,15 @@
           }
         });
 
-        const topNg = groupSum(rows, r => r.keteranganJenisNG, r => r.qtyNG);
-        drawQChart('qc-claim-pareto', buildParetoConfig(topNg, '#ef4444', (_, el) => {
-          if (el.length && topNg[el[0].index]) setQDrill('claim', 'keteranganJenisNG', topNg[el[0].index][0], topNg[el[0].index][0]);
-        }));
+        const topNg = groupSum(rows, r => r.keteranganJenisNG, r => r.qtyNG).slice(0, 8);
+        drawQChart('qc-claim-pareto', {
+          type: 'bar',
+          data: { labels: topNg.map(x => x[0]), datasets: [{ label: 'Qty NG', data: topNg.map(x => x[1]), backgroundColor: '#ef4444' }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            onClick: (_, el) => { if (el.length) setQDrill('claim', 'keteranganJenisNG', topNg[el[0].index][0], topNg[el[0].index][0]); }
+          }
+        });
 
         const byPlant = groupSum(rows, r => r.acjPlant, () => 1);
         drawQChart('qc-claim-plant', {
@@ -1242,10 +1173,15 @@
           options: { responsive: true, maintainAspectRatio: false }
         });
 
-        const topNg = groupSum(rows, r => r.jenisNG, r => r.qtyNG);
-        drawQChart('qc-ng-pareto', buildParetoConfig(topNg, '#1e3a8a', (_, el) => {
-          if (el.length && topNg[el[0].index]) setQDrill('ng', 'jenisNG', topNg[el[0].index][0], topNg[el[0].index][0]);
-        }));
+        const topNg = groupSum(rows, r => r.jenisNG, r => r.qtyNG).slice(0, 8);
+        drawQChart('qc-ng-pareto', {
+          type: 'bar',
+          data: { labels: topNg.map(x => x[0]), datasets: [{ label: 'Qty NG', data: topNg.map(x => x[1]), backgroundColor: '#1e3a8a' }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            onClick: (_, el) => { if (el.length) setQDrill('ng', 'jenisNG', topNg[el[0].index][0], topNg[el[0].index][0]); }
+          }
+        });
 
         const byDiv = groupSum(rows, r => r.divisi, r => r.qtyNG);
         drawQChart('qc-ng-div', {
@@ -1543,66 +1479,36 @@
       XLSX.writeFile(wb, `ACJ_${m.toUpperCase()}_${todayStr()}.xlsx`);
     }
 
-    /* --- LAPORAN EKSEKUTIF PDF (LANDSCAPE RAMAH TINTA + PERBANDINGAN TAHUN LALU) --- */
     function execReport() {
       if (!window.jspdf) return toast('Library PDF belum siap.', false);
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const curYear = String(new Date().getFullYear());
-      const prevYear = String(Number(curYear) - 1);
+      doc.setFontSize(14);
+      doc.text('LAPORAN EKSEKUTIF QUALITY & E-PTP - PT. ADHI CHANDRA JAYA', 14, 15);
+      doc.setFontSize(9);
+      doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')} | Oleh: ${CURRENT_USER ? CURRENT_USER.fullName : 'System'}`, 14, 21);
 
-      doc.setFontSize(13);
-      doc.setFont(undefined, 'bold');
-      doc.text('LAPORAN EKSEKUTIF QUALITY & E-PTP — PT. ADHI CHANDRA JAYA', 14, 14);
-      doc.setFontSize(8.5);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')} | Oleh: ${CURRENT_USER ? CURRENT_USER.fullName : 'System'} | Perbandingan Tahun ${prevYear} vs ${curYear}`, 14, 19.5);
-
-      const clCur = QUALITY_DATA.claims.filter(r => r.tanggalClaim.startsWith(curYear));
-      const clPrev = QUALITY_DATA.claims.filter(r => r.tanggalClaim.startsWith(prevYear));
-      const ngCur = QUALITY_DATA.ngRecords.filter(r => r.tanggal.startsWith(curYear));
-      const ngPrev = QUALITY_DATA.ngRecords.filter(r => r.tanggal.startsWith(prevYear));
-      const inCur = QUALITY_DATA.inspections.filter(r => r.tanggal.startsWith(curYear));
-      const inPrev = QUALITY_DATA.inspections.filter(r => r.tanggal.startsWith(prevYear));
-
-      const tblStyle = {
-        theme: 'grid',
-        styles: { fontSize: 8, textColor: [20, 20, 20], lineColor: [180, 180, 180], lineWidth: 0.2 },
-        headStyles: { fillColor: [240, 244, 248], textColor: [15, 23, 42], fontStyle: 'bold' }
-      };
-
-      doc.autoTable(Object.assign({}, tblStyle, {
-        startY: 23,
-        head: [['Ringkasan Kinerja Quality', `Tahun ${prevYear}`, `Tahun ${curYear} (Berjalan)`, 'Total Keseluruhan', 'Status Open / Monitoring']],
+      doc.autoTable({
+        startY: 26,
+        head: [['Modul Quality', 'Total Kasus / Lot', 'Total Qty NG', 'Open / Monitoring', 'Closed']],
         body: [
-          ['Claim Customer (Kasus / Qty NG)', `${clPrev.length} / ${fmt(clPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${clCur.length} / ${fmt(clCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${QUALITY_DATA.claims.length} / ${fmt(QUALITY_DATA.claims.reduce((s, r) => s + r.qtyNG, 0))}`, `${QUALITY_DATA.claims.filter(r => r.statusClaim !== 'Closed').length} Monitoring`],
-          ['Database NG Internal (Kasus / Qty NG)', `${ngPrev.length} / ${fmt(ngPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${ngCur.length} / ${fmt(ngCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${QUALITY_DATA.ngRecords.length} / ${fmt(QUALITY_DATA.ngRecords.reduce((s, r) => s + r.qtyNG, 0))}`, '-'],
-          ['Final Inspection (Lot / Qty NG)', `${inPrev.length} / ${fmt(inPrev.reduce((s, r) => s + r.qtyNG, 0))}`, `${inCur.length} / ${fmt(inCur.reduce((s, r) => s + r.qtyNG, 0))}`, `${QUALITY_DATA.inspections.length} / ${fmt(QUALITY_DATA.inspections.reduce((s, r) => s + r.qtyNG, 0))}`, '-'],
-          ['E-PTP AF-PROD-014 (Total Dokumen)', '-', '-', `${PTP_LIST.length} Dokumen`, `${PTP_LIST.filter(p => !String(p.status).toLowerCase().includes('closed')).length} On Progress`]
+          ['Claim Customer', QUALITY_DATA.claims.length, fmt(QUALITY_DATA.claims.reduce((s, r) => s + r.qtyNG, 0)), QUALITY_DATA.claims.filter(r => r.statusClaim !== 'Closed').length, QUALITY_DATA.claims.filter(r => r.statusClaim === 'Closed').length],
+          ['Database NG Internal', QUALITY_DATA.ngRecords.length, fmt(QUALITY_DATA.ngRecords.reduce((s, r) => s + r.qtyNG, 0)), '-', '-'],
+          ['Data Inspection', QUALITY_DATA.inspections.length, fmt(QUALITY_DATA.inspections.reduce((s, r) => s + r.qtyNG, 0)), '-', '-'],
+          ['E-PTP (AF-PROD-014)', PTP_LIST.length, '-', PTP_LIST.filter(p => !String(p.status).toLowerCase().includes('closed')).length, PTP_LIST.filter(p => String(p.status).toLowerCase().includes('closed')).length]
         ]
-      }));
+      });
 
-      const topNgParts = groupSum(QUALITY_DATA.ngRecords, r => r.namaPart, r => r.qtyNG).slice(0, 8);
-      doc.autoTable(Object.assign({}, tblStyle, {
-        startY: doc.lastAutoTable.finalY + 6,
-        head: [['Top Part NG Internal Tertinggi', 'Total Qty NG (Pcs)', 'Porsi (%)']],
-        body: (() => {
-          const totAllNg = topNgParts.reduce((s, x) => s + x[1], 0) || 1;
-          return topNgParts.map(x => [x[0], fmt(x[1]), ((x[1] / totAllNg) * 100).toFixed(1) + '%']);
-        })()
-      }));
-
-      doc.autoTable(Object.assign({}, tblStyle, {
-        startY: doc.lastAutoTable.finalY + 6,
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 8,
         head: [['No. Reg. PTP', 'Tanggal', 'Auditee', 'Part Name', 'Part No.', 'Problem', 'Status']],
-        body: PTP_LIST.slice(0, 18).map(p => [p.noReg, p.tanggalTerbit, p.auditee, p.partName, p.partNo, p.problem, p.status])
-      }));
-
+        body: PTP_LIST.slice(0, 20).map(p => [p.noReg, p.tanggalTerbit, p.auditee, p.partName, p.partNo, p.problem, p.status])
+      });
       doc.save(`Executive_Report_ACJ_${todayStr()}.pdf`);
     }
 
     /* ===================================================================== */
-    /* MODUL E-PTP (AF-PROD-014) — OPTIMISTIC SAVE & PDF 1 HALAMAN RESMI     */
+    /* MODUL E-PTP (AF-PROD-014)                                             */
     /* ===================================================================== */
     const SIG_PADS = {};
     let PTP_LIST = [], PTP_REF_ATTACHMENTS = [], PTP_REF_NEW = [];
@@ -2027,42 +1933,6 @@
       });
     }
 
-    function applyOptimisticPtpItem(data, pdfUrl = '') {
-      const lookup = data.originalNoReg || data.noReg;
-      const now = new Date();
-      const stamp = `${pd(now.getDate())}/${pd(now.getMonth() + 1)}/${now.getFullYear()} ${pd(now.getHours())}:${pd(now.getMinutes())}`;
-      const slim = Object.assign({}, data);
-      Object.keys(slim).forEach(k => { if (/Base64$/.test(k) || k === 'refFilesNew') delete slim[k]; });
-
-      const idx = PTP_LIST.findIndex(p => p.noReg === lookup);
-      const existingPdf = idx >= 0 ? PTP_LIST[idx].pdfUrl : '';
-      const item = {
-        noReg: data.noReg,
-        tanggalTerbit: data.tanggalTerbit || todayStr(),
-        auditee: data.auditee || '-',
-        auditor: data.auditor || '-',
-        lokasi: data.lokasi || '-',
-        sumber: data.sumber || '-',
-        noRefSumber: data.noRefSumber || '-',
-        kategori: data.kategori || '-',
-        partName: data.partName || '-',
-        partNo: data.partNo || '-',
-        problem: data.problem || '-',
-        qtyNg: data.qtyNg || '-',
-        hasilSortir: data.hasilSortir || '-',
-        status: data.statusEvaluasi || 'Tidak / Open',
-        pdfUrl: pdfUrl || existingPdf || '',
-        lastUpdated: stamp,
-        dataJson: JSON.stringify(slim)
-      };
-
-      if (idx >= 0) PTP_LIST[idx] = item;
-      else PTP_LIST.unshift(item);
-
-      renderPtpDashboard();
-      renderLogRegisterTable();
-    }
-
     async function executePtpAction(type) {
       const data = collectPtpFormData();
       if (type === 'PREVIEW') {
@@ -2086,47 +1956,18 @@
         return toast('Auditee dan Auditor wajib diisi pada Tahap 1.', false);
       }
 
-      if (type === 'SAVE') {
-        const tempNoReg = data.noReg;
-        applyOptimisticPtpItem(data);
-        closePtpEditor();
-        toast(`PTP ${tempNoReg} diperbarui di layar, menyimpan ke server...`);
-        setBgSaving(1);
-
-        apiCall('handlePtpAction', 'SAVE', data)
-          .then(res => {
-            if (res && res.noReg && res.noReg !== tempNoReg) {
-              const i = PTP_LIST.findIndex(p => p.noReg === tempNoReg);
-              if (i >= 0) {
-                PTP_LIST[i].noReg = res.noReg;
-                renderPtpDashboard();
-                renderLogRegisterTable();
-              }
-            }
-            toast(res.message || `PTP ${res.noReg || tempNoReg} tersimpan permanen di server!`);
-          })
-          .catch(err => {
-            toast('Gagal menyimpan ke server: ' + err.message, false);
-            syncAllSystems(false);
-          })
-          .finally(() => setBgSaving(-1));
-        return;
-      }
-
       $('statusModal').classList.remove('hidden');
-      $('modalTitle').textContent = 'Menyimpan & Membuat PDF 1 Halaman Resmi...';
-      $('modalMessage').textContent = 'Menyimpan arsip ke Google Drive & membuka dokumen PDF.';
+      $('modalTitle').textContent = type === 'PDF' ? 'Menyimpan & Membuat PDF 1 Halaman...' : 'Menyimpan Data PTP...';
+      $('modalMessage').textContent = 'Mohon tunggu sebentar.';
       $('modalActionContainer').innerHTML = '';
 
       try {
-        const res = await apiCall('handlePtpAction', 'PDF', data);
+        const res = await apiCall('handlePtpAction', type, data);
         $('statusModal').classList.add('hidden');
-        if (res.noReg) data.noReg = res.noReg;
-        if (res.refAttachments) data.refAttachments = res.refAttachments;
-        applyOptimisticPtpItem(data, res.pdfUrl || '');
-        closePtpEditor();
-        toast(`PTP ${data.noReg} tersimpan & PDF 1 halaman siap!`);
+        toast(res.message || `PTP ${res.noReg} berhasil diproses!`);
         if (res.pdfUrl) window.open(res.pdfUrl, '_blank');
+        await syncAllSystems(false);
+        closePtpEditor();
       } catch (e) {
         $('statusModal').classList.add('hidden');
         toast(e.message, false);
