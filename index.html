@@ -436,9 +436,89 @@
               <th class="p-2.5 text-center">Aksi</th>
             </tr></thead><tbody id="dashClosedBody" class="divide-y divide-slate-100"></tbody></table></div>
           </div>
-          <div class="border border-emerald-200 rounded-xl overflow-hidden">
-            <div class="bg-emerald-50 px-4 py-2.5"><h4 class="text-xs font-bold text-emerald-800">PTP Closed (Terbaru di Atas)</h4></div>
-            <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead><tr class="bg-slate-50 text-slate-600"><th class="p-2.5">No. Reg.</th><th class="p-2.5">Tanggal</th><th class="p-2.5">Auditee</th><th class="p-2.5">Part Name</th><th class="p-2.5">Part No</th><th class="p-2.5 text-center">Tgl Update</th><th class="p-2.5 text-center">Aksi</th></tr></thead><tbody id="dashClosedBody" class="divide-y divide-slate-100"></tbody></table></div>
+        </div>
+
+        <!-- Baris Tombol Aksi E-PTP -->
+        <div id="actionButtonsBar" class="hidden mt-6 pt-5 border-t border-slate-200 flex flex-wrap items-center justify-end gap-3">
+          <button type="button" onclick="executePtpAction('SAVE')" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1.5"><i data-lucide="save" class="w-4 h-4"></i> Simpan Data PTP</button>
+          <button type="button" onclick="executePtpAction('PREVIEW')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1.5"><i data-lucide="eye" class="w-4 h-4"></i> Print Preview</button>
+          <button type="button" onclick="executePtpAction('PDF')" class="bg-blue-900 hover:bg-blue-950 text-white text-xs font-bold px-5 py-2.5 rounded-lg flex items-center gap-1.5 shadow"><i data-lucide="file-down" class="w-4 h-4"></i> Simpan &amp; Cetak PDF (1 Hal.)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Datalist Customer & Modal Quality -->
+  <datalist id="dlCust"></datalist>
+  <div id="qualityModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm overflow-y-auto p-4"></div>
+
+  <!-- Modal Zoom Chart Layar Penuh -->
+  <div id="chartZoomModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this) closeChartZoom()">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full p-4 sm:p-6 flex flex-col gap-3">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h3 id="chartZoomTitle" class="font-bold text-sm sm:text-base text-slate-900">Detail Grafik</h3>
+          <p id="chartZoomSub" class="text-xs text-slate-500">Klik batang/irisan grafik untuk memfilter Log Register, atau tekan Esc untuk menutup.</p>
+        </div>
+        <button type="button" onclick="closeChartZoom()" class="p-2 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold transition" title="Tutup (Esc)">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="relative w-full h-[65vh] sm:h-[75vh]">
+        <canvas id="zoomedChartCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Status Proses E-PTP -->
+  <div id="statusModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center space-y-4">
+      <div id="statusIcon" class="mx-auto w-12 h-12 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center"></div>
+      <h3 id="statusTitle" class="text-base font-bold text-slate-800">Memproses...</h3>
+      <p id="statusDesc" class="text-xs text-slate-500"></p>
+      <div id="statusActions" class="hidden pt-2 flex justify-center gap-2"></div>
+    </div>
+  </div>
+
+  <!-- Modal Print Preview Form E-PTP -->
+  <div id="previewModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <div class="bg-blue-950 text-white px-5 py-3 flex items-center justify-between">
+        <span class="text-sm font-bold">Print Preview Dokumen PTP (AF-PROD-014)</span>
+        <button type="button" onclick="$('previewModal').classList.add('hidden')" class="text-slate-300 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+      <div id="previewModalBody" class="p-4 overflow-y-auto bg-slate-100 flex-1"></div>
+    </div>
+  </div>
+
+  <script>
+    /* =================================================================== */
+    /* KONFIGURASI BACKEND & CLOUDFLARE TURNSTILE                          */
+    /* =================================================================== */
+    window.PORTAL_CONFIG = {
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzg42z5pU_xO65zM5F2J2P1s29G989K_rW7iD5aN1k4B0X-pD45zS3hT462739A-A0c/exec',
+      TURNSTILE_SITEKEY: '0x4AAAAAAF_JNNxBwXPQpQm_'
+    };
+
+    const $ = id => document.getElementById(id);
+    const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const num = v => Number(String(v == null ? 0 : v).replace(/[^0-9.\-]/g, '')) || 0;
+    const fmt = v => Math.round(num(v)).toLocaleString('id-ID');
+    const pd = v => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || '')); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+    const todayStr = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const add90 = s => { const d = pd(s); if (!d) return ''; d.setDate(d.getDate() + 90); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const readB64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(new Error('Gagal membaca file')); r.readAsDataURL(f); });
+    const icons = () => { if (window.lucide) lucide.createIcons(); };
+
+    let toastTimer = null;
+    function toast(msg, type = 'info') {
+      const t = $('toast'); if (!t) return;
+      t.textContent = msg;
+      t.className = 'fixed bottom-5 right-5 z-[80] transition-all duration-300 px-5 py-3 rounded-xl shadow-2xl text-sm font-medium pointer-events-none max-w-sm ' +
+        (type === 'success' ? 'bg-emerald-700 text-white' : type === 'error' ? 'bg-rose-700 text-white' : 'bg-slate-900 text-white');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3500);
+    }
     let dashPtpSort = { prog: null, closed: null };
     function toggleDashPtpSort(tbl, k) {
       const cur = dashPtpSort[tbl];
@@ -518,6 +598,14 @@
 
       $('dashProgressBody').innerHTML = progSorted.map(r => { const a = ageOf(r); return `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center font-bold">${a === null ? '-' : a + ' hr'}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`; }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada PTP On Progress.</td></tr>';
       $('dashClosedBody').innerHTML = closedSorted.map(r => `<tr><td class="p-2.5 font-mono font-bold text-blue-900">${esc(r.noReg)}</td><td class="p-2.5">${esc(r.tanggalTerbit)}</td><td class="p-2.5">${esc(r.auditee)}</td><td class="p-2.5 font-semibold">${esc(r.partName)}</td><td class="p-2.5 font-mono text-slate-700">${esc(r.partNo || '-')}</td><td class="p-2.5 text-center text-[11px]">${esc(r.lastUpdated)}</td><td class="p-2.5 text-center">${actions(r)}</td></tr>`).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada PTP Closed.</td></tr>';
+    }
+
+    function showStatusModal(isLoading, title, desc, extraBtnHtml = '') {
+      $('statusTitle').textContent = title; $('statusDesc').textContent = desc;
+      $('statusIcon').innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>' : '<i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>';
+      $('statusActions').innerHTML = `${extraBtnHtml}<button type="button" onclick="$('statusModal').classList.add('hidden')" class="bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2 rounded-lg">Tutup</button>`;
+      $('statusActions').classList.toggle('hidden', isLoading);
+      $('statusModal').classList.remove('hidden'); icons();
     }
 
     /* --- Cloudflare Turnstile --- */
